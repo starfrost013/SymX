@@ -1,0 +1,49 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
+<#@ import namespace="System.Text" #>
+<#@ output extension=".cs" #>
+// This file defines the version information - generated using the AssemblyInfo.tt T4 template.
+// This is an automatically generated file - do not modify!
+
+using System.Reflection;
+
+[assembly: AssemblyTitle("<#= SYMX_APPLICATION_NAME #>")]
+[assembly: AssemblyDescription("A Microsoft Symbol Server bulk download tool")]
+[assembly: AssemblyVersion("<#= SYMX_VERSION_MAJOR #>.<#= SYMX_VERSION_MINOR #>.<#= SYMX_VERSION_REVISION #>.<#= SYMX_VERSION_BUILD #>")]
+[assembly: AssemblyFileVersion("<#= SYMX_VERSION_MAJOR #>.<#= SYMX_VERSION_MINOR #>.<#= SYMX_VERSION_REVISION #>.<#= SYMX_VERSION_BUILD #>")]
+[assembly: AssemblyInformationalVersion("<#= SYMX_VERSION_EXTENDED_STRING #>")]
+
+
+namespace SymX
+{
+	public static class SymXVersion
+	{
+		public static string SYMX_APPLICATION_NAME = "<#= SYMX_APPLICATION_NAME #>";
+		public static int SYMX_VERSION_MAJOR = <#= SYMX_VERSION_MAJOR #>;
+		public static int SYMX_VERSION_MINOR = <#= SYMX_VERSION_MINOR #>; 
+		public static int SYMX_VERSION_REVISION = <#= SYMX_VERSION_REVISION #>;
+		public static int SYMX_VERSION_BUILD = <#= SYMX_VERSION_BUILD #>;
+		public static string SYMX_VERSION_SPECIFIER = "<#= SYMX_VERSION_SPECIFIER #>";
+
+		public static string SYMX_VERSION_STRING = "<#= SYMX_VERSION_STRING #>";
+		public static string SYMX_VERSION_EXTENDED_STRING = "<#= SYMX_VERSION_EXTENDED_STRING #>";
+	}
+}
+
+<#+
+
+public static string SYMX_APPLICATION_NAME = "SymX";
+public static int SYMX_VERSION_MAJOR = 3;
+public static int SYMX_VERSION_MINOR = 0; 
+public static int SYMX_VERSION_REVISION = 0;
+public static int SYMX_VERSION_BUILD = (DateTime.UtcNow - new DateTime(2022, 04, 28)).Days;
+public static string SYMX_VERSION_SPECIFIER = "alpha1";
+
+public static string SYMX_VERSION_STRING = $"{SYMX_VERSION_MAJOR}.{SYMX_VERSION_MINOR}.{SYMX_VERSION_REVISION}-{SYMX_VERSION_SPECIFIER}";
+public static string SYMX_VERSION_EXTENDED_STRING = $"{SYMX_VERSION_STRING} (build {SYMX_VERSION_BUILD}, built {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")})";
+
+#>
+
