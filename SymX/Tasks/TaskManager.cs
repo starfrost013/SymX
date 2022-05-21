@@ -129,8 +129,6 @@ namespace SymX
 
             List<string> successfulUrls = new List<string>();
 
-            int successfulUrlsFound = 0;
-
             int noDownloadsAtOnce = CommandLine.NumOfDownloadsAtOnce;
 
             // create a list of tasks
@@ -184,17 +182,18 @@ namespace SymX
 
                 tasks.Clear();
 
+                
                 double percentageCompletion = (((double)i / (double)UrlList.Count)) * 100;
                 string percentageCompletionString = percentageCompletion.ToString("F1");
 
                 // Performance improvement: don't dump to the console so often
                 // allow user to control this in futrue
-                if (i % noDownloadsAtOnce == 0 && CommandLine.Verbosity > Verbosity.Quiet) Console.WriteLine($"{percentageCompletionString}% complete ({i}/{UrlList.Count}), {successfulUrlsFound} files found");
+                if (i % noDownloadsAtOnce == 0 && CommandLine.Verbosity > Verbosity.Quiet) Console.WriteLine($"{percentageCompletionString}% complete ({i}/{UrlList.Count}), {successfulUrls.Count} files found");
 
                 i += (noDownloadsAtOnce - 1);
             }
 
-            if (CommandLine.Verbosity > Verbosity.Quiet) Console.WriteLine($"Took {timer.ElapsedMilliseconds}ms to check {UrlList.Count} URLs");
+            if (CommandLine.Verbosity > Verbosity.Quiet) Console.WriteLine($"Took {timer.ElapsedMilliseconds}ms to check {UrlList.Count} URLs, found {successfulUrls.Count} files");
         }
 
         private static bool TryDownloadFile(string fileName)
@@ -204,6 +203,8 @@ namespace SymX
             HttpRequestMessage headRequest = new HttpRequestMessage(HttpMethod.Head, fileName);
 
             HttpResponseMessage responseMsg = httpClient.Send(headRequest);
+
+            if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine($"HTTP response = {responseMsg.StatusCode}");
 
             return responseMsg.IsSuccessStatusCode;
         }
