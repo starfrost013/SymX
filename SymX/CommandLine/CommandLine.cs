@@ -22,7 +22,7 @@ namespace SymX
         /// The filename to save the file to if downloaded.
         /// </summary>
 
-        public static string OutFileName { get; set; }
+        public static string OutFile { get; set; }
 
         /// <summary>
         /// If true, the list of URLs will be dumped to this filename. 
@@ -74,47 +74,65 @@ namespace SymX
         public static bool DontDownload { get; set; }
 
         /// <summary>
+        /// The number of files to download per second.
+        /// </summary>
+        public static int NumOfDownloadsAtOnce { get; set; }
+
+        /// <summary>
         /// Internal: used to determine if the command-line arguments were parsed successfully.
         /// </summary>
         internal static bool Successful { get; private set; }
 
         static CommandLine()
         {
+            NumOfDownloadsAtOnce = 12;
             Throttle = 30;
             Verbosity = Verbosity.Normal;
         }
 
         public static void Parse(string[] args)
         {
-            foreach (string arg in args)
+            for (int i = 0; i < args.Length; i++)
             {
-                string nArg = arg;
-                nArg = nArg.ToLower(); 
+                string curArg = args[i];
 
-                if (nArg.StartsWith("-"))
+                string nextArg = null;
+                if (args.Length - i > 1) nextArg = args[i + 1];
+
+                curArg = curArg.ToLower(); 
+
+                if (curArg.StartsWith("-"))
                 {
-                    switch (nArg)
+                    switch (curArg)
                     {
                         case "-start":
                         case "-s":
-                            Start = Convert.ToUInt64(arg);
+                            Start = Convert.ToUInt64(nextArg);
                             continue;
                         case "-end":
                         case "-e":
-                            Start = Convert.ToUInt64(arg);
+                            End = Convert.ToUInt64(nextArg);
                             continue;
                         case "-filename":
                         case "-f":
-                            FileName = nArg;
+                            FileName = nextArg;
                             continue;
                         case "-imagesize":
                         case "-i":
-                            ImageSize = nArg;
+                            ImageSize = nextArg;
                             continue;
                         case "-infile":
                         case "-in":
-                            InFile = nArg;
+                            InFile = nextArg;
                             continue;
+                        case "-outfile":
+                        case "-of":
+                            OutFile = nextArg;
+                            continue;
+                        case "-urloutfile":
+                        case "-uof":
+                            UrlOutFile = nextArg;
+                            continue; 
                         case "-quiet":
                         case "-q":
                             Verbosity = Verbosity.Quiet;
@@ -125,19 +143,23 @@ namespace SymX
                             continue;
                         case "-throttle":
                         case "-t":
-                            Throttle = Convert.ToInt32(nArg);
+                            Throttle = Convert.ToInt32(nextArg);
                             continue; 
                         case "-generatecsv":
                         case "-c":
                             CsvGenerate = true;
                             continue;
+                        case "-numdownloads":
+                        case "-n":
+                            NumOfDownloadsAtOnce = Convert.ToInt32(nextArg);
+                            continue;
                         case "-csvinfolder":
                         case "-ci":
-                            CsvInFolder = nArg;
+                            CsvInFolder = nextArg;
                             continue;
                         case "-csvoutfile":
                         case "-co":
-                            CsvOutFile = nArg;
+                            CsvOutFile = nextArg;
                             continue;
                         case "-dontdownload":
                         case "-d":

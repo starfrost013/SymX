@@ -7,11 +7,8 @@ if (CommandLine.Successful)
 {
     CommandLine.PrintVersion();
     TaskManager.GenerateListOfTasks();
-    
-    while (TaskManager.Run())
-    {
 
-    }
+    while (TaskManager.Run()) ;
 }
 else
 {

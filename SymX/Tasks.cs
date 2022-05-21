@@ -9,22 +9,44 @@
     /// </summary>
     public enum Tasks
     {
+        /// <summary>
+        /// Generate a list of URLs.
+        /// </summary>
         GenerateListOfUrls = 0,
 
+        /// <summary>
+        /// Find successful URLs (HEAD request). Goes to Download Files.
+        /// </summary>
         TryDownload = 1,
 
+        /// <summary>
+        /// Download the files that were successfully downloaded.
+        /// </summary>
         DownloadFiles = 2,
 
+        /// <summary>
+        /// A fatal error occurred - print and exit. Goes to exit.
+        /// </summary>
         FatalError = 3,
 
-        SuccessfulDownload = 4,
-
+        /// <summary>
+        /// Generate a CSV file.
+        /// </summary>
         GenerateCsv = 5,
 
-        GenerateUrlList = 6,
+        /// <summary>
+        /// Load a URL list from a file.
+        /// </summary>
+        LoadListOfUrls = 6,
 
+        /// <summary>
+        /// Parse a CSV file contaiing a list of URLs.
+        /// </summary>
         ParseCsv = 7,
 
+        /// <summary>
+        /// Exit the application.
+        /// </summary>
         Exit = 8
     }
 }
