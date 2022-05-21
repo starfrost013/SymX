@@ -1,9 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using SymX;
 
-CommandLine.Parse(args);
-
-if (CommandLine.Successful)
+if (CommandLine.Parse(args))
 {
     CommandLine.PrintVersion();
     TaskManager.GenerateListOfTasks();

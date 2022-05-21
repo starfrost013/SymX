@@ -78,11 +78,6 @@ namespace SymX
         /// </summary>
         public static int NumOfDownloadsAtOnce { get; set; }
 
-        /// <summary>
-        /// Internal: used to determine if the command-line arguments were parsed successfully.
-        /// </summary>
-        internal static bool Successful { get; private set; }
-
         static CommandLine()
         {
             NumOfDownloadsAtOnce = 12;
@@ -90,7 +85,7 @@ namespace SymX
             Verbosity = Verbosity.Normal;
         }
 
-        public static void Parse(string[] args)
+        public static bool Parse(string[] args)
         {
             for (int i = 0; i < args.Length; i++)
             {
@@ -175,7 +170,7 @@ namespace SymX
                 || FileName == null
                 || ImageSize == null)
             {
-                return; 
+                return false;
             }
 
             if (CsvGenerate)
@@ -183,11 +178,17 @@ namespace SymX
                 if (CsvInFolder == null
                     || CsvOutFile == null)
                 {
-                    return;
+                    return false;
                 }
             }
 
-            Successful = true; 
+            if (NumOfDownloadsAtOnce < 0
+                || NumOfDownloadsAtOnce > 30)
+            {;
+                return false; // don't DDOS the servers
+            }
+    
+            return true;
         }
 
         public static void ShowHelp()

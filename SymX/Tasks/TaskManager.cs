@@ -113,12 +113,13 @@ namespace SymX
         {
             if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine("Initialising HttpClient");
 
-            // initialise the http client
+            // initialise the http client (we already instantiate it as a private field)
             // this is so we don't have to add a check for dontdownload
-            httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri("https://msdl.microsoft.com");
 
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("SymX", $"{SymXVersion.SYMX_VERSION_STRING}"));
+            // Fake a DbgX UA.
+            // Just in case (thanks pivotman319)
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Microsoft-Symbol-Server", $"10.1710.0.0"));
 
             TaskList.Add(Tasks.GenerateListOfUrls);
 
@@ -132,7 +133,9 @@ namespace SymX
 
             int noDownloadsAtOnce = CommandLine.NumOfDownloadsAtOnce;
 
-            List<Task> tasks = new List<Task>();
+            // create a list of tasks
+            // consider having it return the url instead
+            List<Task<bool>> tasks = new List<Task<bool>>();
 
             for (int i = 0; i < UrlList.Count; i++)
             {
@@ -155,11 +158,25 @@ namespace SymX
                 // wait for all of our tasks to complete
                 while (waiting)
                 {
+                    // will exit if all tasks complete
                     bool needToWait = false; 
 
-                    foreach (Task task in tasks)
+                    for (int curTask = 0; curTask < tasks.Count; curTask++)
                     {
-                        if (!task.IsCompleted) needToWait = true;
+                        Task<bool> task = tasks[curTask];
+
+                        if (!task.IsCompleted)
+                        {
+                            needToWait = true; // we need to wait as not every task is done
+                        }
+                        else // add to successful url list
+                        {
+                            if (task.Result) // get the current url
+                            {
+                                successfulUrls.Add(UrlList[i + curTask]); // add it
+                            }
+                        }
+
                     }
 
                     waiting = needToWait;
