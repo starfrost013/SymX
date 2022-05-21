@@ -187,7 +187,10 @@ namespace SymX
             {;
                 return false; // don't DDOS the servers
             }
-    
+
+            // default filename
+            if (OutFile == null) OutFile = FileName; 
+
             return true;
         }
 

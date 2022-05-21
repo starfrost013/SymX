@@ -69,9 +69,19 @@ namespace SymX
                         UrlList = GenerateUrlList();
                         continue;
                     case Tasks.TryDownload:
-                        TryDownload();
+                        List<string> successfulUrls = TryDownload();
+                        if (successfulUrls.Count > 0)
+                        {
+                            if (!DownloadSuccessfulFiles(successfulUrls))
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("An error occurred downloading files!\n");
+                                Console.ForegroundColor = ConsoleColor.White;
+                            }
+                        }
+                        
+ 
                         continue; 
-                    
                     // Exit the program.
                     case Tasks.Exit:
                         Environment.Exit(0);
@@ -109,7 +119,11 @@ namespace SymX
             return urlList; 
         }
 
-        private static void TryDownload()
+        /// <summary>
+        /// Tries to download the selected URLs using HEAD requests. 
+        /// </summary>
+        /// <returns>A list of the URLs that successfully downloaded.</returns>
+        private static List<string> TryDownload()
         {
             if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine("Initialising HttpClient");
 
@@ -194,6 +208,8 @@ namespace SymX
             }
 
             if (CommandLine.Verbosity > Verbosity.Quiet) Console.WriteLine($"Took {timer.ElapsedMilliseconds}ms to check {UrlList.Count} URLs, found {successfulUrls.Count} files");
+
+            return successfulUrls;
         }
 
         private static bool TryDownloadFile(string fileName)
@@ -207,6 +223,41 @@ namespace SymX
             if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine($"HTTP response = {responseMsg.StatusCode}");
 
             return responseMsg.IsSuccessStatusCode;
+        }
+
+        private static bool DownloadSuccessfulFiles(List<string> urls)
+        {
+            try
+            {
+                if (CommandLine.Verbosity > Verbosity.Quiet) Console.WriteLine("Downloading successful URLs...");
+
+                foreach (string url in urls)
+                {
+                    if (CommandLine.Verbosity > Verbosity.Quiet)
+                    {
+                        Console.WriteLine($"Downloading {url}... to {CommandLine.OutFile}");
+
+                        // Get a stream of the file 
+                        var stream = httpClient.GetByteArrayAsync(url);
+
+                        // Wait for download to complete (we do this basically synchronously to reduce server load)
+                        while (!stream.IsCompleted) { };
+
+                        using (FileStream fileStream = new FileStream(CommandLine.OutFile, FileMode.Create))
+                        {
+                            fileStream.Write(stream.Result);
+                        }
+                    }
+                }
+
+                return true; 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An exception occurred: {ex}");
+                return false;
+            }
+
         }
     }
 }

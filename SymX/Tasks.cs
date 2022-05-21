@@ -20,11 +20,6 @@
         TryDownload = 1,
 
         /// <summary>
-        /// Download the files that were successfully downloaded.
-        /// </summary>
-        DownloadFiles = 2,
-
-        /// <summary>
         /// A fatal error occurred - print and exit. Goes to exit.
         /// </summary>
         FatalError = 3,
@@ -45,8 +40,13 @@
         ParseCsv = 7,
 
         /// <summary>
+        /// Report information
+        /// </summary>
+        Report = 8,
+
+        /// <summary>
         /// Exit the application.
         /// </summary>
-        Exit = 8
+        Exit = 9
     }
 }
