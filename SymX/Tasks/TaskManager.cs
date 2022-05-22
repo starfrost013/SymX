@@ -112,7 +112,7 @@ namespace SymX
                     ulong imageSizeMin = CommandLine.ImageSizeMin;
                     ulong imageSizeMax = CommandLine.ImageSizeMax;
 
-                    for (ulong curTime = CommandLine.Start; curTime <= CommandLine.End; curTime++)
+                    for (ulong curTime = CommandLine.Start; curTime < CommandLine.End; curTime++)
                     {
                         for (ulong curImageSize = imageSizeMin; curImageSize <= imageSizeMax; curImageSize += IMAGESIZE_PADDING)
                         {
