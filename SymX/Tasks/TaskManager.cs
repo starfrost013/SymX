@@ -52,8 +52,6 @@ namespace SymX
 
         public static bool Run()
         {
-            // if there are no remaining tasks return false.
-
             int numTasks = TaskList.Count;
             int curTask = 1;
 
@@ -67,7 +65,7 @@ namespace SymX
                 Console.Title = taskString;
 
                 if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log(taskString);
-                curTask++;
+                curTask++; 
 
                 switch (currentTask)
                 {
@@ -82,9 +80,6 @@ namespace SymX
                             if (!DownloadSuccessfulFiles(successfulUrls)) NCLogging.Log("An error occurred downloading files!\n", ConsoleColor.Red);
                         }
                         continue;
-                    case Tasks.FatalError:
-                        // A fatal error occurred so we can't continue.
-                        // Nuke the program
                     case Tasks.Exit:
                         // Exit the program.
                         Environment.Exit(0);
@@ -93,7 +88,7 @@ namespace SymX
 
             }
 
-            return (TaskList.Count > 0);
+            return (TaskList.Count > 0);  // if there are no remaining tasks return false.
         }
 
         private static List<string> GenerateUrlList()
@@ -119,16 +114,12 @@ namespace SymX
 
                     for (ulong curTime = CommandLine.Start; curTime < CommandLine.End; curTime++)
                     {
-                        for (ulong curImageSize = imageSizeMin; curImageSize <= imageSizeMax; curImageSize++)
+                        for (ulong curImageSize = imageSizeMin; curImageSize <= imageSizeMax; curImageSize += IMAGESIZE_PADDING)
                         {
                             string fileUrl = $"https://msdl.microsoft.com/download/symbols/{CommandLine.FileName}/{curTime.ToString("x")}{curImageSize.ToString("x")}/{CommandLine.FileName}";
                             if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
                             urlList.Add(fileUrl);
-
-                            curImageSize += (IMAGESIZE_PADDING - 1);
                         }
-
-                        
                     }
                 }
 
@@ -172,7 +163,7 @@ namespace SymX
             // consider having it return the url instead
             List<Task<bool>> tasks = new List<Task<bool>>();
 
-            for (int i = 0; i < UrlList.Count; i++)
+            for (int i = 0; i < UrlList.Count; i += noDownloadsAtOnce)
             {
                 // Set up a batch of downloads (default 12, ~numdownloads)
                 for (int j = 0; j < noDownloadsAtOnce; j++)
@@ -218,15 +209,12 @@ namespace SymX
 
                 tasks.Clear();
 
-                
                 double percentageCompletion = (((double)i / (double)UrlList.Count)) * 100;
                 string percentageCompletionString = percentageCompletion.ToString("F1");
 
                 // Performance improvement: don't dump to the console so often
                 // allow user to control this in futrue
                 if (i % noDownloadsAtOnce == 0 && CommandLine.Verbosity > Verbosity.Quiet) Console.WriteLine($"{percentageCompletionString}% complete ({i}/{UrlList.Count} URLs scanned), {successfulUrls.Count} files found");
-
-                i += (noDownloadsAtOnce - 1);
             }
 
             if (CommandLine.Verbosity > Verbosity.Quiet) NCLogging.Log($"Took {timer.ElapsedMilliseconds / 1000}sec to check {UrlList.Count} URLs, found {successfulUrls.Count} files");
@@ -234,6 +222,11 @@ namespace SymX
             return successfulUrls;
         }
 
+        /// <summary>
+        /// Try and download a file.
+        /// </summary>
+        /// <param name="fileName">A URI to try and download.</param>
+        /// <returns>A boolean determining if the file downloaded successfully.</returns>
         private static bool TryDownloadFile(string fileName)
         {
             if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {fileName}...");

@@ -20,11 +20,6 @@
         TryDownload = 1,
 
         /// <summary>
-        /// A fatal error occurred - print and exit. Goes to exit.
-        /// </summary>
-        FatalError = 3,
-
-        /// <summary>
         /// Generate a CSV file.
         /// </summary>
         GenerateCsv = 5,
@@ -40,7 +35,7 @@
         ParseCsv = 7,
 
         /// <summary>
-        /// Report information
+        /// Report download information
         /// </summary>
         Report = 8,
 
