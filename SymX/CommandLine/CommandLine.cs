@@ -1,4 +1,6 @@
-﻿
+﻿using NuCore.Utilities;
+using System.Globalization;
+
 namespace SymX
 {
     public static class CommandLine
@@ -21,24 +23,34 @@ namespace SymX
         /// <summary>
         /// The filename to save the file to if downloaded.
         /// </summary>
-
         public static string OutFile { get; set; }
 
         /// <summary>
-        /// If true, the list of URLs will be dumped to this filename. 
+        /// If this string is not null, the list of URLs will be dumped to this filename. 
         /// </summary>
         public static string UrlOutFile { get; set; }
 
         /// <summary>
         /// The image size to search for on the symbol server.
+        /// Ignored if both <see cref="ImageSizeMin"/> and <see cref="ImageSizeMax"/> are set.
         /// </summary>
-
         public static string ImageSize { get; set; }
+
+        /// <summary>
+        /// Optional minimum image size to search for on the symbol server. 
+        /// If this and <see cref="ImageSizeMax"/> are set, <see cref="ImageSize"/> is ignored.
+        /// </summary>
+        public static ulong ImageSizeMin { get; set; }
+
+        /// <summary>
+        /// Optional maximum image size to search for on the symbol server. 
+        /// If this and <see cref="ImageSizeMin"/> are set, <see cref="ImageSize"/> is ignored.
+        /// </summary>
+        public static ulong ImageSizeMax { get; set; }
 
         /// <summary>
         /// A MassView-format CSV file containing a list of files, imagesizes, and TimeDateStamps to search for.
         /// </summary>
-
         public static string InFile { get; set; }
 
         /// <summary>
@@ -63,143 +75,183 @@ namespace SymX
         public static Verbosity Verbosity { get; set; }
 
         /// <summary>
-        /// Limit the number of requests per second so as to not throttle the Microsoft symbol servers.
-        /// 30 is the default. Set to -1 for unlimited request speed (dangerous!)
-        /// </summary>
-        public static int Throttle { get; set; }
-
-        /// <summary>
         /// Do not download files. Simply generate a list of URLs, optionally dump them to a file, and exit.
         /// </summary>
         public static bool DontDownload { get; set; }
 
         /// <summary>
-        /// The number of files to download per second.
+        /// If true, logging information will be printed to a file. Respects verbosity. 
+        /// </summary>
+        public static bool LogToFile { get; set; }
+
+        /// <summary>
+        /// Limit the number of requests per second so as to not throttle the Microsoft symbol servers.
+        /// 30 is the default. Set to -1 for unlimited request speed (dangerous!)
         /// </summary>
         public static int NumOfDownloadsAtOnce { get; set; }
 
         static CommandLine()
         {
             NumOfDownloadsAtOnce = 12;
-            Throttle = 30;
             Verbosity = Verbosity.Normal;
         }
 
+        /// <summary>
+        /// Parses command line arguments.
+        /// 
+        /// All error handling related to command-line arguments should be done here for the purposes of code quality.
+        /// </summary>
+        /// <param name="args">The arguments in the form of a string array.</param>
+        /// <returns></returns>
         public static bool Parse(string[] args)
         {
-            for (int i = 0; i < args.Length; i++)
+            try
             {
-                string curArg = args[i];
-
-                string nextArg = null;
-                if (args.Length - i > 1) nextArg = args[i + 1];
-
-                curArg = curArg.ToLower(); 
-
-                if (curArg.StartsWith("-"))
+                for (int i = 0; i < args.Length; i++)
                 {
-                    switch (curArg)
+                    string curArg = args[i];
+
+                    string nextArg = null;
+                    if (args.Length - i > 1) nextArg = args[i + 1];
+
+                    curArg = curArg.ToLower();
+
+                    if (curArg.StartsWith("-"))
                     {
-                        case "-start":
-                        case "-s":
-                            Start = Convert.ToUInt64(nextArg);
-                            continue;
-                        case "-end":
-                        case "-e":
-                            End = Convert.ToUInt64(nextArg);
-                            continue;
-                        case "-filename":
-                        case "-f":
-                            FileName = nextArg;
-                            continue;
-                        case "-imagesize":
-                        case "-i":
-                            ImageSize = nextArg;
-                            continue;
-                        case "-infile":
-                        case "-in":
-                            InFile = nextArg;
-                            continue;
-                        case "-outfile":
-                        case "-of":
-                            OutFile = nextArg;
-                            continue;
-                        case "-urloutfile":
-                        case "-uof":
-                            UrlOutFile = nextArg;
-                            continue; 
-                        case "-quiet":
-                        case "-q":
-                            Verbosity = Verbosity.Quiet;
-                            continue;
-                        case "-verbose":
-                        case "-v":
-                            Verbosity = Verbosity.Verbose;
-                            continue;
-                        case "-throttle":
-                        case "-t":
-                            Throttle = Convert.ToInt32(nextArg);
-                            continue; 
-                        case "-generatecsv":
-                        case "-c":
-                            CsvGenerate = true;
-                            continue;
-                        case "-numdownloads":
-                        case "-n":
-                            NumOfDownloadsAtOnce = Convert.ToInt32(nextArg);
-                            continue;
-                        case "-csvinfolder":
-                        case "-ci":
-                            CsvInFolder = nextArg;
-                            continue;
-                        case "-csvoutfile":
-                        case "-co":
-                            CsvOutFile = nextArg;
-                            continue;
-                        case "-dontdownload":
-                        case "-d":
-                            DontDownload = true;
-                            continue; 
+                        switch (curArg)
+                        {
+                            case "-start":
+                            case "-s":
+                                Start = Convert.ToUInt64(nextArg);
+                                continue;
+                            case "-end":
+                            case "-e":
+                                End = Convert.ToUInt64(nextArg);
+                                continue;
+                            case "-filename":
+                            case "-f":
+                                FileName = nextArg;
+                                continue;
+                            case "-imagesize":
+                            case "-i":
+                                ImageSize = nextArg;
+                                continue;
+                            case "-infile":
+                            case "-in":
+                                InFile = nextArg;
+                                continue;
+                            case "-outfile":
+                            case "-out":
+                            case "-o":
+                                OutFile = nextArg;
+                                continue;
+                            case "-urloutfile":
+                            case "-url":
+                                UrlOutFile = nextArg;
+                                continue;
+                            case "-quiet":
+                            case "-q":
+                                Verbosity = Verbosity.Quiet;
+                                continue;
+                            case "-verbose":
+                            case "-v":
+                                Verbosity = Verbosity.Verbose;
+                                continue;
+                            case "-generatecsv":
+                            case "-g":
+                                CsvGenerate = true;
+                                continue;
+                            case "-numdownloads":
+                            case "-threads":
+                            case "-num":
+                            case "-t":
+                                NumOfDownloadsAtOnce = Convert.ToInt32(nextArg);
+                                continue;
+                            case "-csvinfolder":
+                            case "-ci":
+                                CsvInFolder = nextArg;
+                                continue;
+                            case "-csvoutfile":
+                            case "-co":
+                                CsvOutFile = nextArg;
+                                continue;
+                            case "-logtofile":
+                            case "-log":
+                            case "-l":
+                                LogToFile = true;
+                                continue;
+                            case "-imagesizemin":
+                            case "-imin":
+                                // more concise than ulong Convert.ToHexString, as no byte array conversion is necessary
+                                ImageSizeMin = ulong.Parse(nextArg, NumberStyles.HexNumber);
+                                continue;
+                            case "-imagesizemax":
+                            case "-imax":
+                                ImageSizeMax = ulong.Parse(nextArg, NumberStyles.HexNumber);
+                                continue;
+                            case "-dontdownload":
+                            case "-d":
+                                DontDownload = true;
+                                continue;
+                        }
+
                     }
-                    
                 }
-            }
 
-            if (Start <= 0
-                || End <= 0
-                || FileName == null
-                || ImageSize == null)
-            {
-                return false;
-            }
-
-            if (CsvGenerate)
-            {
-                if (CsvInFolder == null
-                    || CsvOutFile == null)
+                // Check for valid start, end, and filename
+                if (Start <= 0
+                    || End <= 0
+                    || FileName == null)
                 {
                     return false;
                 }
+
+                // Check for invalid image size.
+                if (ImageSize == null)
+                {
+                    if (ImageSizeMin == 0
+                        || ImageSizeMax == 0)
+                    {
+                        return false;
+                    }
+                }
+
+                // Check for invalid csv generation options. 
+                if (CsvGenerate)
+                {
+                    if (CsvInFolder == null
+                        || CsvOutFile == null)
+                    {
+                        return false;
+                    }
+                }
+
+                // Check for invalid or DDOSing thread count options. 
+                if (NumOfDownloadsAtOnce < 1
+                    || NumOfDownloadsAtOnce > 30)
+                {
+                    return false; // don't DDOS the servers
+                }
+
+                // default filename
+                if (OutFile == null) OutFile = FileName;
+
+                return true;
             }
+            catch (Exception ex)
+            {
+                NCLogging.Log($"An error occurred parsing command-line arguments: {ex.Message}");
 
-            if (NumOfDownloadsAtOnce < 0
-                || NumOfDownloadsAtOnce > 30)
-            {;
-                return false; // don't DDOS the servers
+                if (Verbosity >= Verbosity.Verbose) NCLogging.Log($"\n\nStacktrace: {ex.StackTrace}");
+
+                return false; 
             }
-
-            // default filename
-            if (OutFile == null) OutFile = FileName; 
-
-            return true;
         }
 
         public static void ShowHelp()
         {
             PrintVersion(); 
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Help placeholder - remove before final release");
-            Console.ForegroundColor = ConsoleColor.White; 
+            Console.WriteLine(Properties.Resources.Help);
         }
 
         public static void PrintVersion()
@@ -207,8 +259,9 @@ namespace SymX
             // this always succeeds as we set it to normal in the static constructor of CommandLine()
             if (Verbosity >= Verbosity.Normal)
             {
+                // temp until nucore allows you to turn off function name
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"{SymXVersion.SYMX_APPLICATION_NAME} {SymXVersion.SYMX_VERSION_EXTENDED_STRING}");
+                Console.WriteLine($"{SymXVersion.SYMX_APPLICATION_NAME} {SymXVersion.SYMX_VERSION_EXTENDED_STRING}", ConsoleColor.Green);
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("A Microsoft Symbol Server bulk download tool");
                 Console.WriteLine("© 2022 starfrost");

@@ -1,0 +1,24 @@
+
+Required switches:
+
+-start [-s]: Start time to scan for (in decimal unix time format)
+-end [-e]: End time to scan for (in decimal unix time format)
+-filename [-f]: Filename to search for on symsrv
+-imagesize [-i]: Imagesize to search for in hex format. Disregarded if -imagesizemin and -imagesizemax are both specified.
+
+Optional switches:
+
+-imagesizemin [-imin]: Minimum image size to search for in hex format.
+-imagesizemax [-imax]: Maximum image size to search for in hex format.
+-quiet [-q]: Quiet mode. Find nothing without making too much noise.
+-verbose [-v]: Verbose mode. Find nothing going out in a blaze of glory!
+-numdownloads [-threads, -t, -num]: Change the number of threads used for downloading. Range is 1-30 as this isn't DDOSX. Default is 12
+-logtofile [-l, -log]: Log output to file. This respects verbosity.
+-outfile [-out, -o]: Rename the discovered. file after download.
+
+NOT IMPLEMENTED SWITCHES in this alpha version:
+-dontdownload [-d]: Generate list of URLs and exit, msdlurlgen 1.1 style!
+-urloutfile [-u]: Output filename for list of URLs. 
+-generatecsv [-g]: Generate a CSV from URL list specified before downloading.
+If -csvinfolder [-ci] and -csvoutfile [-co] are specified, a list of ImageSizes and TimeDateStamps will be generated from a folder. 
+-infile [-in]: Input to CSV-style list of URLs to try and download.

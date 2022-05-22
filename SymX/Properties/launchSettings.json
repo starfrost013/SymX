@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "-start 1298539910 -end 1298539920 -filename ntkrnlmp.exe -imagesize 472000 -v"
+      "commandLineArgs": "-start 1298539910 -end 1298539920 -filename ntkrnlmp.exe -imin 470000 -imax 475000 -v"
     }
   }
 }
