@@ -20,6 +20,14 @@
     <NoWarn>1701;1702</NoWarn>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TextTemplating\Microsoft.TextTemplating.targets" />
+  <ItemGroup>
+    <None Remove="Content\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="Tools\AssemblyInfo.tt">
