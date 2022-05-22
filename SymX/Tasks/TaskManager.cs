@@ -60,9 +60,9 @@ namespace SymX
             {
                 Tasks currentTask = TaskList[i];
 
-                string taskString = $"{SymXVersion.SYMX_APPLICATION_NAME} - Performing task {curTask}/{numTasks} ({currentTask})...";
+                string taskString = $"Performing task {curTask}/{numTasks} ({currentTask})...";
 
-                Console.Title = taskString;
+                Console.Title = $"{SymXVersion.SYMX_APPLICATION_NAME} - {taskString}";
 
                 if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log(taskString);
                 curTask++; 
