@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "-generatecsv -csvinfolder C:\\Users\\FiercePC\\experiments\\msdlurlgen\\msdlurlgen\\x64\\Debug\\files -outfile 7950-x86.csv -v"
+      "commandLineArgs": "-s 1298539200 -e 1298540700 -f csrss.exe -imin 4000 -imax 9000 -v"
     }
   }
 }

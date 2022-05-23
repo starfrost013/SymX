@@ -166,7 +166,7 @@ namespace SymX
 
             // Fake a DbgX UA.
             // Just in case (thanks pivotman319)
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Microsoft-Symbol-Server", $"10.1710.0.0"));
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Microsoft-Symbol-Server", "10.1710.0.0"));
 
             TaskList.Add(Tasks.GenerateListOfUrls);
 
@@ -222,11 +222,18 @@ namespace SymX
                 {
                     Task<bool> task = tasks[curTask];
 
+                    string foundUrl = UrlList[i + curTask];
+                    // it was successful so...
+                    // get the current url 
                     if (task.Result) // get the current url
                     {
-                        string foundUrl = UrlList[i + curTask];
+
                         if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Found valid link at {foundUrl}!");
                         successfulUrls.Add(UrlList[i + curTask]); // add it
+                    }
+                    else
+                    {
+                        if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Failed: {foundUrl}");
                     }
                 }
 
@@ -255,8 +262,6 @@ namespace SymX
             HttpRequestMessage headRequest = new HttpRequestMessage(HttpMethod.Head, fileName);
             HttpResponseMessage responseMsg = httpClient.Send(headRequest);
 
-            if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"HTTP response = {responseMsg.StatusCode}");
-
             return responseMsg.IsSuccessStatusCode;
         }
 
@@ -272,7 +277,12 @@ namespace SymX
 
                     if (CommandLine.Verbosity > Verbosity.Quiet)
                     {
-                        Console.WriteLine($"Downloading {url}... to {CommandLine.OutFile}");
+                        string outFileName = CommandLine.OutFile;
+
+                        // prevent downloading the same file several times 
+                        if (urls.Count > 1) outFileName = $"{curUrl + 1}_{CommandLine.OutFile}";
+
+                        NCLogging.Log($"Downloading {url}... to {outFileName}");
 
                         // Get a stream of the file 
                         var stream = httpClient.GetByteArrayAsync(url);
@@ -280,12 +290,7 @@ namespace SymX
                         // Wait for download to complete (we do this basically synchronously to reduce server load)
                         while (!stream.IsCompleted) { };
 
-                        string outFileName = CommandLine.OutFile;
-
-                        // prevent downloading the same file several times 
-                        if (urls.Count > 1) outFileName = $"{curUrl + 1}_{CommandLine.OutFile}";
-
-                        using (FileStream fileStream = new FileStream(CommandLine.OutFile, FileMode.Create))
+                        using (FileStream fileStream = new FileStream(outFileName, FileMode.Create))
                         {
                             fileStream.Write(stream.Result);
                         }
