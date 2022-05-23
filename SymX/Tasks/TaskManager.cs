@@ -158,7 +158,7 @@ namespace SymX
         /// <returns>A list of the URLs that successfully downloaded.</returns>
         private static List<string> TryDownload()
         {
-            if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log("Initialising HttpClient");
+            if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log("Initialising HttpClient...");
 
             // initialise the http client (we already instantiate it as a private field)
             // this is so we don't have to add a check for dontdownload
@@ -196,12 +196,11 @@ namespace SymX
                         Task<bool> worker = Task<bool>.Run(() => TryDownloadFile(curUrl));
                         tasks.Add(worker);
                     }
-
                 }
 
+                // wait for all current downloads to complete
                 bool waiting = true;
 
-                // wait for all of our tasks to complete
                 while (waiting)
                 {
                     // will exit if all tasks complete
