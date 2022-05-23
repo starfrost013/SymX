@@ -1,3 +1,4 @@
+SymX -start <start time> -end <end time> -filename <filename> -imagesize <image size> [options...]
 
 Required switches:
 
@@ -14,7 +15,7 @@ Optional switches:
 -verbose [-v]: Verbose mode. Find nothing going out in a blaze of glory!
 -numdownloads [-threads, -t, -num]: Change the number of threads used for downloading. Range is 1-30 as this isn't DDOSX. Default is 12
 -logtofile [-l, -log]: Log output to file. This respects verbosity.
--outfile [-out, -o]: Rename the discovered. file after download.
+-outfile [-out, -o]: If a file is found, rename it after download to the filename specified.
 
 NOT IMPLEMENTED SWITCHES in this alpha version:
 -dontdownload [-d]: Generate list of URLs and exit, msdlurlgen 1.1 style!

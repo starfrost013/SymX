@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "-start 1298539910 -end 1298539920 -filename ntkrnlmp.exe -imin 470000 -imax 475000 -v"
+      "commandLineArgs": "-s 1298539200 -e 1298540700 -f csrss.exe -imin 4000 -imax 9000 -v -l"
     }
   }
 }

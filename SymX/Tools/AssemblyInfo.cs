@@ -5,9 +5,9 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("SymX")]
 [assembly: AssemblyDescription("A Microsoft Symbol Server bulk download tool")]
-[assembly: AssemblyVersion("3.0.0.24")]
-[assembly: AssemblyFileVersion("3.0.0.24")]
-[assembly: AssemblyInformationalVersion("3.0.0-alpha2 (build 24, built 2022-05-22 21:43:47)")]
+[assembly: AssemblyVersion("3.0.0.25")]
+[assembly: AssemblyFileVersion("3.0.0.25")]
+[assembly: AssemblyInformationalVersion("3.0.0-alpha3 (build 25, built 2022-05-23 15:39:57)")]
 
 
 namespace SymX
@@ -18,11 +18,11 @@ namespace SymX
 		public static int SYMX_VERSION_MAJOR = 3;
 		public static int SYMX_VERSION_MINOR = 0; 
 		public static int SYMX_VERSION_REVISION = 0;
-		public static int SYMX_VERSION_BUILD = 24;
-		public static string SYMX_VERSION_SPECIFIER = "alpha2";
+		public static int SYMX_VERSION_BUILD = 25;
+		public static string SYMX_VERSION_SPECIFIER = "alpha3";
 
-		public static string SYMX_VERSION_STRING = "3.0.0-alpha2";
-		public static string SYMX_VERSION_EXTENDED_STRING = "3.0.0-alpha2 (build 24, built 2022-05-22 21:43:47)";
+		public static string SYMX_VERSION_STRING = "3.0.0-alpha3";
+		public static string SYMX_VERSION_EXTENDED_STRING = "3.0.0-alpha3 (build 25, built 2022-05-23 15:39:57)";
 	}
 }
 

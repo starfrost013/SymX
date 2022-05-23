@@ -32,16 +32,21 @@ namespace SymX
         {
             if (CommandLine.Verbosity == Verbosity.Verbose) Console.WriteLine("Initialising HTTP client...");
 
-            if (CommandLine.CsvInFolder == null)
+            if (CommandLine.InFile == null)
             {
-                TaskList.Add(Tasks.GenerateListOfUrls);
+                if (!CommandLine.CsvGenerate)
+                {
+                    TaskList.Add(Tasks.GenerateListOfUrls);
+                }
+                else
+                {
+                    TaskList.Add(Tasks.GenerateCsv);
+                }
             }
             else
-            {
+            { 
                 TaskList.Add(Tasks.ParseCsv);
             }
-
-            if (CommandLine.CsvGenerate) TaskList.Add(Tasks.GenerateCsv);
 
             if (CommandLine.InFile != null) TaskList.Add(Tasks.ParseCsv);
             
@@ -80,6 +85,19 @@ namespace SymX
                             if (!DownloadSuccessfulFiles(successfulUrls)) NCLogging.Log("An error occurred downloading files!\n", ConsoleColor.Red);
                         }
                         continue;
+                    case Tasks.GenerateCsv:
+                        if (CommandLine.CsvInFolder == null) // generate a csv folder and then download
+                        {
+                            Console.WriteLine("This feature (generating file list from command line) is not yet implemented");
+                        }
+                        else
+                        {
+                            if (!MassView.Run())
+                            {
+                                NCLogging.Log("MassView failed to generate CSV file!", ConsoleColor.Red);
+                            }
+                        }
+                        continue; 
                     case Tasks.Exit:
                         // Exit the program.
                         Environment.Exit(0);
@@ -173,6 +191,7 @@ namespace SymX
                     if (curUrlId < UrlList.Count)
                     {
                         string curUrl = UrlList[i + j];
+                        if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {curUrl}...");
                         Task<bool> worker = Task<bool>.Run(() => TryDownloadFile(curUrl));
                         tasks.Add(worker);
                     }
@@ -191,20 +210,21 @@ namespace SymX
                     {
                         Task<bool> task = tasks[curTask];
 
-                        if (!task.IsCompleted)
-                        {
-                            needToWait = true; // we need to wait as not every task is done
-                        }
-                        else // add to successful url list
-                        {
-                            if (task.Result) // get the current url
-                            {
-                                successfulUrls.Add(UrlList[i + curTask]); // add it
-                            }
-                        }
+                        // we need to wait as not every task is done
+                        if (!task.IsCompleted) needToWait = true;
                     }
 
                     waiting = needToWait;
+                }
+
+                for (int curTask = 0; curTask < tasks.Count; curTask++)
+                {
+                    Task<bool> task = tasks[curTask];
+
+                    if (task.Result) // get the current url
+                    {
+                        successfulUrls.Add(UrlList[i + curTask]); // add it
+                    }
                 }
 
                 tasks.Clear();
@@ -229,10 +249,7 @@ namespace SymX
         /// <returns>A boolean determining if the file downloaded successfully.</returns>
         private static bool TryDownloadFile(string fileName)
         {
-            if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {fileName}...");
-
             HttpRequestMessage headRequest = new HttpRequestMessage(HttpMethod.Head, fileName);
-
             HttpResponseMessage responseMsg = httpClient.Send(headRequest);
 
             if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"HTTP response = {responseMsg.StatusCode}");
@@ -246,8 +263,10 @@ namespace SymX
             {
                 if (CommandLine.Verbosity > Verbosity.Quiet) NCLogging.Log("Downloading successful URLs...");
 
-                foreach (string url in urls)
+                for (int curUrl = 0; curUrl < urls.Count; curUrl++)
                 {
+                    string url = urls[curUrl];
+
                     if (CommandLine.Verbosity > Verbosity.Quiet)
                     {
                         Console.WriteLine($"Downloading {url}... to {CommandLine.OutFile}");
@@ -257,6 +276,11 @@ namespace SymX
 
                         // Wait for download to complete (we do this basically synchronously to reduce server load)
                         while (!stream.IsCompleted) { };
+
+                        string outFileName = CommandLine.OutFile;
+
+                        // prevent downloading the same file several times 
+                        if (urls.Count > 1) outFileName = $"{curUrl + 1}_{CommandLine.OutFile}";
 
                         using (FileStream fileStream = new FileStream(CommandLine.OutFile, FileMode.Create))
                         {
