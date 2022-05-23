@@ -1,6 +1,6 @@
 SymX Alpha Preview
 A Microsoft Symbol Server bulk download tool
-Version 3.0.0 Alpha 2
+Version 3.0.0 Alpha 3
 
 23 May 2022
 
@@ -18,12 +18,13 @@ KNOWN ISSUES:
 * Logging!
 * Different levels of verbosity!
 * Ability to specify a range of image sizes!
+* MassView features!
+* Downloading multiple files (kind of)
 
 Features coming in later alpha versions:
-* MassView features!
-* Downloading multiple files
+
 * CSV input (read a csv, download all files) 
-* Dump to URL and exit!
+* Dump URL list to CSV and exit!
 
 I found a bug!
 - DM me (Starfrost#9088) with what happened, OS, architecture, and your CL args.

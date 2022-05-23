@@ -34,7 +34,7 @@ namespace SymX
 
             if (CommandLine.InFile == null)
             {
-                if (!CommandLine.CsvGenerate)
+                if (!CommandLine.GenerateCsv)
                 {
                     TaskList.Add(Tasks.GenerateListOfUrls);
                 }
@@ -50,7 +50,8 @@ namespace SymX
 
             if (CommandLine.InFile != null) TaskList.Add(Tasks.ParseCsv);
             
-            if (!CommandLine.DontDownload) TaskList.Add(Tasks.TryDownload);
+            if (!CommandLine.DontDownload
+                && !CommandLine.GenerateCsv) TaskList.Add(Tasks.TryDownload);
 
             TaskList.Add(Tasks.Exit);
         }
@@ -223,6 +224,8 @@ namespace SymX
 
                     if (task.Result) // get the current url
                     {
+                        string foundUrl = UrlList[i + curTask];
+                        if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Found valid link at {foundUrl}!");
                         successfulUrls.Add(UrlList[i + curTask]); // add it
                     }
                 }
@@ -234,10 +237,10 @@ namespace SymX
 
                 // Performance improvement: don't dump to the console so often
                 // allow user to control this in futrue
-                if (i % noDownloadsAtOnce == 0 && CommandLine.Verbosity > Verbosity.Quiet) Console.WriteLine($"{percentageCompletionString}% complete ({i}/{UrlList.Count} URLs scanned), {successfulUrls.Count} files found");
+                if (i % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal) Console.WriteLine($"{percentageCompletionString}% complete ({i}/{UrlList.Count} URLs scanned), {successfulUrls.Count} files found");
             }
 
-            if (CommandLine.Verbosity > Verbosity.Quiet) NCLogging.Log($"Took {timer.ElapsedMilliseconds / 1000}sec to check {UrlList.Count} URLs, found {successfulUrls.Count} files");
+            if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Took {timer.ElapsedMilliseconds / 1000}sec to check {UrlList.Count} URLs, found {successfulUrls.Count} files");
 
             return successfulUrls;
         }

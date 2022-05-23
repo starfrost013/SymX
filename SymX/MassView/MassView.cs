@@ -16,6 +16,7 @@ namespace SymX
             }
             else
             {
+                if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"MassView: Checking folder {inFolder}, dumping to {outFile}");
                 StreamWriter bw = null;
 
                 bw = new StreamWriter(new FileStream(outFile, FileMode.Create));
@@ -35,7 +36,7 @@ namespace SymX
                         || fileName.Contains(".scr")
                         || fileName.Contains(".winmd"))
                     {
-                        using (BinaryReader br = new BinaryReader(new FileStream(fileName, FileMode.Open)))
+                        using (BinaryReader br = new BinaryReader(File.OpenRead(fileName)))
                         {
                             // read e_lfanew
                             br.BaseStream.Seek(0x3C, SeekOrigin.Begin);

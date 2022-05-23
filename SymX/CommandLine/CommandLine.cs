@@ -56,17 +56,12 @@ namespace SymX
         /// <summary>
         /// If true, a CSV will be generated, then the program will exit.
         /// </summary>
-        public static bool CsvGenerate { get; set; }
+        public static bool GenerateCsv { get; set; }
 
         /// <summary>
-        /// The folder to input CSV files from. Ignored if <see cref="CsvGenerate"/> is not set to true.
+        /// The folder to input CSV files from. Ignored if <see cref="GenerateCsv"/> is not set to true.
         /// </summary>
         public static string CsvInFolder { get; set; }
-
-        /// <summary>
-        /// The output file to set the CSV file to. Ignored if <see cref="CsvOutFile"/> is not set to true.
-        /// </summary>
-        public static string CsvOutFile { get; set; }
 
         /// <summary>
         /// The verbosity level of the application.
@@ -159,7 +154,7 @@ namespace SymX
                                 continue;
                             case "-generatecsv":
                             case "-g":
-                                CsvGenerate = true;
+                                GenerateCsv = true;
                                 continue;
                             case "-numdownloads":
                             case "-threads":
@@ -170,10 +165,6 @@ namespace SymX
                             case "-csvinfolder":
                             case "-ci":
                                 CsvInFolder = nextArg;
-                                continue;
-                            case "-csvoutfile":
-                            case "-co":
-                                CsvOutFile = nextArg;
                                 continue;
                             case "-logtofile":
                             case "-log":
@@ -198,43 +189,45 @@ namespace SymX
                     }
                 }
 
-                // Check for valid start, end, and filename
-                if (Start <= 0
-                    || End <= 0
-                    || FileName == null)
+                if (!GenerateCsv) // non-massview mode
                 {
-                    return false;
-                }
-
-                // Check for invalid image size.
-                if (ImageSize == null)
-                {
-                    if (ImageSizeMin == 0
-                        || ImageSizeMax == 0)
+                    // Check for valid start, end, and filename
+                    if (Start <= 0
+                        || End <= 0
+                        || FileName == null)
                     {
                         return false;
                     }
-                }
 
-                // Check for invalid csv generation options. 
-                if (CsvGenerate)
+                    // Check for invalid image size.
+                    if (ImageSize == null)
+                    {
+                        if (ImageSizeMin == 0
+                            || ImageSizeMax == 0)
+                        {
+                            return false;
+                        }
+                    }
+
+                    // Check for invalid or DDOSing thread count options. 
+                    if (NumOfDownloadsAtOnce < 1
+                        || NumOfDownloadsAtOnce > 30)
+                    {
+                        return false; // don't DDOS the servers
+                    }
+
+                    // default filename
+                    if (OutFile == null) OutFile = FileName;
+                }
+                else // massview mode
                 {
                     if (CsvInFolder == null
-                        || CsvOutFile == null)
+                    || OutFile == null)
                     {
                         return false;
                     }
                 }
 
-                // Check for invalid or DDOSing thread count options. 
-                if (NumOfDownloadsAtOnce < 1
-                    || NumOfDownloadsAtOnce > 30)
-                {
-                    return false; // don't DDOS the servers
-                }
-
-                // default filename
-                if (OutFile == null) OutFile = FileName;
 
                 return true;
             }
