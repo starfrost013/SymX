@@ -83,11 +83,22 @@ namespace SymX
         /// Limit the number of requests per second so as to not throttle the Microsoft symbol servers.
         /// 30 is the default. Set to -1 for unlimited request speed (dangerous!)
         /// </summary>
-        public static int NumOfDownloadsAtOnce { get; set; }
+        public static int NumThreads { get; set; }
+
+        /// <summary>
+        /// Determines that a hex string is being passed directly for the Start and End switches.
+        /// </summary>
+        public static bool HexTime { get; set; }
+
+        /// <summary>
+        /// If this flag is set, the temporary text file containing successful URLs will not be
+        /// generated.
+        /// </summary>
+        public static bool DontGenerateTempFile { get; set; }
 
         static CommandLine()
         {
-            NumOfDownloadsAtOnce = 12;
+            NumThreads = 12;
             Verbosity = Verbosity.Normal;
         }
 
@@ -160,7 +171,7 @@ namespace SymX
                             case "-threads":
                             case "-num":
                             case "-t":
-                                NumOfDownloadsAtOnce = Convert.ToInt32(nextArg);
+                                NumThreads = Convert.ToInt32(nextArg);
                                 continue;
                             case "-csvinfolder":
                             case "-ci":
@@ -184,6 +195,15 @@ namespace SymX
                             case "-d":
                                 DontDownload = true;
                                 continue;
+                            case "-hextime":
+                            case "-h":
+                                HexTime = true;
+                                continue;
+                            case "-dontgeneratetempfile":
+                            case "-dt":
+                            case "-dtemp":
+                                DontGenerateTempFile = true;
+                                continue; 
                         }
 
                     }
@@ -210,10 +230,27 @@ namespace SymX
                     }
 
                     // Check for invalid or DDOSing thread count options. 
-                    if (NumOfDownloadsAtOnce < 1
-                        || NumOfDownloadsAtOnce > 30)
+                    if (NumThreads < 1
+                        || NumThreads > 30)
                     {
                         return false; // don't DDOS the servers
+                    }
+
+                    // The user has specified they want hex time format, reconvert to it
+                    if (HexTime)
+                    {
+                        string startString = Start.ToString();
+                        string endString = End.ToString();  
+
+                        Start = ulong.Parse(startString, NumberStyles.HexNumber);
+                        End = ulong.Parse(endString, NumberStyles.HexNumber);
+                    }
+
+                    // check we specified infile
+                    if (InFile != null
+                        && !File.Exists(InFile))
+                    {
+                        return false;
                     }
 
                     // default filename

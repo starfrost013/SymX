@@ -93,7 +93,7 @@ namespace SymX
                         }
                         else
                         {
-                            if (!MassView.Run())
+                            if (!MassView.Run()) 
                             {
                                 NCLogging.Log("MassView failed to generate CSV file!", ConsoleColor.Red);
                             }
@@ -145,8 +145,8 @@ namespace SymX
             }
             else
             {
-                // placeholder until NuCore
-                NCLogging.Log("-infile not implemented yet!", ConsoleColor.Red);
+                // massview
+                return MassView.ParseUrls(CommandLine.InFile);
             }
 
             return urlList; 
@@ -176,7 +176,7 @@ namespace SymX
 
             List<string> successfulUrls = new List<string>();
 
-            int noDownloadsAtOnce = CommandLine.NumOfDownloadsAtOnce;
+            int noDownloadsAtOnce = CommandLine.NumThreads;
 
             // create a list of tasks
             // consider having it return the url instead

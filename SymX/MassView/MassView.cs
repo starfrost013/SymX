@@ -3,7 +3,7 @@
 namespace SymX
 {
     /// <summary>
-    /// MassView 2.0
+    /// MassView 2.1
     /// 
     /// Dumps required information for symsrv links to a file.
     /// </summary>
@@ -29,6 +29,12 @@ namespace SymX
         /// </summary>
         private static byte SizeOfImageOffset = 0x50;
 
+        /// <summary>
+        /// One-indexed column number of the URL column. CHANGE THIS IF LINE 55 CHANGES. 
+        /// Temporary solution until a better rewrite?
+        /// </summary>
+        private static uint URL_COLUMN_NUMBER = 6;
+
         public static bool Run()
         {
             string inFolder = CommandLine.CsvInFolder;
@@ -45,13 +51,17 @@ namespace SymX
                 StreamWriter bw = null;
 
                 bw = new StreamWriter(new FileStream(outFile, FileMode.Create));
-                bw.WriteLine("FileName,TimeDateStamp,ISO8601,Hex,SizeOfImage,URL"); // write csv elements
+
+                // Write the CSV elements
+                bw.WriteLine("FileName,TimeDateStamp,ISO8601,Hex,SizeOfImage,URL");
 
                 string[] dirFiles = Directory.GetFiles(inFolder);
 
                 foreach (string fileName in dirFiles)
                 {
-                    // list of file extensions (all of these are PEs)
+                    // list of file extensions that are usually PEs 
+                    // .WinMD is Windows Metadata file, used for API metadata/exposing in Win8+ WinRT
+                    // .cpls are Control Panel Applets, they are always PEs
                     if (fileName.Contains(".exe")
                         || fileName.Contains(".dll")
                         || fileName.Contains(".sys")
@@ -76,12 +86,13 @@ namespace SymX
 
                                 byte[] peMagic = br.ReadBytes(2);
 
-                                // skip MZ/NE files in 32bit. skip other files.
+                                // Skip files that aren't Portable Executables
                                 if (peMagic[0] == PEMagicData[0]
                                     && peMagic[1] == PEMagicData[1])
                                 {
                                     br.BaseStream.Seek(e_lfanew + TimeDateStampOffset, SeekOrigin.Begin); // timestamp is at 0x08
 
+                                    // convert the date to hex formats
                                     ulong timeDateStamp = br.ReadUInt64();
                                     DateTime date = new DateTime(1970, 1, 1, 1, 1, 1).AddSeconds(timeDateStamp);
                                     string dateIso = date.ToString("yyyy-MM-dd HH:mm:ss");
@@ -94,7 +105,13 @@ namespace SymX
 
                                     if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine($"{fileName}: {dateIso} (hex: {dateHex}, unix: {timeDateStamp}), imagesize: {sizeOfImageHex}");
 
-                                    if (outFile != null) bw.WriteLine($"{fileName},{timeDateStamp},{dateIso},{dateHex},{sizeOfImageHex},https://msdl.microsoft.com/download/symbols/{fileName}/{dateHex}{sizeOfImageHex}/{fileName}");
+                                    // truncate the path so that we generate valid URLs
+                                    string[] fileNameFolders = fileName.Split('\\');
+
+                                    // i don't think there's any possible situation where there could NOT be slashes in this path
+                                    string fileNameOnly = fileNameFolders[fileNameFolders.Length - 1];
+
+                                    if (outFile != null) bw.WriteLine($"{fileName},{timeDateStamp},{dateIso},{dateHex},{sizeOfImageHex},https://msdl.microsoft.com/download/symbols/{fileNameOnly}/{dateHex}{sizeOfImageHex}/{fileNameOnly}");
                                 }
                             }
                         }
@@ -103,10 +120,40 @@ namespace SymX
 
                 bw.Close();
 
-                NCLogging.Log($"Written CSV file to: {outFile}!", ConsoleColor.Green);
+                NCLogging.Log($"Successfully wrote CSV file to: {outFile}!", ConsoleColor.Green);
 
                 return true; 
             }
+        }
+
+        public static List<string> ParseUrls(string csvFile)
+        {
+            List<string> urls = new List<string>();
+
+            string[] csvLines = File.ReadAllLines(csvFile);
+
+            // skip the first line (CSV header) by starting at 1
+            for (int curLine = 1; curLine < csvLines.Length; curLine++)   
+            {
+                string csvLine = csvLines[curLine];
+                
+                string[] csvLineSections = csvLine.Split(',');
+
+                if (csvLineSections.Length < URL_COLUMN_NUMBER)
+                {
+                    if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log("Rejected line as it does not have URL section");
+                }
+                else
+                {
+                    string csvLineUrl = csvLineSections[URL_COLUMN_NUMBER - 1];
+
+                    if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Found URL = {csvLineUrl}");
+
+                    urls.Add(csvLineUrl);
+                }
+            }
+
+            return urls;
         }
     }
 }
