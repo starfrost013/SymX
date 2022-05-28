@@ -5,7 +5,7 @@ namespace SymX
     /// <summary>
     /// MassView 2.1
     /// 
-    /// Dumps required information for symsrv links to a file.
+    /// Dumps required information for Microsoft Symbol Server links to a file.
     /// </summary>
     public static class MassView
     {
@@ -98,12 +98,12 @@ namespace SymX
                                     string dateIso = date.ToString("yyyy-MM-dd HH:mm:ss");
                                     string dateHex = timeDateStamp.ToString("x");
 
-                                    br.BaseStream.Seek(e_lfanew + SizeOfImageOffset, SeekOrigin.Begin); // we don't need to distinguish between PE32 (x86) and PE32+ (x86-64) here, as it just happens to line up where we need it
+                                    br.BaseStream.Seek(e_lfanew + SizeOfImageOffset, SeekOrigin.Begin); // we don't need to distinguish between PE32 (x86) and PE32+ (x86-64) here, as the offsets just happen to line up where we need it
 
                                     uint sizeOfImage = br.ReadUInt32();
                                     string sizeOfImageHex = sizeOfImage.ToString("x");
 
-                                    if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine($"{fileName}: {dateIso} (hex: {dateHex}, unix: {timeDateStamp}), imagesize: {sizeOfImageHex}");
+                                    if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine($"{fileName}: {dateIso} (hex: {dateHex}, unix: {timeDateStamp}), ImageSize: {sizeOfImageHex}");
 
                                     // truncate the path so that we generate valid URLs
                                     string[] fileNameFolders = fileName.Split('\\');

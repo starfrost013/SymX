@@ -28,23 +28,23 @@ Optional switches:
 
 -outfile [-out, -o]: If a file is found, rename it after download to the filename specified.
 
--generatecsv [-g]: Generate a CSV containing image size and TimeDateStamp information from a folder, instead of downloading any files.
-
-If -csvinfolder [-ci] and -outfile are specified, a list of ImageSizes and TimeDateStamps will be generated from a folder. Currently these are mandatory but they will soon be optional.
+-generatecsv [-g]: Generate a CSV containing image size and TimeDateStamp information from a folder, instead of downloading any files. If -generatecsv is specified, -csvinfolder [-ci] and -outfile are required options.
+A list of ImageSizes and TimeDateStamps will be generated from the folder specified by -csvinfolder and dumped to the CSV file specified by -outfile.
 
 -hextime [-h]: If this option is set, Start and End will be interpreted as hex format strings rather than as decimal Unix time format numbers.
 
--dontgeneratetempfile [-dt, -dtemp]: If this option is set, the temporary text file containing the 
+-dontgeneratetempfile [-dt, -dtemp]: If this option is set, the temporary text file containing the successfully downloaded URLs will not be generated.
 
--infile [-in]: Input to CSV-style list of URLs to try and download.
+-infile [-in]: Input to a CSV file generated using -generatecsv to try and download.
 
 -dontdownload [-d]: Generate list of URLs and exit, msdlurlgen 1.1 style!
 
 
 NOT IMPLEMENTED SWITCHES in this alpha version:
 
--outfolder [-of]: Folder to output downloaded files to.
+-outfolder [-of]: Folder to output downloaded files to. Default is /download
 -overrideurl [-u, -url]: Alternative URL to try and acquire files from. Default is http://msdl.microsoft.com/download/symbols. Must be a real symbol server.
 -useragent [-ua, -useragent]: Overrides the current user agent. If you are downloading from a custom server that requires a specific useragent, this may be helpful.
+-max-retries: Number of times to retry downloading a file before failing it. Default is 5.
 
 Feature suggestions welcome!

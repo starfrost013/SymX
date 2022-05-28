@@ -4,7 +4,7 @@ Version 3.0.0 Alpha 4
 
 28 May 2022
 
-This is an experimental and buggy preview of the future merger of msdlurlgen and MassView (the MassView functionality is not in yet) that adds many new features, is far faster, and far more robust.
+This is an experimental and buggy preview of the future merger of msdlurlgen and MassView that adds many new features, is far faster, and is far more robust.
 
 Please note that this is alpha quality software, is missing planned features, and is not guaranteed to be stable. Please suggest features and test for bugs! Requires an x64 machine (ARM64 will also be supported and can be compiled on request).
 
@@ -20,6 +20,8 @@ Alpha 4 (May 28, 2022):
 * Added timeout handling. 
 * Implemented -hextime / -h option, which will interpret the -start and -end parameters as a hex-format 
 * Refactoring and code cleanup
+* Now outputs how many URLs failed to download or timed out
+* Successful URLs are now in green 
 
 Alpha 3 (May 23, 2022):
 * MassView is now integrated! Use -generatecsv in combination with -csvinfolder and -csvoutfile

@@ -209,6 +209,17 @@ namespace SymX
                     }
                 }
 
+                if (InFile != null)
+                {
+                    if (!File.Exists(InFile))
+                    {
+                        Console.WriteLine($"The file {InFile} does not exist!");
+                        return false;
+                    }
+
+                    return true;
+                }
+
                 if (!GenerateCsv) // non-massview mode
                 {
                     // Check for valid start, end, and filename
