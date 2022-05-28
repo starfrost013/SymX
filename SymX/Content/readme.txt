@@ -10,6 +10,16 @@ Please note that this is alpha quality software, is missing features, and is not
 
 RELEASE NOTES:
 
+Alpha 4 (May 28, 2022):
+* Added -infile - will attempt to download all files from a CSV generated with -generatecsv (this only works with Alpha 4-generated CSVs due to the lack of a properly functional URL column)
+* Fixed invalid MassView URL generation bug
+* Download report now reports URLs per second
+* Fixed multiple file downloading always having the same filename
+* Added a temporary file generated with the list of successful links. Useful if it goes over scrollback or you crash. -dontgeneratetempfile / -dtemp suppresses it.
+* Added vanity logo in \Content
+* Added timeout handling. 
+* Implemented -hextime / -h option, which will interpret the -start and -end parameters as a hex-format 
+* Refactoring and code cleanup
 
 Alpha 3 (May 23, 2022):
 * MassView is now integrated! Use -generatecsv in combination with -csvinfolder and -csvoutfile

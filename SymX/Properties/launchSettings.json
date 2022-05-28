@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "-s 1298539200 -e 1298540700 -f csrss.exe -imin 4000 -imax 9000 -v -hextime"
+      "commandLineArgs": "-s 1298539200 -e 1298540700 -f csrss.exe -imin 4000 -imax 9000 -infile 25120.csv"
     }
   }
 }

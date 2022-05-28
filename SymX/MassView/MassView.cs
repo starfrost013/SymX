@@ -132,6 +132,8 @@ namespace SymX
 
             string[] csvLines = File.ReadAllLines(csvFile);
 
+            int numRejectedLines = 0; 
+
             // skip the first line (CSV header) by starting at 1
             for (int curLine = 1; curLine < csvLines.Length; curLine++)   
             {
@@ -141,18 +143,24 @@ namespace SymX
 
                 if (csvLineSections.Length < URL_COLUMN_NUMBER)
                 {
-                    if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log("Rejected line as it does not have URL section");
+                    if (CommandLine.Verbosity >= Verbosity.Normal)
+                    {
+                        NCLogging.Log($"Warning: Rejected line {curLine} as it does not have URL section", ConsoleColor.Yellow);
+                        numRejectedLines++; 
+                    }
                 }
                 else
                 {
                     string csvLineUrl = csvLineSections[URL_COLUMN_NUMBER - 1];
 
-                    if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Found URL = {csvLineUrl}");
+                    if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Found URL: {csvLineUrl}");
 
                     urls.Add(csvLineUrl);
                 }
             }
 
+            // take away 1 as we don't count the first line
+            if (numRejectedLines > 0 && CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Warning: {numRejectedLines + 1} of {csvLines.Length - 1} lines (excluding the first line) did not have a valid URL column and were skipped!", ConsoleColor.Yellow);
             return urls;
         }
     }

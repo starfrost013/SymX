@@ -7,20 +7,42 @@ using System.Net.Http.Headers;
  
 namespace SymX
 {
+    /// <summary>
+    /// TaskManager
+    /// 
+    /// SymX's state machine - handles all of the tasks that SymX must perform
+    /// </summary>
     public static class TaskManager
     {
+        /// <summary>
+        /// The list of tasks that need to run in this session.
+        /// </summary>
         public static List<Tasks> TaskList { get; set; }
-
+        
+        /// <summary>
+        /// Private: List of generated URLs
+        /// </summary>
         private static List<string> UrlList { get; set; }
 
+        /// <summary>
+        /// Private: HTTP client used for sending requests
+        /// </summary>
         private static HttpClient httpClient = new HttpClient();
 
+        /// <summary>
+        /// Private: Timer used for measuring how long a download took
+        /// </summary>
         private static Stopwatch timer = new Stopwatch();
 
         /// <summary>
         /// Magic number for how much Microsoft pads their SizeOfImage values to.
         /// </summary>
-        private static ulong IMAGESIZE_PADDING = 0x1000; 
+        private static ulong IMAGESIZE_PADDING = 0x1000;
+
+        /// <summary>
+        /// Default filename used for logging successful URLs.
+        /// </summary>
+        private static string DEFAULT_TEMP_FILE_NAME = "SuccessfulURLs.log";
 
         static TaskManager()
         {
@@ -32,23 +54,14 @@ namespace SymX
         {
             if (CommandLine.Verbosity == Verbosity.Verbose) Console.WriteLine("Initialising HTTP client...");
 
-            if (CommandLine.InFile == null)
+            if (!CommandLine.GenerateCsv)
             {
-                if (!CommandLine.GenerateCsv)
-                {
-                    TaskList.Add(Tasks.GenerateListOfUrls);
-                }
-                else
-                {
-                    TaskList.Add(Tasks.GenerateCsv);
-                }
+                TaskList.Add(Tasks.GenerateListOfUrls);
             }
             else
-            { 
-                TaskList.Add(Tasks.ParseCsv);
+            {
+                TaskList.Add(Tasks.GenerateCsv);
             }
-
-            if (CommandLine.InFile != null) TaskList.Add(Tasks.ParseCsv);
             
             if (!CommandLine.DontDownload
                 && !CommandLine.GenerateCsv) TaskList.Add(Tasks.TryDownload);
@@ -168,7 +181,13 @@ namespace SymX
             // Just in case (thanks pivotman319)
             httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Microsoft-Symbol-Server", "10.1710.0.0"));
 
-            TaskList.Add(Tasks.GenerateListOfUrls);
+            StreamWriter tempFile = null;
+
+            // create a temporary file if the user has not explicitly specified to do this
+            if (!CommandLine.DontGenerateTempFile)
+            {
+                tempFile = new StreamWriter(new FileStream(DEFAULT_TEMP_FILE_NAME, FileMode.OpenOrCreate));
+            }
 
             if (CommandLine.Verbosity >= Verbosity.Quiet) NCLogging.Log($"Trying {UrlList.Count} URLs...");
 
@@ -177,6 +196,7 @@ namespace SymX
             List<string> successfulUrls = new List<string>();
 
             int noDownloadsAtOnce = CommandLine.NumThreads;
+            int failedUrls = 0; // The number of failed URLs
 
             // create a list of tasks
             // consider having it return the url instead
@@ -188,12 +208,12 @@ namespace SymX
                 for (int j = 0; j < noDownloadsAtOnce; j++)
                 {
                     int curUrlId = i + j;
-
+                    
                     if (curUrlId < UrlList.Count)
                     {
                         string curUrl = UrlList[i + j];
                         if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {curUrl}...");
-                        Task<bool> worker = Task<bool>.Run(() => TryDownloadFile(curUrl));
+                        Task<bool> worker = Task<bool>.Run(() => CheckFileExists(curUrl));
                         tasks.Add(worker);
                     }
                 }
@@ -226,13 +246,24 @@ namespace SymX
                     // get the current url 
                     if (task.Result) // get the current url
                     {
+                        // If we haven't specified we don't want a temporary file, write it to successful_urls.log
+                        if (!CommandLine.DontGenerateTempFile) tempFile.WriteLine(foundUrl);
 
                         if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Found valid link at {foundUrl}!");
-                        successfulUrls.Add(UrlList[i + curTask]); // add it
+                        successfulUrls.Add(foundUrl); // add it
                     }
                     else
                     {
-                        if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Failed: {foundUrl}");
+                        if (task.IsFaulted)
+                        {
+                            NCLogging.Log($"An error occurred while downloading {foundUrl}!");
+                            failedUrls++;
+                        }
+                        else
+                        {
+                            if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"URL not found: {foundUrl}");
+                        }
+
                     }
                 }
 
@@ -242,11 +273,21 @@ namespace SymX
                 string percentageCompletionString = percentageCompletion.ToString("F1");
 
                 // Performance improvement: don't dump to the console so often
-                // allow user to control this in futrue
-                if (i % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal) Console.WriteLine($"{percentageCompletionString}% complete ({i}/{UrlList.Count} URLs scanned), {successfulUrls.Count} files found");
+                // we should allow the user to control this in future
+                if (i % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal) Console.WriteLine($"{percentageCompletionString}% complete ({i}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found");
             }
+            
+            // set some temporary variables
+            double timeElapsed = timer.ElapsedMilliseconds / 1000;
 
-            if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Took {timer.ElapsedMilliseconds / 1000}sec to check {UrlList.Count} URLs, found {successfulUrls.Count} files");
+            if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Took {timeElapsed}sec to check {UrlList.Count} URLs, found {successfulUrls.Count} files ({successfulUrls.Count / timeElapsed} URLs per second");
+
+            if (!CommandLine.DontGenerateTempFile)
+            {
+                // delete SuccessfulURLs.log if we created it
+                tempFile.Close();
+                File.Delete(DEFAULT_TEMP_FILE_NAME);
+            }
 
             return successfulUrls;
         }
@@ -255,13 +296,20 @@ namespace SymX
         /// Try and download a file.
         /// </summary>
         /// <param name="fileName">A URI to try and download.</param>
-        /// <returns>A boolean determining if the file downloaded successfully.</returns>
-        private static bool TryDownloadFile(string fileName)
+        /// <returns>A boolean determining if the file downloaded successfully. It will return false and <see cref="Task.IsFaulted"/> will be true if an exception occurred.</returns>
+        private static bool CheckFileExists(string fileName)
         {
-            HttpRequestMessage headRequest = new HttpRequestMessage(HttpMethod.Head, fileName);
-            HttpResponseMessage responseMsg = httpClient.Send(headRequest);
+            try
+            {
+                HttpRequestMessage headRequest = new HttpRequestMessage(HttpMethod.Head, fileName);
+                HttpResponseMessage responseMsg = httpClient.Send(headRequest);
 
-            return responseMsg.IsSuccessStatusCode;
+                return responseMsg.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false; 
+            }
         }
 
         private static bool DownloadSuccessfulFiles(List<string> urls)
@@ -279,7 +327,14 @@ namespace SymX
                         string outFileName = CommandLine.OutFile;
 
                         // prevent downloading the same file several times 
-                        if (urls.Count > 1) outFileName = $"{curUrl + 1}_{CommandLine.OutFile}";
+                        if (urls.Count > 1)
+                        {
+                            string[] fileNameSplit = url.Split('/');
+                            // get the last one
+                            string fileNameOnly = fileNameSplit[fileNameSplit.Length - 1];
+
+                            outFileName = $"{curUrl + 1}_{fileNameOnly}";
+                        }
 
                         NCLogging.Log($"Downloading {url}... to {outFileName}");
 
