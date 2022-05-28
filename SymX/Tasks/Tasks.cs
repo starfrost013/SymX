@@ -30,11 +30,6 @@
         LoadListOfUrls = 6,
 
         /// <summary>
-        /// Parse a CSV file contaiing a list of URLs.
-        /// </summary>
-        ParseCsv = 7,
-
-        /// <summary>
         /// Report download information
         /// </summary>
         Report = 8,

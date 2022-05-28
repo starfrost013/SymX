@@ -96,10 +96,62 @@ namespace SymX
         /// </summary>
         public static bool DontGenerateTempFile { get; set; }
 
+        /// <summary>
+        /// The maximum download retries permissible before a file fails.
+        /// </summary>
+        public static uint MaxRetries { get; set; }
+
+        /// <summary>
+        /// Output folder for downloaded files. Default is /download
+        /// </summary>
+        public static string OutFolder { get; set; }
+
+        /// <summary>
+        /// If not <c>null</c>, the user-agent vendor string will be overridden with this value.
+        /// </summary>
+        public static string UserAgentVendor { get; set; }
+
+        /// <summary>
+        /// If not <c>null</c>, the user-agent version string will be overridden with this value.
+        /// </summary>
+        public static string UserAgentVersion { get; set; }
+
+        /// <summary>
+        /// Optional overriding of the symbol server url
+        /// </summary>
+        public static string SymbolServerUrl { get; set; }
+
+        /// <summary>
+        /// Private: Default user agent vendor string to use while sending requests.
+        /// </summary>
+
+        private static string DEFAULT_UA_VENDOR = "Microsoft-Symbol-Server";
+
+        /// <summary>
+        /// Private: Default user agent version string to use while sending requests.
+        /// </summary>
+
+        private static string DEFAULT_UA_VERSION = "10.1710.0.0";
+
+        /// <summary>
+        /// Private: The default symbol server URL
+        /// </summary>
+        private static string DEFAULT_SYMSRV_URL = "https://msdl.microsoft.com/download/symbols";
+
         static CommandLine()
         {
+            // Set up default values
             NumThreads = 12;
+            MaxRetries = 5;
+
             Verbosity = Verbosity.Normal;
+
+            UserAgentVendor = DEFAULT_UA_VENDOR;
+            UserAgentVersion = DEFAULT_UA_VERSION;
+
+            OutFolder = "download";
+
+            SymbolServerUrl = DEFAULT_SYMSRV_URL;
         }
 
         /// <summary>
@@ -203,9 +255,31 @@ namespace SymX
                             case "-dt":
                             case "-dtemp":
                                 DontGenerateTempFile = true;
-                                continue; 
+                                continue;
+                            case "-maxretries":
+                            case "-retries":
+                            case "-max":
+                            case "-m":
+                                MaxRetries = Convert.ToUInt32(nextArg);
+                                continue;
+                            case "-outfolder":
+                            case "-of":
+                                OutFolder = nextArg;
+                                continue;
+                            case "-useragentvendor":
+                            case "-uavendor":
+                                UserAgentVendor = nextArg;
+                                continue;
+                            case "-useragentversion":
+                            case "-uaversion":
+                                UserAgentVersion = nextArg;
+                                continue;
+                            case "-symbolserverurl":
+                            case "-symsrvurl":
+                            case "-symsrv":
+                                SymbolServerUrl = nextArg;
+                                continue;
                         }
-
                     }
                 }
 
@@ -264,6 +338,19 @@ namespace SymX
                         return false;
                     }
 
+                    if (OutFolder != null
+                        && !Directory.Exists(OutFolder))
+                    {
+                        Directory.CreateDirectory(OutFolder);
+                    }
+                    
+                    // Only allow official DbgX user agent with official symsrv
+                    if (SymbolServerUrl == DEFAULT_SYMSRV_URL)
+                    {
+                        UserAgentVendor = DEFAULT_UA_VENDOR;
+                        UserAgentVersion = DEFAULT_UA_VERSION;
+                    }
+
                     // default filename
                     if (OutFile == null) OutFile = FileName;
                 }
@@ -275,7 +362,6 @@ namespace SymX
                         return false;
                     }
                 }
-
 
                 return true;
             }

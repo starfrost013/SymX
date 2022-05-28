@@ -1,6 +1,6 @@
 SymX Alpha Preview
 A Microsoft Symbol Server bulk download tool
-Version 3.0.0 Alpha 4
+Version 3.0.0 Alpha 5
 
 28 May 2022
 
@@ -10,7 +10,17 @@ Please note that this is alpha quality software, is missing planned features, an
 
 RELEASE NOTES:
 
-Alpha 4 (May 28, 2022):
+Alpha 5 (May 28, 2022 21:30): 
+* SymX will now try to resume downloads a number of times before failing. -maxretries will control this value - the default is 5.
+* Fixed URLs per second always being 0 bug
+* Added -symbolserverurl: Allows you to use a custom symbol server url for download tools. The default is https://msdl.microsoft.com/download/symbols
+* Added -useragentvendor and -useragentversion. These do not work with the default Microsoft symbol server and are only used for custom symbol servers.
+* Fixed command line parsing bug where -start, -end, -imagesize, and -filename needed to be passed when supplying -infile
+* Added -outfolder to change the file download output folder. Default is /download in the root directory. A slash is automatically appended.
+* Fixed some minor bugs with text
+* Added new icon to SymX.exe
+
+Alpha 4 (May 28, 2022 13:15):
 * Added -infile - will attempt to download all files from a CSV generated with -generatecsv (this only works with Alpha 4-generated CSVs due to the lack of a properly functional URL column)
 * Fixed invalid MassView URL generation bug
 * Download report now reports URLs per second
@@ -21,7 +31,8 @@ Alpha 4 (May 28, 2022):
 * Implemented -hextime / -h option, which will interpret the -start and -end parameters as a hex-format 
 * Refactoring and code cleanup
 * Now outputs how many URLs failed to download or timed out
-* Successful URLs are now in green 
+* Now outputs URLs per second rate
+* Successful URLs are now outputted in green 
 
 Alpha 3 (May 23, 2022):
 * MassView is now integrated! Use -generatecsv in combination with -csvinfolder and -csvoutfile

@@ -10,6 +10,8 @@
 	<OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
 	<TransformOutOfDateOnly>false</TransformOutOfDateOnly>
 	<PlatformTarget>x64</PlatformTarget>
+	<PackageIcon>logo.png</PackageIcon>
+	<ApplicationIcon>Content\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -21,10 +23,10 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TextTemplating\Microsoft.TextTemplating.targets" />
   <ItemGroup>
-    <None Remove="Content\logo.png" />
     <None Remove="Content\readme.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\icon.ico" />
     <Content Include="Content\logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -34,6 +36,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Content\icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="Content\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Update="Tools\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>

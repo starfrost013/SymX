@@ -126,7 +126,7 @@ namespace SymX
                 {
                     for (ulong curTime = CommandLine.Start; curTime < CommandLine.End; curTime++)
                     {
-                        string fileUrl = $"https://msdl.microsoft.com/download/symbols/{CommandLine.FileName}/{curTime.ToString("x")}{CommandLine.ImageSize}/{CommandLine.FileName}";
+                        string fileUrl = $"{CommandLine.SymbolServerUrl}/{CommandLine.FileName}/{curTime.ToString("x")}{CommandLine.ImageSize}/{CommandLine.FileName}";
                         if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
                         urlList.Add(fileUrl);
                     }
@@ -140,7 +140,7 @@ namespace SymX
                     {
                         for (ulong curImageSize = imageSizeMin; curImageSize <= imageSizeMax; curImageSize += IMAGESIZE_PADDING)
                         {
-                            string fileUrl = $"https://msdl.microsoft.com/download/symbols/{CommandLine.FileName}/{curTime.ToString("x")}{curImageSize.ToString("x")}/{CommandLine.FileName}";
+                            string fileUrl = $"{CommandLine.SymbolServerUrl}/{CommandLine.FileName}/{curTime.ToString("x")}{curImageSize.ToString("x")}/{CommandLine.FileName}";
                             if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
                             urlList.Add(fileUrl);
                         }
@@ -150,7 +150,7 @@ namespace SymX
             }
             else
             {
-                // massview
+                // generate the URL list using massview
                 return MassView.ParseUrls(CommandLine.InFile);
             }
 
@@ -171,7 +171,7 @@ namespace SymX
 
             // Fake a DbgX UA.
             // Just in case (thanks pivotman319)
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Microsoft-Symbol-Server", "10.1710.0.0"));
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(CommandLine.UserAgentVendor, CommandLine.UserAgentVersion));
 
             StreamWriter tempFile = null;
 
@@ -313,6 +313,9 @@ namespace SymX
         {
             try
             {
+                int numOfRetries = 0;
+                int numFailedUrls = 0;
+
                 if (CommandLine.Verbosity > Verbosity.Quiet) NCLogging.Log($"Downloading {urls.Count} successful URLs...");
 
                 for (int curUrl = 0; curUrl < urls.Count; curUrl++)
@@ -333,10 +336,12 @@ namespace SymX
                             outFileName = $"{curUrl + 1}_{fileNameOnly}";
                         }
 
+                        // Prepend the output folder.
+                        outFileName = $"{CommandLine.OutFolder}\\{outFileName}";
+
                         NCLogging.Log($"Downloading {url} to {outFileName}...");
 
                         // Perform the download.
-                        // Get a stream of the file 
 
                         try
                         {
@@ -344,13 +349,28 @@ namespace SymX
                         }
                         catch
                         {
-                            NCLogging.Log("Failed to download the file. Retrying...", ConsoleColor.Yellow);
-                            curUrl--; // decrement current URL
+                            if (numOfRetries > CommandLine.MaxRetries)
+                            {
+                                // reset the number of retries. we will skip the url by doing this
+                                NCLogging.Log($"Reached {CommandLine.MaxRetries} tries, failing {url}...", ConsoleColor.Red);
+                                numFailedUrls++; 
+                                numOfRetries = 0;
+                            }
+                            else
+                            {
+                                // derement curURL to retry the current URL
+                                curUrl--;
+                            }
+
+                            numOfRetries++;
+                            NCLogging.Log($"Failed to download the file. Retrying ({numOfRetries}/{CommandLine.MaxRetries})...", ConsoleColor.Yellow);
+
                             continue;
                         }
                     }
                 }
 
+                if (numFailedUrls > 0) NCLogging.Log($"{numFailedUrls} URLs failed to download!", ConsoleColor.Yellow);
                 return true;
             }
             catch (Exception ex)
@@ -358,7 +378,6 @@ namespace SymX
                 NCLogging.Log($"A fatal error occurred while downloading files: {ex}", ConsoleColor.Red);
                 return false;
             }
-
         }
 
         private static void DownloadSuccessfulFile(string url, string outFileName)
@@ -366,6 +385,7 @@ namespace SymX
             var stream = httpClient.GetByteArrayAsync(url);
 
             // Wait for download to complete (we do this basically synchronously to reduce server load)
+            // Get a stream of the file 
             while (!stream.IsCompleted) { };
 
             using (FileStream fileStream = new FileStream(outFileName, FileMode.Create))

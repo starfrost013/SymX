@@ -11,7 +11,6 @@ Required switches:
 
 -imagesize [-i]: Imagesize to search for in hex format. Disregarded if the -imagesizemin and -imagesizemax options are both specified.
 
-
 Optional switches:
 
 -imagesizemin [-imin]: Minimum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded. Required if -imagesize is not provided.
@@ -39,12 +38,18 @@ A list of ImageSizes and TimeDateStamps will be generated from the folder specif
 
 -dontdownload [-d]: Generate list of URLs and exit, msdlurlgen 1.1 style!
 
+-maxretries [-retries, -max, -m]: Number of times to retry downloading a file before failing it. Default is 5.
+
+-useragentversion [-uaversion and useragentvendor [-uavendor]: Override the user agent If you are downloading from a custom server that requires a specific useragent, this may be helpful.
+Ignored if the default symbol server is specified.
+
+-outfolder [-of]: Folder to output downloaded files to. Default is /download
+
+-symbolserverurl [-symsrvurl, -symsrv]: Alternative URL to try and acquire files from. Default is http://msdl.microsoft.com/download/symbols. Must be a real symbol server.
 
 NOT IMPLEMENTED SWITCHES in this alpha version:
 
--outfolder [-of]: Folder to output downloaded files to. Default is /download
--overrideurl [-u, -url]: Alternative URL to try and acquire files from. Default is http://msdl.microsoft.com/download/symbols. Must be a real symbol server.
--useragent [-ua, -useragent]: Overrides the current user agent. If you are downloading from a custom server that requires a specific useragent, this may be helpful.
--max-retries: Number of times to retry downloading a file before failing it. Default is 5.
+
+
 
 Feature suggestions welcome!
