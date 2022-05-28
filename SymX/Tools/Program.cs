@@ -4,7 +4,7 @@ using SymX;
 
 if (CommandLine.Parse(args))
 {
-    // Initialise NuCore logging with default settings
+    // Initialise NuCore logging with logging based on the status of the -l option
     NCLogging.Settings.WriteToLog = CommandLine.LogToFile;
     NCLogging.Init();
 

@@ -2,11 +2,11 @@ SymX Alpha Preview
 A Microsoft Symbol Server bulk download tool
 Version 3.0.0 Alpha 4
 
-26 May 2022
+28 May 2022
 
 This is an experimental and buggy preview of the future merger of msdlurlgen and MassView (the MassView functionality is not in yet) that adds many new features, is far faster, and far more robust.
 
-Please note that this is alpha quality software, is missing features, and is not guaranteed to be stable. Please suggest features and test for bugs! Requires an x64 machine (ARM64 will also be supported and can be compiled on request).
+Please note that this is alpha quality software, is missing planned features, and is not guaranteed to be stable. Please suggest features and test for bugs! Requires an x64 machine (ARM64 will also be supported and can be compiled on request).
 
 RELEASE NOTES:
 
@@ -14,8 +14,8 @@ Alpha 4 (May 28, 2022):
 * Added -infile - will attempt to download all files from a CSV generated with -generatecsv (this only works with Alpha 4-generated CSVs due to the lack of a properly functional URL column)
 * Fixed invalid MassView URL generation bug
 * Download report now reports URLs per second
-* Fixed multiple file downloading always having the same filename
-* Added a temporary file generated with the list of successful links. Useful if it goes over scrollback or you crash. -dontgeneratetempfile / -dtemp suppresses it.
+* Fixed multiple file downloading always having using the file name of the first file found
+* Added a temporary file generated with the list of successful links. Useful if it goes over scrollback or you crash. -dontgeneratetempfile / -dtemp suppresses the generation of this log file.
 * Added vanity logo in \Content
 * Added timeout handling. 
 * Implemented -hextime / -h option, which will interpret the -start and -end parameters as a hex-format 

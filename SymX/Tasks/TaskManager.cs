@@ -249,21 +249,20 @@ namespace SymX
                         // If we haven't specified we don't want a temporary file, write it to successful_urls.log
                         if (!CommandLine.DontGenerateTempFile) tempFile.WriteLine(foundUrl);
 
-                        if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Found valid link at {foundUrl}!");
+                        if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Found a valid link at {foundUrl}!", ConsoleColor.Green);
                         successfulUrls.Add(foundUrl); // add it
                     }
                     else
                     {
                         if (task.IsFaulted)
                         {
-                            NCLogging.Log($"An error occurred while downloading {foundUrl}!");
+                            NCLogging.Log($"An error occurred while downloading {foundUrl}!", ConsoleColor.Red);
                             failedUrls++;
                         }
                         else
                         {
-                            if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"URL not found: {foundUrl}");
+                            if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"URL not found: {foundUrl}", ConsoleColor.Yellow);
                         }
-
                     }
                 }
 
@@ -280,7 +279,7 @@ namespace SymX
             // set some temporary variables
             double timeElapsed = timer.ElapsedMilliseconds / 1000;
 
-            if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Took {timeElapsed}sec to check {UrlList.Count} URLs, found {successfulUrls.Count} files ({successfulUrls.Count / timeElapsed} URLs per second");
+            if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Took {timeElapsed} seconds to check {UrlList.Count} URLs, found {successfulUrls.Count} files ({successfulUrls.Count / timeElapsed} URLs per second");
 
             if (!CommandLine.DontGenerateTempFile)
             {
@@ -316,7 +315,7 @@ namespace SymX
         {
             try
             {
-                if (CommandLine.Verbosity > Verbosity.Quiet) NCLogging.Log("Downloading successful URLs...");
+                if (CommandLine.Verbosity > Verbosity.Quiet) NCLogging.Log($"Downloading {urls.Count} successful URLs...");
 
                 for (int curUrl = 0; curUrl < urls.Count; curUrl++)
                 {
@@ -355,7 +354,7 @@ namespace SymX
             }
             catch (Exception ex)
             {
-                NCLogging.Log($"An exception occurred: {ex}");
+                NCLogging.Log($"A fatal error occurred while downloading files: {ex}");
                 return false;
             }
 
