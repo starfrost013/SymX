@@ -76,6 +76,7 @@ namespace SymX
             {
                 Tasks currentTask = TaskList[i];
 
+                // set window title
                 string taskString = $"Performing task {curTask}/{numTasks} ({currentTask})...";
 
                 Console.Title = $"{SymXVersion.SYMX_APPLICATION_NAME} - {taskString}";
@@ -83,6 +84,7 @@ namespace SymX
                 if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log(taskString);
                 curTask++;
 
+                // perform the current task
                 switch (currentTask)
                 {
                     // Generate a list of URLs from comman-dline options or CSV.
@@ -143,7 +145,6 @@ namespace SymX
                         }
                     }
                 }
-
             }
             else
             {
@@ -175,7 +176,16 @@ namespace SymX
             // create a temporary file if the user has not explicitly specified to do this
             if (!CommandLine.DontGenerateTempFile)
             {
-                tempFile = new StreamWriter(new FileStream(DEFAULT_TEMP_FILE_NAME, FileMode.OpenOrCreate));
+                try
+                {
+                    tempFile = new StreamWriter(new FileStream(DEFAULT_TEMP_FILE_NAME, FileMode.OpenOrCreate));
+                }
+                catch
+                {
+                    NCLogging.Log("Warning: Failed to create temp file - another instance is likely running", ConsoleColor.Yellow);
+                    // don't run temp file commands to prevent crashing
+                    CommandLine.DontGenerateTempFile = true;   
+                }
             }
 
             if (CommandLine.Verbosity >= Verbosity.Quiet) NCLogging.Log($"Trying {UrlList.Count} URLs...");
@@ -248,6 +258,7 @@ namespace SymX
                     }
                     else
                     {
+                        // if the task caused an exception then fail checking the URL
                         if (task.IsFaulted)
                         {
                             NCLogging.Log($"An error occurred while downloading {foundUrl}!", ConsoleColor.Red);
@@ -270,6 +281,7 @@ namespace SymX
                 if (i % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal) Console.WriteLine($"{percentageCompletionString}% complete ({i}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found");
             }
 
+            // calculate download information
             timeElapsed = timer.ElapsedMilliseconds / 1000;
             numSuccessfulUrls = successfulUrls.Count;
             urlsPerSecond = UrlList.Count / timeElapsed;
@@ -355,7 +367,7 @@ namespace SymX
                             }
                             else
                             {
-                                // derement curURL to retry the current URL
+                                // decrement curURL to retry the current URL
                                 curUrl--;
                             }
 

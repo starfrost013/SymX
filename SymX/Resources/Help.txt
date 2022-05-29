@@ -1,5 +1,8 @@
 
+Usage:
 SymX -start <start time> -end <end time> -filename <filename> -imagesize <image size> [options...]
+SymX -generatecsv -csvinfolder <folder> -outfile <filename
+SymX -infile <filename>
 
 Required switches:
 

@@ -1,14 +1,22 @@
-SymX Alpha Preview
+SymX
 A Microsoft Symbol Server bulk download tool
 Version 3.0.0 RC 1
 
 29 May 2022
 
-This is a release candidate of the future merger of msdlurlgen and MassView that adds many new features, is far faster, and is far more robust.
+SymX is a bulk download tool for binaries stored on the Microsoft Symbol Server. It has been used to find files from unleaked builds of Windows as well as dumping all the binaries from a Windows version.
+It is a merger of msdlurlgen and MassView that adds many new features to both, is far faster (60+ URLs per second, vs. <5), and is far more robust.
 
-Please note that this is alpha quality software, is missing planned features, and is not guaranteed to be stable. Please suggest features and test for bugs! Requires an x64 machine (ARM64 will also be supported and can be compiled on request).
+Please note that this is still a release candidate and therefore testing for bugs is highly encouraged. Requires an x64 machine (ARM64 will also be supported and can be compiled on request).
+If no bugs are found in this build this will be declared final 3.0.
 
 RELEASE NOTES:
+RC 1 (May 29, 2022):
+* Fixed bug where -outfolder folder would sometimes not be created
+* Changed text colours around a bit
+* Fixed typos in text
+* Increased default retry count from 5 to 8
+* Added additional command-line parsing error messages
 
 Alpha 5 (May 28, 2022 21:30): 
 * SymX will now try to resume downloads a number of times before failing. -maxretries will control this value - the default is 5.

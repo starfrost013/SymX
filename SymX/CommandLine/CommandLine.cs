@@ -310,9 +310,15 @@ namespace SymX
                 {
                     // Check for valid start, end, and filename
                     if (Start <= 0
-                        || End <= 0
-                        || FileName == null)
+                        || End <= 0)
                     {
+                        Console.WriteLine("-start or end: Required option not present!");
+                        return false;
+                    }
+
+                    if (FileName == null)
+                    {
+                        Console.WriteLine("-filename: Required option not present");
                         return false;
                     }
 
@@ -322,6 +328,7 @@ namespace SymX
                         if (ImageSizeMin == 0
                             || ImageSizeMax == 0)
                         {
+                            Console.WriteLine("Either -imagesize or both -imagesizemin and -imagesizemax must be present!");
                             return false;
                         }
                     }
@@ -330,6 +337,7 @@ namespace SymX
                     if (NumThreads < 1
                         || NumThreads > 30)
                     {
+                        Console.WriteLine("-numthreads: must be between 1-30 - no DDOSing the servers!");
                         return false; // don't DDOS the servers
                     }
 
@@ -341,13 +349,6 @@ namespace SymX
 
                         Start = ulong.Parse(startString, NumberStyles.HexNumber);
                         End = ulong.Parse(endString, NumberStyles.HexNumber);
-                    }
-
-                    // check we specified infile
-                    if (InFile != null
-                        && !File.Exists(InFile))
-                    {
-                        return false;
                     }
 
                     // Only allow official DbgX user agent with official symsrv
@@ -365,6 +366,7 @@ namespace SymX
                     if (CsvInFolder == null
                     || OutFile == null)
                     {
+                        Console.WriteLine("-csvinfolder and -outfile: both must be provided if -generatecsv is provided!");
                         return false;
                     }
                 }
