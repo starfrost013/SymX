@@ -16,9 +16,11 @@ Required switches:
 
 Optional switches:
 
--imagesizemin [-imin]: Minimum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded. Required if -imagesize is not provided.
+-imagesizemin [-imin]: Minimum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded.
+Required if -imagesize is not provided.
 
--imagesizemax [-imax]: Maximum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded. Required if -imagesize is not provided.
+-imagesizemax [-imax]: Maximum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded. 
+Required if -imagesize is not provided.
 
 -quiet [-q]: Quiet mode. Find nothing without making too much noise.
 
@@ -26,7 +28,7 @@ Optional switches:
 
 -numdownloads [-threads, -t, -num]: Change the number of threads used for downloading. A lower number of threads will reduce URL scanning performance. Range is 1-30, as this isn't DDOSX. The default value is 12.
 
--logtofile [-l, -log]: Log output to file. This respects verbosity.
+-logtofile [-l, -log]: Log output to file. This respects -q and -v.
 
 -outfile [-out, -o]: If a file is found, rename it after download to the filename specified.
 
@@ -41,13 +43,13 @@ A list of ImageSizes and TimeDateStamps will be generated from the folder specif
 
 -dontdownload [-d]: Generate list of URLs and exit, msdlurlgen 1.1 style!
 
--maxretries [-retries, -max, -m]: Number of times to retry downloading a file before failing it. Default is 5.
+-maxretries [-retries, -max, -m]: Number of times to retry downloading a file before giving up. Default is 5.
 
--useragentversion [-uaversion and useragentvendor [-uavendor]: Override the user agent If you are downloading from a custom server that requires a specific useragent, this may be helpful.
+-useragentversion [-uaversion] and useragentvendor [-uavendor]: Override the user agent If you are downloading from a custom server that requires a specific useragent, this may be helpful.
 Ignored if the default symbol server is specified.
 
--outfolder [-of]: Folder to output downloaded files to. Default is /download
+-outfolder [-of]: Folder to output downloaded files to. Default is a "download" folder in the current working directory.
 
 -symbolserverurl [-symsrvurl, -symsrv]: Alternative URL to try and acquire files from. Default is http://msdl.microsoft.com/download/symbols. Must be a real symbol server.
 
-Feature suggestions welcome!
+Feature suggestions are welcome!

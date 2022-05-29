@@ -361,7 +361,7 @@ namespace SymX
                             if (numOfRetries > CommandLine.MaxRetries)
                             {
                                 // reset the number of retries. we will skip the url by doing this
-                                NCLogging.Log($"Reached {CommandLine.MaxRetries} tries, failing {url}...", ConsoleColor.Red);
+                                NCLogging.Log($"Reached {CommandLine.MaxRetries} tries, giving up on {url}...", ConsoleColor.Red);
                                 numFailedUrls++;
                                 numOfRetries = 0;
                             }

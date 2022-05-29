@@ -1,6 +1,6 @@
 SymX
 A Microsoft Symbol Server bulk download tool
-Version 3.0.0 RC 1
+Version 3.0.0 RC 2
 
 29 May 2022
 
@@ -11,12 +11,17 @@ Please note that this is still a release candidate and therefore testing for bug
 If no bugs are found in this build this will be declared final 3.0.
 
 RELEASE NOTES:
-RC 1 (May 29, 2022):
+RC 2 (May 29, 2022 13:46):
+* Fixed help
+
+RC 1 (May 29, 2022 13:40):
 * Fixed bug where -outfolder folder would sometimes not be created
 * Changed text colours around a bit
 * Fixed typos in text
 * Increased default retry count from 5 to 8
 * Added additional command-line parsing error messages
+* Added handling for when SuccessfulURLs.log is already open
+* Fixed bug where custom symbol servers were not respected by MassView
 
 Alpha 5 (May 28, 2022 21:30): 
 * SymX will now try to resume downloads a number of times before failing. -maxretries will control this value - the default is 5.
@@ -32,7 +37,7 @@ Alpha 4 (May 28, 2022 13:15):
 * Added -infile - will attempt to download all files from a CSV generated with -generatecsv (this only works with Alpha 4-generated CSVs due to the lack of a properly functional URL column)
 * Fixed invalid MassView URL generation bug
 * Download report now reports URLs per second
-* Fixed multiple file downloading always having using the file name of the first file found
+* Fixed multiple file downloading always using the file name of the first file found
 * Added a temporary file generated with the list of successful links. Useful if it goes over scrollback or you crash. -dontgeneratetempfile / -dtemp suppresses the generation of this log file.
 * Added vanity logo in \Content
 * Added timeout handling. 
@@ -63,14 +68,12 @@ Alpha 2 (May 22, 2022)
 * Logging!
 * Different levels of verbosity!
 * Ability to specify a range of image sizes!
-* MassView features!
-* Downloading multiple files (kind of)
-
-Features coming in later alpha versions:
-
-* CSV input (read a csv, download all files) 
-* Changing the output directory
-* Hex string imput for start and end time (i'm working on it pivot :D)
+* MassView merged in
+* Ability to download files from a CSV
+* Hex time support!
+* Overridable user-agent and support for non-Microsoft symbol servers
+* Downloading multiple files!
+* 
 
 I found a bug!
 - DM me (Starfrost#9088) with what happened, OS, architecture, and your CL args.
