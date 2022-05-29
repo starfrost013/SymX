@@ -3,15 +3,21 @@ using System.Globalization;
 
 namespace SymX
 {
+    /// <summary>
+    /// CommandLine
+    /// 
+    /// Defines the command-line options that SymX can use,
+    /// and methods to parse them.
+    /// </summary>
     public static class CommandLine
     {
         /// <summary>
-        /// The start (in 64-bit unix time) epoch to scan for files in.
+        /// The start (in 64-bit unix time format) time to scan for files in.
         /// </summary>
         public static ulong Start { get; set; }
 
         /// <summary>
-        /// The end (in 64-bit unix time) epoch to scan for files to.
+        /// The end (in 64-bit unix time format) time to scan for files to.
         /// </summary>
         public static ulong End { get; set; }
 
@@ -138,11 +144,14 @@ namespace SymX
         /// </summary>
         private static string DEFAULT_SYMSRV_URL = "https://msdl.microsoft.com/download/symbols";
 
+        /// <summary>
+        /// Constructor for <see cref="CommandLine"/> that sets up default values.
+        /// </summary>
         static CommandLine()
         {
             // Set up default values
             NumThreads = 12;
-            MaxRetries = 5;
+            MaxRetries = 8;
 
             Verbosity = Verbosity.Normal;
 
@@ -283,11 +292,14 @@ namespace SymX
                     }
                 }
 
+                if (OutFolder != null
+                && !Directory.Exists(OutFolder)) Directory.CreateDirectory(OutFolder);
+
                 if (InFile != null)
                 {
                     if (!File.Exists(InFile))
                     {
-                        Console.WriteLine($"The file {InFile} does not exist!");
+                        Console.WriteLine($"-infile: The file {InFile} does not exist!");
                         return false;
                     }
 
@@ -325,7 +337,7 @@ namespace SymX
                     if (HexTime)
                     {
                         string startString = Start.ToString();
-                        string endString = End.ToString();  
+                        string endString = End.ToString();
 
                         Start = ulong.Parse(startString, NumberStyles.HexNumber);
                         End = ulong.Parse(endString, NumberStyles.HexNumber);
@@ -338,12 +350,6 @@ namespace SymX
                         return false;
                     }
 
-                    if (OutFolder != null
-                        && !Directory.Exists(OutFolder))
-                    {
-                        Directory.CreateDirectory(OutFolder);
-                    }
-                    
                     // Only allow official DbgX user agent with official symsrv
                     if (SymbolServerUrl == DEFAULT_SYMSRV_URL)
                     {
@@ -367,17 +373,17 @@ namespace SymX
             }
             catch (Exception ex)
             {
-                NCLogging.Log($"An error occurred parsing command-line arguments: {ex.Message}");
+                NCLogging.Log($"An error occurred while parsing command-line arguments: {ex.Message}", ConsoleColor.Red);
 
-                if (Verbosity >= Verbosity.Verbose) NCLogging.Log($"\n\nStacktrace: {ex.StackTrace}");
+                if (Verbosity >= Verbosity.Verbose) NCLogging.Log($"\n\nStacktrace: {ex.StackTrace}", ConsoleColor.Red);
 
-                return false; 
+                return false;
             }
         }
 
         public static void ShowHelp()
         {
-            PrintVersion(); 
+            PrintVersion();
             Console.WriteLine(Properties.Resources.Help);
         }
 
@@ -388,7 +394,7 @@ namespace SymX
             {
                 // temp until nucore allows you to turn off function name
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"{SymXVersion.SYMX_APPLICATION_NAME} {SymXVersion.SYMX_VERSION_EXTENDED_STRING}", ConsoleColor.Green);
+                Console.WriteLine($"{SymXVersion.SYMX_APPLICATION_NAME} {SymXVersion.SYMX_VERSION_EXTENDED_STRING}");
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("A Microsoft Symbol Server bulk download tool");
                 Console.WriteLine("© 2022 starfrost");

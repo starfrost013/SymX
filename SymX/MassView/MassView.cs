@@ -1,4 +1,4 @@
-﻿using NuCore.Utilities; 
+﻿using NuCore.Utilities;
 
 namespace SymX
 {
@@ -43,7 +43,7 @@ namespace SymX
             if (!Directory.Exists(inFolder))
             {
                 NCLogging.Log($"The folder {inFolder} does not exist!", ConsoleColor.Red);
-                return false; 
+                return false;
             }
             else
             {
@@ -62,6 +62,8 @@ namespace SymX
                     // list of file extensions that are usually PEs 
                     // .WinMD is Windows Metadata file, used for API metadata/exposing in Win8+ WinRT
                     // .cpls are Control Panel Applets, they are always PEs
+                    // .scrs are screensavers, which are also PE DLLs
+                    // .rlls are resource libraries
                     if (fileName.Contains(".exe")
                         || fileName.Contains(".dll")
                         || fileName.Contains(".sys")
@@ -79,7 +81,7 @@ namespace SymX
                             uint e_lfanew = br.ReadUInt32();
 
                             // check for the PE header 
-
+                            // not exactly foolproof, but should work 99.99% of the time. and in worse case we will get invalid values and skip the file anyway
                             if (e_lfanew < br.BaseStream.Length - 4)
                             {
                                 br.BaseStream.Seek(e_lfanew, SeekOrigin.Begin);
@@ -111,7 +113,7 @@ namespace SymX
                                     // i don't think there's any possible situation where there could NOT be slashes in this path
                                     string fileNameOnly = fileNameFolders[fileNameFolders.Length - 1];
 
-                                    if (outFile != null) bw.WriteLine($"{fileName},{timeDateStamp},{dateIso},{dateHex},{sizeOfImageHex},https://msdl.microsoft.com/download/symbols/{fileNameOnly}/{dateHex}{sizeOfImageHex}/{fileNameOnly}");
+                                    if (outFile != null) bw.WriteLine($"{fileName},{timeDateStamp},{dateIso},{dateHex},{sizeOfImageHex},{CommandLine.SymbolServerUrl}/{fileNameOnly}/{dateHex}{sizeOfImageHex}/{fileNameOnly}");
                                 }
                             }
                         }
@@ -122,7 +124,7 @@ namespace SymX
 
                 NCLogging.Log($"Successfully wrote CSV file to: {outFile}!", ConsoleColor.Green);
 
-                return true; 
+                return true;
             }
         }
 
@@ -132,13 +134,13 @@ namespace SymX
 
             string[] csvLines = File.ReadAllLines(csvFile);
 
-            int numRejectedLines = 0; 
+            int numRejectedLines = 0;
 
             // skip the first line (CSV header) by starting at 1
-            for (int curLine = 1; curLine < csvLines.Length; curLine++)   
+            for (int curLine = 1; curLine < csvLines.Length; curLine++)
             {
                 string csvLine = csvLines[curLine];
-                
+
                 string[] csvLineSections = csvLine.Split(',');
 
                 if (csvLineSections.Length < URL_COLUMN_NUMBER)
@@ -146,7 +148,7 @@ namespace SymX
                     if (CommandLine.Verbosity >= Verbosity.Normal)
                     {
                         NCLogging.Log($"Warning: Rejected line {curLine} as it does not have URL section", ConsoleColor.Yellow);
-                        numRejectedLines++; 
+                        numRejectedLines++;
                     }
                 }
                 else

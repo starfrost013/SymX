@@ -1,10 +1,10 @@
 SymX Alpha Preview
 A Microsoft Symbol Server bulk download tool
-Version 3.0.0 Alpha 5
+Version 3.0.0 RC 1
 
-28 May 2022
+29 May 2022
 
-This is an experimental and buggy preview of the future merger of msdlurlgen and MassView that adds many new features, is far faster, and is far more robust.
+This is a release candidate of the future merger of msdlurlgen and MassView that adds many new features, is far faster, and is far more robust.
 
 Please note that this is alpha quality software, is missing planned features, and is not guaranteed to be stable. Please suggest features and test for bugs! Requires an x64 machine (ARM64 will also be supported and can be compiled on request).
 
