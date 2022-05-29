@@ -50,9 +50,4 @@ Ignored if the default symbol server is specified.
 
 -symbolserverurl [-symsrvurl, -symsrv]: Alternative URL to try and acquire files from. Default is http://msdl.microsoft.com/download/symbols. Must be a real symbol server.
 
-NOT IMPLEMENTED SWITCHES in this alpha version:
-
-
-
-
 Feature suggestions welcome!
