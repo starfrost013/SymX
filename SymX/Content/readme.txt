@@ -1,21 +1,25 @@
 SymX
 A Microsoft Symbol Server bulk download tool
-Version 3.0.0 RC 2
+Version 3.0.0 
 
 29 May 2022
 
 SymX is a bulk download tool for binaries stored on the Microsoft Symbol Server. It has been used to find files from unleaked builds of Windows as well as dumping all the binaries from a Windows version.
 It is a merger of msdlurlgen and MassView that adds many new features to both, is far faster (60+ URLs per second, vs. <5), and is far more robust.
 
-Please note that this is still a release candidate and therefore testing for bugs is highly encouraged. Requires an x64 machine (ARM64 will also be supported and can be compiled on request).
-If no bugs are found in this build this will be declared final 3.0.
+It is not intended as a replacement for symchk and cannot at present be used to download symbols, only binaries.
+
+This program requires an x64 machine (ARM64 can be compiled on request) and the .NET 6.0 runtime. It also requires an internet or intranet connection in order to download files. 
 
 RELEASE NOTES:
+3.0.0 (May 29, 2022 15:15):
+* More grammatical fixes in help, readme, and in some strings
+
 RC 2 (May 29, 2022 13:46):
 * Fixed help
 
 RC 1 (May 29, 2022 13:40):
-* Fixed bug where -outfolder folder would sometimes not be created
+* Fixed bug where the folder specified by -outfolder would not be created in some cases.
 * Changed text colours around a bit
 * Fixed typos in text
 * Increased default retry count from 5 to 8
@@ -73,7 +77,7 @@ Alpha 2 (May 22, 2022)
 * Hex time support!
 * Overridable user-agent and support for non-Microsoft symbol servers
 * Downloading multiple files!
-* 
+* Changing the output directory!
 
 I found a bug!
-- DM me (Starfrost#9088) with what happened, OS, architecture, and your CL args.
+- DM me (Starfrost#9088) with what happened, OS, architecture, and your CL args. Feature suggestions are welcome!

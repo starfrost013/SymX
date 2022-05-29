@@ -372,7 +372,7 @@ namespace SymX
                             }
 
                             numOfRetries++;
-                            NCLogging.Log($"Failed to download the file. Retrying ({numOfRetries}/{CommandLine.MaxRetries})...", ConsoleColor.Yellow);
+                            NCLogging.Log($"An error occurred while downloading. Retrying ({numOfRetries}/{CommandLine.MaxRetries})...", ConsoleColor.Yellow);
 
                             continue;
                         }
