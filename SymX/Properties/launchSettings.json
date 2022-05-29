@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "-s 1298539200 -e 1298540700 -f csrss.exe -imin 4000 -imax 9000 -outfolder d:\\hahahaha"
+      "commandLineArgs": "-s 1298539200 -e 1298540700 -f csrss.exe -imin 4000 -imax 9000 "
     }
   }
 }
