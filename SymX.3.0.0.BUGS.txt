@@ -1,5 +1,0 @@
-SymX 3.0.0
-Bug List
-
-* -q, -infile don't play well
-* URL scanned text is -numthreads files behind
