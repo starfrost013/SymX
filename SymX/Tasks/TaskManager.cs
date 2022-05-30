@@ -1,4 +1,4 @@
-﻿using NuCore.Utilities;
+using NuCore.Utilities;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 
@@ -209,13 +209,14 @@ namespace SymX
             for (int i = 0; i < UrlList.Count; i += noDownloadsAtOnce)
             {
                 // Set up a batch of downloads (default 12, ~numdownloads)
-                for (int j = 0; j < noDownloadsAtOnce; j++)
+                for (int curUrlInUrlSet = 0; curUrlInUrlSet < noDownloadsAtOnce; curUrlInUrlSet++)
                 {
-                    int curUrlId = i + j;
+                    int curUrlId = curUrlSet + curUrlInUrlSet;
 
                     if (curUrlId < UrlList.Count)
                     {
                         string curUrl = UrlList[i + j];
+
                         if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {curUrl}...");
                         Task<bool> worker = Task<bool>.Run(() => CheckFileExists(curUrl));
                         tasks.Add(worker);

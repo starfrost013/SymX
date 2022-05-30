@@ -20,7 +20,6 @@ namespace SymX
 		public static int SYMX_VERSION_REVISION = 0;
 		public static int SYMX_VERSION_BUILD = 31;
 		public static string SYMX_VERSION_SPECIFIER = "-alpha1";
-
 		public static string SYMX_VERSION_STRING = "3.1.0--alpha1";
 		public static string SYMX_VERSION_EXTENDED_STRING = "3.1.0--alpha1 (build 31, built 2022-05-29 18:53:23)";
 	}
