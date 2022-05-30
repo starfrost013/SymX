@@ -1,6 +1,6 @@
 SymX
 A Microsoft Symbol Server bulk download tool
-Version 3.0.1
+Version 3.0.2
 
 30 May 2022
 
@@ -12,7 +12,11 @@ It is not intended as a replacement for symchk and cannot at present be used to 
 This program requires an x64 machine (ARM64 can be compiled on request) and the .NET 6.0 runtime. It also requires an internet or intranet connection in order to download files. 
 
 RELEASE NOTES:
-3.0.1 (May 30, 2022):
+3.0.2 (May 30, 2022 20:20)
+* Fix percentage (i am extremely dumb)
+* More minor refactoring
+
+3.0.1 (May 30, 2022 20:05):
 * Fix quiet verbosity not actually downloading any files
 * Fix retry count not being reset for each file
 * Hopefully fix "9/8" retries bug
