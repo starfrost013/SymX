@@ -207,22 +207,23 @@ namespace SymX
             double urlsPerSecond = 0;
             double percentageCompletion = 0; 
 
-            for (int i = 0; i < UrlList.Count; i += noDownloadsAtOnce)
+            for (int curUrlSet = 0; curUrlSet < UrlList.Count; curUrlSet += noDownloadsAtOnce)
             {
+                percentageCompletion = ((curUrlSet / (double)UrlList.Count)) * 100;
                 string percentageCompletionString = percentageCompletion.ToString("F1");
 
                 // Performance improvement: don't dump to the console so often
                 // we should allow the user to control this in future
-                if (i % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal) Console.WriteLine($"{percentageCompletionString}% complete ({i}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found");
+                if (curUrlSet % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal) Console.WriteLine($"{percentageCompletionString}% complete ({curUrlSet}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found");
 
                 // Set up a batch of downloads (default 12, ~numdownloads)
                 for (int j = 0; j < noDownloadsAtOnce; j++)
                 {
-                    int curUrlId = i + j;
+                    int curUrlId = curUrlSet + j;
 
                     if (curUrlId < UrlList.Count)
                     {
-                        string curUrl = UrlList[i + j];
+                        string curUrl = UrlList[curUrlSet + j];
                         if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {curUrl}...");
                         Task<bool> worker = Task<bool>.Run(() => CheckFileExists(curUrl));
                         tasks.Add(worker);
@@ -252,7 +253,7 @@ namespace SymX
                 {
                     Task<bool> task = tasks[curTask];
 
-                    string foundUrl = UrlList[i + curTask];
+                    string foundUrl = UrlList[curUrlSet + curTask];
                     // it was successful so...
                     // get the current url 
                     if (task.Result) // get the current url

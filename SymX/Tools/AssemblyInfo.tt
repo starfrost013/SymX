@@ -38,7 +38,7 @@ namespace SymX
 public static string SYMX_APPLICATION_NAME = "SymX";
 public static int SYMX_VERSION_MAJOR = 3;
 public static int SYMX_VERSION_MINOR = 0; 
-public static int SYMX_VERSION_REVISION = 1;
+public static int SYMX_VERSION_REVISION = 2;
 public static int SYMX_VERSION_BUILD = (DateTime.UtcNow - new DateTime(2022, 04, 28)).Days;
 public static string SYMX_VERSION_SPECIFIER = "final";
 
