@@ -205,17 +205,25 @@ namespace SymX
             double timeElapsed = 0;
             int numSuccessfulUrls = 0;
             double urlsPerSecond = 0;
+            double percentageCompletion = 0; 
 
-            for (int i = 0; i < UrlList.Count; i += noDownloadsAtOnce)
+            for (int curUrlSet = 0; curUrlSet < UrlList.Count; curUrlSet += noDownloadsAtOnce)
             {
+                percentageCompletion = ((curUrlSet / (double)UrlList.Count)) * 100;
+                string percentageCompletionString = percentageCompletion.ToString("F1");
+
+                // Performance improvement: don't dump to the console so often
+                // we should allow the user to control this in future
+                if (curUrlSet % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal) Console.WriteLine($"{percentageCompletionString}% complete ({curUrlSet}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found");
+
                 // Set up a batch of downloads (default 12, ~numdownloads)
                 for (int j = 0; j < noDownloadsAtOnce; j++)
                 {
-                    int curUrlId = i + j;
+                    int curUrlId = curUrlSet + j;
 
                     if (curUrlId < UrlList.Count)
                     {
-                        string curUrl = UrlList[i + j];
+                        string curUrl = UrlList[curUrlSet + j];
                         if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {curUrl}...");
                         Task<bool> worker = Task<bool>.Run(() => CheckFileExists(curUrl));
                         tasks.Add(worker);
@@ -245,7 +253,7 @@ namespace SymX
                 {
                     Task<bool> task = tasks[curTask];
 
-                    string foundUrl = UrlList[i + curTask];
+                    string foundUrl = UrlList[curUrlSet + curTask];
                     // it was successful so...
                     // get the current url 
                     if (task.Result) // get the current url
@@ -272,13 +280,6 @@ namespace SymX
                 }
 
                 tasks.Clear();
-
-                double percentageCompletion = ((i / (double)UrlList.Count)) * 100;
-                string percentageCompletionString = percentageCompletion.ToString("F1");
-
-                // Performance improvement: don't dump to the console so often
-                // we should allow the user to control this in future
-                if (i % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal) Console.WriteLine($"{percentageCompletionString}% complete ({i}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found");
             }
 
             // calculate download information
@@ -325,58 +326,57 @@ namespace SymX
                 int numOfRetries = 0;
                 int numFailedUrls = 0;
 
-                if (CommandLine.Verbosity > Verbosity.Quiet) NCLogging.Log($"Downloading {urls.Count} successful URLs...");
+                if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {urls.Count} successful URLs...");
 
                 for (int curUrl = 0; curUrl < urls.Count; curUrl++)
                 {
                     string url = urls[curUrl];
 
-                    if (CommandLine.Verbosity > Verbosity.Quiet)
+                    string outFileName = CommandLine.OutFile;
+
+                    // prevent downloading the same file several times 
+                    if (urls.Count > 1)
                     {
-                        string outFileName = CommandLine.OutFile;
+                        string[] fileNameSplit = url.Split('/');
+                        // get the last one
+                        string fileNameOnly = fileNameSplit[fileNameSplit.Length - 1];
 
-                        // prevent downloading the same file several times 
-                        if (urls.Count > 1)
-                        {
-                            string[] fileNameSplit = url.Split('/');
-                            // get the last one
-                            string fileNameOnly = fileNameSplit[fileNameSplit.Length - 1];
-
-                            outFileName = $"{curUrl + 1}_{fileNameOnly}";
-                        }
-
-                        // Prepend the output folder.
-                        outFileName = $"{CommandLine.OutFolder}\\{outFileName}";
-
-                        NCLogging.Log($"Downloading {url} to {outFileName}...");
-
-                        // Perform the download.
-
-                        try
-                        {
-                            DownloadSuccessfulFile(url, outFileName);
-                        }
-                        catch
-                        {
-                            if (numOfRetries > CommandLine.MaxRetries)
-                            {
-                                // reset the number of retries. we will skip the url by doing this
-                                NCLogging.Log($"Reached {CommandLine.MaxRetries} tries, giving up on {url}...", ConsoleColor.Red);
-                                numFailedUrls++;
-                                numOfRetries = 0;
-                            }
-                            else
-                            {
-                                // decrement curURL to retry the current URL
-                                curUrl--;
-                            }
-
-                            numOfRetries++;
-                            NCLogging.Log($"An error occurred while downloading. Retrying ({numOfRetries}/{CommandLine.MaxRetries})...", ConsoleColor.Yellow);
-
-                            continue;
-                        }
+                        outFileName = $"{curUrl + 1}_{fileNameOnly}";
                     }
+
+                    // Prepend the output folder.
+                    outFileName = $"{CommandLine.OutFolder}\\{outFileName}";
+
+                    if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {url} to {outFileName}...");
+
+                    // Perform the download.
+
+                    try
+                    {
+                        DownloadSuccessfulFile(url, outFileName);
+                        // reset the number of retries for each file
+                        numOfRetries = 0;
+                    }
+                    catch
+                    {
+                        if (numOfRetries > CommandLine.MaxRetries)
+                        {
+                            // reset the number of retries. we will skip the url by doing this
+                            NCLogging.Log($"Reached {CommandLine.MaxRetries} tries, giving up on {url}...", ConsoleColor.Red);
+                            numFailedUrls++;
+                            numOfRetries = 0;
+                        }
+                        else
+                        {
+                            NCLogging.Log($"An error occurred while downloading. Retrying ({numOfRetries}/{CommandLine.MaxRetries})...", ConsoleColor.Yellow);
+                            // decrement curURL to retry the current URL
+                            curUrl--;
+                            numOfRetries++;
+                        }
+
+                        continue;
+                    }
+
                 }
 
                 if (numFailedUrls > 0) NCLogging.Log($"{numFailedUrls} URLs failed to download!", ConsoleColor.Yellow);
