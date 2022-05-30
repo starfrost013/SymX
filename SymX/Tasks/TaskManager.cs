@@ -217,13 +217,13 @@ namespace SymX
                 if (curUrlSet % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal) Console.WriteLine($"{percentageCompletionString}% complete ({curUrlSet}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found");
 
                 // Set up a batch of downloads (default 12, ~numdownloads)
-                for (int j = 0; j < noDownloadsAtOnce; j++)
+                for (int curUrlInUrlSet = 0; curUrlInUrlSet < noDownloadsAtOnce; curUrlInUrlSet++)
                 {
-                    int curUrlId = curUrlSet + j;
+                    int curUrlId = curUrlSet + curUrlInUrlSet;
 
                     if (curUrlId < UrlList.Count)
                     {
-                        string curUrl = UrlList[curUrlSet + j];
+                        string curUrl = UrlList[curUrlSet + curUrlInUrlSet];
                         if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {curUrl}...");
                         Task<bool> worker = Task<bool>.Run(() => CheckFileExists(curUrl));
                         tasks.Add(worker);
