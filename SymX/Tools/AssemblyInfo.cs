@@ -1,4 +1,4 @@
-﻿// This file defines the version information - generated using the AssemblyInfo.tt T4 template.
+// This file defines the version information - generated using the AssemblyInfo.tt T4 template.
 // This is an automatically generated file - do not modify!
 
 using System.Reflection;
@@ -8,7 +8,6 @@ using System.Reflection;
 [assembly: AssemblyVersion("3.1.0.32")]
 [assembly: AssemblyFileVersion("3.1.0.32")]
 [assembly: AssemblyInformationalVersion("3.1.0-alpha1 (build 32, built 2022-05-30 20:34:30)")]
-
 
 namespace SymX
 {

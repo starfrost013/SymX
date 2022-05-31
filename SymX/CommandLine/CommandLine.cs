@@ -127,6 +127,7 @@ namespace SymX
         /// </summary>
         public static string SymbolServerUrl { get; set; }
 
+        #region Defaults
         /// <summary>
         /// Private: Default user agent vendor string to use while sending requests.
         /// </summary>
@@ -145,7 +146,13 @@ namespace SymX
         private static string DEFAULT_SYMSRV_URL = "https://msdl.microsoft.com/download/symbols";
 
         /// <summary>
-        /// Constructor for <see cref="CommandLine"/> that sets up default values.
+        /// Private: The default output folder.
+        /// </summary>
+        private static string DEFAULT_OUTPUT_FOLDER = "download";
+        #endregion
+
+        /// <summary>
+        /// Constructor for <see cref="CommandLine"/> that sets up the default values.
         /// </summary>
         static CommandLine()
         {
@@ -158,7 +165,7 @@ namespace SymX
             UserAgentVendor = DEFAULT_UA_VENDOR;
             UserAgentVersion = DEFAULT_UA_VERSION;
 
-            OutFolder = "download";
+            OutFolder = DEFAULT_OUTPUT_FOLDER;
 
             SymbolServerUrl = DEFAULT_SYMSRV_URL;
         }
@@ -318,7 +325,7 @@ namespace SymX
 
                     if (FileName == null)
                     {
-                        Console.WriteLine("-filename: Required option not present");
+                        Console.WriteLine("-filename: Required option not present!");
                         return false;
                     }
 
