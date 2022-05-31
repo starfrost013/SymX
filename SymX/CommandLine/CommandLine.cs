@@ -312,6 +312,11 @@ namespace SymX
 
                     return true;
                 }
+                else
+                {
+                    Console.WriteLine("-infile: Required option not present!");
+                    return false;
+                }
 
                 if (!GenerateCsv) // non-massview mode
                 {
@@ -325,7 +330,7 @@ namespace SymX
 
                     if (FileName == null)
                     {
-                        Console.WriteLine("-filename: Required option not present");
+                        Console.WriteLine("-filename: Required option not present!");
                         return false;
                     }
 
