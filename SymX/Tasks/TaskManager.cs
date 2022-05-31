@@ -224,6 +224,7 @@ namespace SymX
                     if (curUrlId < UrlList.Count)
                     {
                         string curUrl = UrlList[curUrlSet + curUrlInUrlSet];
+                      
                         if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {curUrl}...");
                         Task<bool> worker = Task<bool>.Run(() => CheckFileExists(curUrl));
                         tasks.Add(worker);
