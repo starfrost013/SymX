@@ -127,6 +127,16 @@ namespace SymX
         /// </summary>
         public static string SymbolServerUrl { get; set; }
 
+        /// <summary>
+        /// The number of simultaneous downloads.
+        /// </summary>
+        public static int NumOfDownloads { get; set; }
+
+        /// <summary>
+        /// MassView: Recurse
+        /// </summary>
+        public static bool Recurse { get; set; }
+
         #region Defaults
         /// <summary>
         /// Private: Default user agent vendor string to use while sending requests.
@@ -168,6 +178,9 @@ namespace SymX
             OutFolder = DEFAULT_OUTPUT_FOLDER;
 
             SymbolServerUrl = DEFAULT_SYMSRV_URL;
+
+            NumOfDownloads = NumThreads;
+            if (NumOfDownloads > 10) NumOfDownloads = 10;
         }
 
         /// <summary>
@@ -295,6 +308,11 @@ namespace SymX
                             case "-symsrv":
                                 SymbolServerUrl = nextArg;
                                 continue;
+                            case "-recursive":
+                            case "-recurse":
+                            case "-r":
+                                Recurse = true;
+                                continue; 
                         }
                     }
                 }

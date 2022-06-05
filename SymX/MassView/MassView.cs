@@ -47,7 +47,7 @@ namespace SymX
             }
             else
             {
-                if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"MassView: Checking folder {inFolder}, dumping to {outFile}");
+                if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"MassView: Checking folder {inFolder}, dumping to {outFile}");
                 StreamWriter bw = null;
 
                 bw = new StreamWriter(new FileStream(outFile, FileMode.Create));
@@ -56,6 +56,11 @@ namespace SymX
                 bw.WriteLine("FileName,TimeDateStamp,ISO8601,Hex,SizeOfImage,URL");
 
                 string[] dirFiles = Directory.GetFiles(inFolder);
+
+                if (CommandLine.Recurse)
+                { 
+                    
+                }
 
                 foreach (string fileName in dirFiles)
                 {
@@ -127,6 +132,14 @@ namespace SymX
                 return true;
             }
         }
+
+        //private static List<string> BuildListOfUrlsRecursively(string[] urls)
+        //{
+        //  foreach (string fileName in Directory.GetFiles(CommandLine.CsvInFolder))
+        //  {
+
+        //  }
+        //}
 
         public static List<string> ParseUrls(string csvFile)
         {

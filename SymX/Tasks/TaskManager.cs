@@ -214,7 +214,14 @@ namespace SymX
 
                 // Performance improvement: don't dump to the console so often
                 // we should allow the user to control this in future
-                if (curUrlSet % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal) Console.WriteLine($"{percentageCompletionString}% complete ({curUrlSet}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found");
+                if (curUrlSet % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal)
+                {
+                    // don't log this (nucore will allow optional logging)
+                    if (CommandLine.Verbosity < Verbosity.Verbose) Console.Clear(); // clear console when not in verbose mode
+                    Console.WriteLine($"{percentageCompletionString}% complete ({curUrlSet}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found");
+                }
+
+                
 
                 // Set up a batch of downloads (default 12, ~numdownloads)
                 for (int curUrlInUrlSet = 0; curUrlInUrlSet < noDownloadsAtOnce; curUrlInUrlSet++)
