@@ -43,7 +43,7 @@ A list of ImageSizes and TimeDateStamps will be generated from the folder specif
 
 -dontdownload [-d]: Generate list of URLs and exit, msdlurlgen 1.1 style!
 
--maxretries [-retries, -max, -m]: Number of times to retry downloading a file before giving up. Default is 5.
+-maxretries [-retries, -max, -m]: Number of times to retry downloading a file before giving up. Default is 8.
 
 -useragentversion [-uaversion] and useragentvendor [-uavendor]: Override the user agent If you are downloading from a custom server that requires a specific useragent, this may be helpful.
 Ignored if the default symbol server is specified.

@@ -1,4 +1,7 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿// SymX
+// A Microsoft Symbol Server bulk download tool
+// © 2022 starfrost
+
 using NuCore.Utilities;
 using SymX;
 

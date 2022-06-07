@@ -221,8 +221,6 @@ namespace SymX
                     Console.WriteLine($"{percentageCompletionString}% complete ({curUrlSet}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found");
                 }
 
-                
-
                 // Set up a batch of downloads (default 12, ~numdownloads)
                 for (int curUrlInUrlSet = 0; curUrlInUrlSet < noDownloadsAtOnce; curUrlInUrlSet++)
                 {
@@ -346,10 +344,21 @@ namespace SymX
                     if (urls.Count > 1)
                     {
                         string[] fileNameSplit = url.Split('/');
+
                         // get the last one
                         string fileNameOnly = fileNameSplit[fileNameSplit.Length - 1];
 
-                        outFileName = $"{curUrl + 1}_{fileNameOnly}";
+                        int urlId = curUrl + 1;
+
+                        outFileName = $"{urlId}_{fileNameOnly}";
+
+                        // Prevent files with the same number and filename in the folder overwriing each other.
+                        // If the filename exists, increment it.
+                        while (File.Exists(outFileName))
+                        {
+                            urlId++;
+                            outFileName = $"{urlId}_{fileNameOnly}";
+                        }
                     }
 
                     // Prepend the output folder.

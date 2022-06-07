@@ -55,11 +55,17 @@ namespace SymX
                 // Write the CSV elements
                 bw.WriteLine("FileName,TimeDateStamp,ISO8601,Hex,SizeOfImage,URL");
 
-                string[] dirFiles = Directory.GetFiles(inFolder);
+                // set up the list of files to get files frmo
+                string[] dirFiles = null;
 
                 if (CommandLine.Recurse)
                 { 
-                    
+                    dirFiles = Directory.GetFiles(inFolder);
+                }
+                else
+                {
+                    // generate a list of files recursively
+                    dirFiles = BuildListOfUrlsRecursively().ToArray();
                 }
 
                 foreach (string fileName in dirFiles)
@@ -133,13 +139,23 @@ namespace SymX
             }
         }
 
-        //private static List<string> BuildListOfUrlsRecursively(string[] urls)
-        //{
-        //  foreach (string fileName in Directory.GetFiles(CommandLine.CsvInFolder))
-        //  {
+        private static List<string> BuildListOfUrlsRecursively(string directory = null, List<string> urls = null)
+        {
+            if (urls == null) urls = new List<string>();
+            if (directory == null) directory = CommandLine.CsvInFolder;
 
-        //  }
-        //}
+            foreach (string fileName in Directory.GetFiles(directory))
+            {
+                urls.Add(fileName);
+            }
+
+            foreach (string dirName in Directory.GetDirectories(directory))
+            {
+                BuildListOfUrlsRecursively(dirName, urls);
+            }
+
+            return urls; 
+        }
 
         public static List<string> ParseUrls(string csvFile)
         {
