@@ -3,9 +3,9 @@
 namespace SymX
 {
     /// <summary>
-    /// MassView 2.1
+    /// MassView
     /// 
-    /// Dumps required information for Microsoft Symbol Server links to a file.
+    /// Dumps required information for Microsoft Symbol Server links to a CSV file.
     /// </summary>
     public static class MassView
     {

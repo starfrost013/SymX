@@ -42,10 +42,13 @@
             this.MainMenuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.FileList = new System.Windows.Forms.ListView();
             this.FileListFileName = new System.Windows.Forms.ColumnHeader();
-            this.FileListImageSize = new System.Windows.Forms.ColumnHeader();
+            this.FileListImageSizeMin = new System.Windows.Forms.ColumnHeader();
             this.TimeDateStamp = new System.Windows.Forms.ColumnHeader();
             this.FileListHeader = new System.Windows.Forms.Label();
             this.DownloadButton = new System.Windows.Forms.Button();
+            this.AddFileButton = new System.Windows.Forms.Button();
+            this.RemoveFileButton = new System.Windows.Forms.Button();
+            this.FileListImageSizeMax = new System.Windows.Forms.ColumnHeader();
             this.MainMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -74,19 +77,19 @@
             // MainMenuFileGenerateCSV
             // 
             this.MainMenuFileGenerateCSV.Name = "MainMenuFileGenerateCSV";
-            this.MainMenuFileGenerateCSV.Size = new System.Drawing.Size(145, 22);
+            this.MainMenuFileGenerateCSV.Size = new System.Drawing.Size(180, 22);
             this.MainMenuFileGenerateCSV.Text = "Generate CSV";
             // 
             // MainMenuFileLoadCSV
             // 
             this.MainMenuFileLoadCSV.Name = "MainMenuFileLoadCSV";
-            this.MainMenuFileLoadCSV.Size = new System.Drawing.Size(145, 22);
+            this.MainMenuFileLoadCSV.Size = new System.Drawing.Size(180, 22);
             this.MainMenuFileLoadCSV.Text = "Load CSV";
             // 
             // MainMenuFileExit
             // 
             this.MainMenuFileExit.Name = "MainMenuFileExit";
-            this.MainMenuFileExit.Size = new System.Drawing.Size(145, 22);
+            this.MainMenuFileExit.Size = new System.Drawing.Size(180, 22);
             this.MainMenuFileExit.Text = "Exit";
             // 
             // MainMenuSettings
@@ -142,7 +145,8 @@
             // 
             this.FileList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.FileListFileName,
-            this.FileListImageSize,
+            this.FileListImageSizeMin,
+            this.FileListImageSizeMax,
             this.TimeDateStamp});
             this.FileList.Location = new System.Drawing.Point(70, 49);
             this.FileList.Name = "FileList";
@@ -155,12 +159,14 @@
             this.FileListFileName.Text = "Filename";
             this.FileListFileName.Width = 250;
             // 
-            // FileListImageSize
+            // FileListImageSizeMin
             // 
-            this.FileListImageSize.Text = "Image size";
+            this.FileListImageSizeMin.Text = "Minimum image size";
+            this.FileListImageSizeMin.Width = 100;
             // 
             // TimeDateStamp
             // 
+            this.TimeDateStamp.DisplayIndex = 2;
             this.TimeDateStamp.Text = "TimeDateStamp";
             // 
             // FileListHeader
@@ -181,11 +187,38 @@
             this.DownloadButton.Text = "Download";
             this.DownloadButton.UseVisualStyleBackColor = true;
             // 
+            // AddFileButton
+            // 
+            this.AddFileButton.Location = new System.Drawing.Point(70, 390);
+            this.AddFileButton.Name = "AddFileButton";
+            this.AddFileButton.Size = new System.Drawing.Size(120, 32);
+            this.AddFileButton.TabIndex = 4;
+            this.AddFileButton.Text = "Add File";
+            this.AddFileButton.UseVisualStyleBackColor = true;
+            this.AddFileButton.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // RemoveFileButton
+            // 
+            this.RemoveFileButton.Location = new System.Drawing.Point(196, 390);
+            this.RemoveFileButton.Name = "RemoveFileButton";
+            this.RemoveFileButton.Size = new System.Drawing.Size(120, 32);
+            this.RemoveFileButton.TabIndex = 5;
+            this.RemoveFileButton.Text = "Remove File";
+            this.RemoveFileButton.UseVisualStyleBackColor = true;
+            // 
+            // FileListImageSizeMax
+            // 
+            this.FileListImageSizeMax.DisplayIndex = 3;
+            this.FileListImageSizeMax.Text = "Maximum image size";
+            this.FileListImageSizeMax.Width = 100;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.RemoveFileButton);
+            this.Controls.Add(this.AddFileButton);
             this.Controls.Add(this.DownloadButton);
             this.Controls.Add(this.FileListHeader);
             this.Controls.Add(this.FileList);
@@ -218,7 +251,10 @@
         private ToolStripMenuItem MainMenuHelpReleaseNotes;
         private ToolStripMenuItem MainMenuHelpAbout;
         private ColumnHeader FileListFileName;
-        private ColumnHeader FileListImageSize;
+        private ColumnHeader FileListImageSizeMin;
         private ColumnHeader TimeDateStamp;
+        private Button AddFileButton;
+        private Button RemoveFileButton;
+        private ColumnHeader FileListImageSizeMax;
     }
 }

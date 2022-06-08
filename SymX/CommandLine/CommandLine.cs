@@ -183,6 +183,7 @@ namespace SymX
             if (NumOfDownloads > 10) NumOfDownloads = 10;
         }
 
+        #region Parser
         /// <summary>
         /// Parses command line arguments.
         /// 
@@ -427,5 +428,7 @@ namespace SymX
                 Console.WriteLine("© 2022 starfrost");
             }
         }
+
+        #endregion
     }
 }

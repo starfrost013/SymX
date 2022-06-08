@@ -12,28 +12,10 @@
 	<PackageIcon>logo.png</PackageIcon>
 	<ApplicationIcon>Content\icon.ico</ApplicationIcon>
 	<Configurations>Debug;Release</Configurations>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702</NoWarn>
+	<NoWarn>1701;1702</NoWarn>
 	<PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug.Arm64|AnyCPU'">
-    <NoWarn>1701;1702</NoWarn>
-	<PlatformTarget>ARM64</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702</NoWarn>
-	<PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release.Arm64|AnyCPU'">
-    <NoWarn>1701;1702</NoWarn>
-	<PlatformTarget>ARM64</PlatformTarget>
-  </PropertyGroup>
-	
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TextTemplating\Microsoft.TextTemplating.targets" />
   <ItemGroup>
     <None Remove="Content\readme.txt" />
