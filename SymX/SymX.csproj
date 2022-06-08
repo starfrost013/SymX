@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -11,7 +11,7 @@
 	<TransformOutOfDateOnly>false</TransformOutOfDateOnly>
 	<PackageIcon>logo.png</PackageIcon>
 	<ApplicationIcon>Content\icon.ico</ApplicationIcon>
-	<Configurations>Debug;Release;Debug.Arm64;Release.Arm64</Configurations>
+	<Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -33,6 +33,7 @@
     <NoWarn>1701;1702</NoWarn>
 	<PlatformTarget>ARM64</PlatformTarget>
   </PropertyGroup>
+	
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TextTemplating\Microsoft.TextTemplating.targets" />
   <ItemGroup>
     <None Remove="Content\readme.txt" />
@@ -87,29 +88,16 @@
 
 	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<Reference Include="NuCore.Utilities">
-			<HintPath>..\..\..\b\b\NuCore.Utilities.dll</HintPath>
+			<HintPath>NuCore.Utilities.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<Reference Include="NuCore.Utilities">
-			<HintPath>..\..\..\b\b\NuCore.Utilities.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug.Arm64|AnyCPU'">
-		<Reference Include="NuCore.Utilities">
-			<HintPath>..\..\..\b\b\NuCore.Utilities-ARM64.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release.Arm64|AnyCPU'">
-		<Reference Include="NuCore.Utilities">
-			<HintPath>..\..\..\b\b\NuCore.Utilities-ARM64.dll</HintPath>
+			<HintPath>NuCore.Utilities.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	
-
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

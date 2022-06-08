@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Configurations>Debug;Release;Debug.Arm64;Release.Arm64</Configurations>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
 </Project>
