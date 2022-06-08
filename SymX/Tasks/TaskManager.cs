@@ -326,7 +326,7 @@ namespace SymX
                     Console.Write("█");
                 }
 
-                for (int curBar = numberOfPercentagesToDraw; curBar <= PROGRESS_BAR_LENGTH; curBar++)
+                for (int curBar = numberOfPercentagesToDraw; curBar < PROGRESS_BAR_LENGTH; curBar++)
                 {
                     Console.Write(" ");
                 }
@@ -370,29 +370,33 @@ namespace SymX
 
                     string outFileName = CommandLine.OutFile;
 
+                    int urlId = 0;
+                    string inFileName = null;
+
                     // prevent downloading the same file several times 
                     if (urls.Count > 1)
                     {
                         string[] fileNameSplit = url.Split('/');
 
-                        // get the last one
-                        string fileNameOnly = fileNameSplit[fileNameSplit.Length - 1];
+                        // get the last section of the path (the filename)
+                        inFileName = fileNameSplit[fileNameSplit.Length - 1];
 
-                        int urlId = curUrl + 1;
+                        urlId = curUrl + 1;
 
-                        outFileName = $"{urlId}_{fileNameOnly}";
+                        outFileName = $"{urlId}_{inFileName}";
 
-                        // Prevent files with the same number and filename in the folder overwriing each other.
-                        // If the filename exists, increment it.
-                        while (File.Exists(outFileName))
-                        {
-                            urlId++;
-                            outFileName = $"{urlId}_{fileNameOnly}";
-                        }
                     }
 
                     // Prepend the output folder.
                     outFileName = $"{CommandLine.OutFolder}\\{outFileName}";
+
+                    // Prevent files with the same number and filename in the folder overwriing each other.
+                    // If the filename exists, increment it.
+                    while (File.Exists(outFileName))
+                    {
+                        urlId++;
+                        outFileName = $"{CommandLine.OutFolder}\\{urlId}_{inFileName}";
+                    }
 
                     if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {url} to {outFileName}...");
 
