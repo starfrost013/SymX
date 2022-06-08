@@ -6,5 +6,6 @@ namespace SymX_UI
         {
             InitializeComponent();
         }
+
     }
 }

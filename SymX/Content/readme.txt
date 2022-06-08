@@ -9,7 +9,13 @@ It is a merger of msdlurlgen and MassView that adds many new features to both, i
 
 It is not intended as a replacement for symchk and cannot at present be used to download symbols, only binaries.
 
-This program requires an x64 machine (ARM64 can be compiled on request) and the .NET 6.0 runtime. It also requires an internet or intranet connection in order to download files. 
+System Requirements:
+x86-64 or ARM64 architecture
+.NET 6.0 runtime
+
+x86-64: Windows 7, Windows 8.1, or Windows 10 version 1607+
+ARM64: Windows 10, build 21277 or later (SymX-UI.exe not supported)
+An internet or intranet connection in order to download files. 
 
 RELEASE NOTES:
 3.0.3 (May 31, 2022):

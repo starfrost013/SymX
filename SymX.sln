@@ -9,26 +9,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SymX-UI", "SymX-UI\SymX-UI.
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug.Arm64|Any CPU = Debug.Arm64|Any CPU
 		Debug|Any CPU = Debug|Any CPU
-		Release.Arm64|Any CPU = Release.Arm64|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A1279E6B-4360-46EC-896D-A6779F5E91C5}.Debug.Arm64|Any CPU.ActiveCfg = Debug.Arm64|Any CPU
-		{A1279E6B-4360-46EC-896D-A6779F5E91C5}.Debug.Arm64|Any CPU.Build.0 = Debug.Arm64|Any CPU
 		{A1279E6B-4360-46EC-896D-A6779F5E91C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A1279E6B-4360-46EC-896D-A6779F5E91C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1279E6B-4360-46EC-896D-A6779F5E91C5}.Release.Arm64|Any CPU.ActiveCfg = Release.Arm64|Any CPU
-		{A1279E6B-4360-46EC-896D-A6779F5E91C5}.Release.Arm64|Any CPU.Build.0 = Release.Arm64|Any CPU
 		{A1279E6B-4360-46EC-896D-A6779F5E91C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1279E6B-4360-46EC-896D-A6779F5E91C5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D7E05E8E-CA38-4DD9-8934-B6932A661662}.Debug.Arm64|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7E05E8E-CA38-4DD9-8934-B6932A661662}.Debug.Arm64|Any CPU.Build.0 = Debug|Any CPU
 		{D7E05E8E-CA38-4DD9-8934-B6932A661662}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D7E05E8E-CA38-4DD9-8934-B6932A661662}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D7E05E8E-CA38-4DD9-8934-B6932A661662}.Release.Arm64|Any CPU.ActiveCfg = Release|Any CPU
-		{D7E05E8E-CA38-4DD9-8934-B6932A661662}.Release.Arm64|Any CPU.Build.0 = Release|Any CPU
 		{D7E05E8E-CA38-4DD9-8934-B6932A661662}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7E05E8E-CA38-4DD9-8934-B6932A661662}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
