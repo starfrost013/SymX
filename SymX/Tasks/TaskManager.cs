@@ -341,7 +341,7 @@ namespace SymX
                 // clear current line 
                 Console.Write(clearCurrentLineString);
 
-                Console.WriteLine(reportString);
+                NCLogging.Log(reportString);
 
                 // clear current line again
                 Console.Write(clearCurrentLineString);
@@ -364,11 +364,11 @@ namespace SymX
                 // clear current line again. this will be in nucore later on
                 Console.Write(clearCurrentLineString);
 
-                Console.WriteLine("Latest successful URLs (SuccessfulURLs.log contains all successful URLs):");
+                NCLogging.Log("Latest successful URLs (SuccessfulURLs.log contains all successful URLs):");
             }
             else
             {
-                Console.WriteLine(reportString);
+                NCLogging.Log(reportString);
             }
             
         }

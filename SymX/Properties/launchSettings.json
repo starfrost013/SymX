@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "-filename profapi.dll -start 1275699300 -end 1275700300 -imagesize f000"
+      "commandLineArgs": "-in 14993.csv -of 14993 -t 30 -l"
     }
   }
 }
