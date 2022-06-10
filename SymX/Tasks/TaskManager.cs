@@ -77,7 +77,7 @@ namespace SymX
             int curTask = 1;
 
             // delete temp file
-            if (File.Exists(DEFAULT_TEMP_FILE_NAME)) File.Delete(DEFAULT_TEMP_FILE_NAME);
+            if (File.Exists(DEFAULT_TEMP_FILE_NAME) && !CommandLine.DontGenerateTempFile) File.Delete(DEFAULT_TEMP_FILE_NAME);
 
             // perform each task in sequence
             for (int i = 0; i < TaskList.Count; i++)
@@ -113,7 +113,6 @@ namespace SymX
                         continue;
                     // Exit the program.
                     case Tasks.Exit:
-                        //if (File.Exists(DEFAULT_TEMP_FILE_NAME)) File.Delete(DEFAULT_TEMP_FILE_NAME);
                         Environment.Exit(0);
                         continue;
                 }
