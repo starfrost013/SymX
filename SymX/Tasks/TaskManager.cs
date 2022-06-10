@@ -332,7 +332,7 @@ namespace SymX
 
                 string clearCurrentLineString = "\x1b[2K";
 
-                foreach (string successfulUrl in successfulUrls) Console.WriteLine(successfulUrl);
+                foreach (string successfulUrl in successfulUrls) NCLogging.Log(successfulUrl);
 
                 // draw it last so we draw over the top of the successful urls if necessary so the user can always see the progress
 
@@ -341,7 +341,7 @@ namespace SymX
                 // clear current line 
                 Console.Write(clearCurrentLineString);
 
-                NCLogging.Log(reportString);
+                Console.WriteLine(reportString);
 
                 // clear current line again
                 Console.Write(clearCurrentLineString);
