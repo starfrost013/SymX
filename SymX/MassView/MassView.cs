@@ -58,7 +58,7 @@ namespace SymX
                 // set up the list of files to get files frmo
                 string[] dirFiles = null;
 
-                if (CommandLine.Recurse)
+                if (!CommandLine.Recurse)
                 { 
                     dirFiles = Directory.GetFiles(inFolder);
                 }
