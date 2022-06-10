@@ -222,7 +222,7 @@ namespace SymX
                 if (curUrlSet % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal)
                 {
                     string reportString = $"{percentageCompletionString}% complete ({curUrlSet}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found";
-                    ScanDrawDownloadUi(reportString, percentageCompletion);
+                    ScanDrawDownloadUi(reportString, percentageCompletion, successfulUrls);
                 }
 
                 // Set up a batch of downloads (default 12, ~numdownloads)
@@ -271,7 +271,7 @@ namespace SymX
                         // If we haven't specified we don't want a temporary file, write it to successful_urls.log
                         if (!CommandLine.DontGenerateTempFile) tempFile.WriteLine(foundUrl);
 
-                        if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Found a valid link at {foundUrl}!", ConsoleColor.Green);
+                        if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Found a valid link at {foundUrl}!", ConsoleColor.Green);
                         successfulUrls.Add(foundUrl); // add it
                     }
                     else
@@ -309,30 +309,63 @@ namespace SymX
             return successfulUrls;
         }
 
-        private static void ScanDrawDownloadUi(string reportString, double percentageCompletion)
+        private static void ScanDrawDownloadUi(string reportString, double percentageCompletion, List<string> successfulUrls)
         {
             // don't log this (nucore will allow optional logging)
-            if (CommandLine.Verbosity < Verbosity.Verbose) Console.Clear(); // clear console when not in verbose mode
-
-            Console.WriteLine(reportString);
-
             if (CommandLine.Verbosity < Verbosity.Verbose)
             {
-                int numberOfPercentagesToDraw = (int)(PROGRESS_BAR_LENGTH * (percentageCompletion / 100));
+                // the reason that there is an empty catch block here
+                // is that console.clear throws an exception if the console is piped to a file
+                // so for some reason if someone was piping symx to a file...
+                try
+                {
+                    // clear the *ENTIRE* console, not just visible stuff. this fixes display issues
+                    // BUT may cause garbage <Win10 1507. We have to use a VTS here for now because Console doesn't have this functionality
+                    Console.Write($"\x1b[3J"); // clear console when not in verbose mode
+                }
+                catch { };
 
-                for (int curPercent = 0; curPercent < numberOfPercentagesToDraw; curPercent++)
+                string clearScreenString = "\x1b[2K";
+
+                foreach (string successfulUrl in successfulUrls) Console.WriteLine(successfulUrl);
+
+                // draw it last so we draw over the top of the successful urls if necessary so the user can always see the progress
+
+                Console.SetCursorPosition(0, 0);
+
+                // clear current line 
+                Console.Write(clearScreenString);
+
+                Console.WriteLine(reportString);
+
+                // clear current line again
+                Console.Write(clearScreenString);
+
+                int numberOfBarsToDraw = (int)(PROGRESS_BAR_LENGTH * (percentageCompletion / 100));
+
+                for (int curPercent = 0; curPercent < numberOfBarsToDraw; curPercent++)
                 {
                     // large box character dec:219 hex:DB
                     Console.Write("█");
                 }
 
-                for (int curBar = numberOfPercentagesToDraw; curBar < PROGRESS_BAR_LENGTH; curBar++)
-                {
-                    Console.Write(" ");
-                }
+                for (int curBar = numberOfBarsToDraw; curBar < (PROGRESS_BAR_LENGTH - 1); curBar++) Console.Write(" ");
 
-                Console.Write("█\n");
+                Console.Write("█\n\n");
+
+                // start at (0, 2) so that this is always visible
+                Console.SetCursorPosition(0, 2);
+
+                // clear current line again. this will be in nucore later on
+                Console.Write(clearScreenString);
+
+                Console.WriteLine("Latest successful URLs (SuccessfulURLs.log contains all successful URLs):");
             }
+            else
+            {
+                Console.WriteLine(reportString);
+            }
+            
         }
 
         /// <summary>

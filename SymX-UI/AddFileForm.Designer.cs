@@ -28,19 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.AddFileHeader = new System.Windows.Forms.Label();
             this.SuspendLayout();
+            // 
+            // AddFileHeader
+            // 
+            this.AddFileHeader.AutoSize = true;
+            this.AddFileHeader.Font = new System.Drawing.Font("Segoe UI", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AddFileHeader.Location = new System.Drawing.Point(12, 9);
+            this.AddFileHeader.Name = "AddFileHeader";
+            this.AddFileHeader.Size = new System.Drawing.Size(200, 65);
+            this.AddFileHeader.TabIndex = 0;
+            this.AddFileHeader.Text = "Add File";
             // 
             // AddFileForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.AddFileHeader);
             this.Name = "AddFileForm";
             this.Text = "Add File";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
+
+        private Label AddFileHeader;
     }
 }
