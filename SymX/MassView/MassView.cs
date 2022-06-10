@@ -57,7 +57,7 @@ namespace SymX
                 bw = new StreamWriter(new FileStream(outFile, FileMode.Create));
 
                 // Write the CSV elements
-                bw.WriteLine("FileName,TimeDateStamp,ISO8601,Hex,SizeOfImage,URL");
+                bw.WriteLine("FileName,TimeDateStamp,ISO8601,Hex,SizeOfImage,Url");
 
                 // set up the list of files to get files frmo
                 string[] dirFiles = null;

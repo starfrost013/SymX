@@ -76,6 +76,9 @@ namespace SymX
             int numTasks = TaskList.Count;
             int curTask = 1;
 
+            // delete temp file
+            if (File.Exists(DEFAULT_TEMP_FILE_NAME)) File.Delete(DEFAULT_TEMP_FILE_NAME);
+
             // perform each task in sequence
             for (int i = 0; i < TaskList.Count; i++)
             {
@@ -110,7 +113,7 @@ namespace SymX
                         continue;
                     // Exit the program.
                     case Tasks.Exit:
-                        if (File.Exists(DEFAULT_TEMP_FILE_NAME)) File.Delete(DEFAULT_TEMP_FILE_NAME);
+                        //if (File.Exists(DEFAULT_TEMP_FILE_NAME)) File.Delete(DEFAULT_TEMP_FILE_NAME);
                         Environment.Exit(0);
                         continue;
                 }
@@ -188,7 +191,7 @@ namespace SymX
                 }
                 catch
                 {
-                    NCLogging.Log("Warning: Failed to create temp file - another instance is likely running", ConsoleColor.Yellow);
+                    NCLogging.Log("Warning: Failed to create temp file - another instance of SymX is likely running!", ConsoleColor.Yellow);
                     // don't run temp file commands to prevent crashing
                     CommandLine.DontGenerateTempFile = true;
                 }
@@ -396,6 +399,8 @@ namespace SymX
             {
                 int numOfRetries = 0;
                 int numFailedUrls = 0;
+
+                if (CommandLine.Verbosity >= Verbosity.Verbose) Console.Clear(); // clear console
 
                 if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {urls.Count} successful URLs...");
 
