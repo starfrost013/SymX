@@ -35,6 +35,10 @@ namespace SymX
         /// </summary>
         private static uint URL_COLUMN_NUMBER = 6;
 
+        /// <summary>
+        /// Runs a standard MassView scam
+        /// </summary>
+        /// <returns></returns>
         public static bool Run()
         {
             string inFolder = CommandLine.CsvInFolder;

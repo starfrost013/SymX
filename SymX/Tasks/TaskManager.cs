@@ -110,6 +110,7 @@ namespace SymX
                         continue;
                     // Exit the program.
                     case Tasks.Exit:
+                        if (File.Exists(DEFAULT_TEMP_FILE_NAME)) File.Delete(DEFAULT_TEMP_FILE_NAME);
                         Environment.Exit(0);
                         continue;
                 }
@@ -303,7 +304,7 @@ namespace SymX
             {
                 // delete SuccessfulURLs.log if we created it
                 tempFile.Close();
-                File.Delete(DEFAULT_TEMP_FILE_NAME);
+
             }
 
             return successfulUrls;
@@ -321,11 +322,12 @@ namespace SymX
                 {
                     // clear the *ENTIRE* console, not just visible stuff. this fixes display issues
                     // BUT may cause garbage <Win10 1507. We have to use a VTS here for now because Console doesn't have this functionality
+                    Console.Clear();
                     Console.Write($"\x1b[3J"); // clear console when not in verbose mode
                 }
                 catch { };
 
-                string clearScreenString = "\x1b[2K";
+                string clearCurrentLineString = "\x1b[2K";
 
                 foreach (string successfulUrl in successfulUrls) Console.WriteLine(successfulUrl);
 
@@ -334,12 +336,12 @@ namespace SymX
                 Console.SetCursorPosition(0, 0);
 
                 // clear current line 
-                Console.Write(clearScreenString);
+                Console.Write(clearCurrentLineString);
 
                 Console.WriteLine(reportString);
 
                 // clear current line again
-                Console.Write(clearScreenString);
+                Console.Write(clearCurrentLineString);
 
                 int numberOfBarsToDraw = (int)(PROGRESS_BAR_LENGTH * (percentageCompletion / 100));
 
@@ -357,7 +359,7 @@ namespace SymX
                 Console.SetCursorPosition(0, 2);
 
                 // clear current line again. this will be in nucore later on
-                Console.Write(clearScreenString);
+                Console.Write(clearCurrentLineString);
 
                 Console.WriteLine("Latest successful URLs (SuccessfulURLs.log contains all successful URLs):");
             }
@@ -406,18 +408,17 @@ namespace SymX
                     int urlId = 0;
                     string inFileName = null;
 
+                    string[] fileNameSplit = url.Split('/');
+
+                    // get the last section of the path (the filename)
+                    inFileName = fileNameSplit[fileNameSplit.Length - 1];
+
                     // prevent downloading the same file several times 
                     if (urls.Count > 1)
                     {
-                        string[] fileNameSplit = url.Split('/');
-
-                        // get the last section of the path (the filename)
-                        inFileName = fileNameSplit[fileNameSplit.Length - 1];
-
                         urlId = curUrl + 1;
 
                         outFileName = $"{urlId}_{inFileName}";
-
                     }
 
                     // Prepend the output folder.

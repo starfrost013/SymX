@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "-generatecsv -csvinfolder C:\\temp -outfile recursetest.csv -recursive"
+      "commandLineArgs": "-filename profapi.dll -start 1275699300 -end 1275700300 -imagesize f000"
     }
   }
 }
