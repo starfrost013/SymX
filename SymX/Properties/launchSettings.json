@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "-in 14993.csv -of 14993 -t 30 -l"
+      "commandLineArgs": "symx -infile 25140_2022-06-17.csv -v"
     }
   }
 }

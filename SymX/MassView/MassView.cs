@@ -128,7 +128,11 @@ namespace SymX
                                     // i don't think there's any possible situation where there could NOT be slashes in this path
                                     string fileNameOnly = fileNameFolders[fileNameFolders.Length - 1];
 
-                                    if (outFile != null) bw.WriteLine($"{fileName},{timeDateStamp},{dateIso},{dateHex},{sizeOfImageHex},{CommandLine.SymbolServerUrl}/{fileNameOnly}/{dateHex}{sizeOfImageHex}/{fileNameOnly}");
+                                    // 0x5C = \
+                                    // This escapes the string so that Excel does not interpret any e000 as scientific notation
+                                    string finalString = $"{fileName},{timeDateStamp},{dateIso},{dateHex},{sizeOfImageHex},{CommandLine.SymbolServerUrl}/{fileNameOnly}/{dateHex}{sizeOfImageHex}/{fileNameOnly}";
+                                    
+                                    if (outFile != null) bw.WriteLine(finalString);
                                 }
                             }
                         }

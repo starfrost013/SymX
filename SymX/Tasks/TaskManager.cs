@@ -210,6 +210,8 @@ namespace SymX
             List<Task<bool>> tasks = new List<Task<bool>>();
 
             // set up some temporary variables to use later
+            // calculate download information
+            long timeElapsedMs = 0;
             double timeElapsed = 0;
             int numSuccessfulUrls = 0;
             double urlsPerSecond = 0;
@@ -279,10 +281,11 @@ namespace SymX
                     }
                     else
                     {
+                        
                         // if the task caused an exception then fail checking the URL
                         if (task.IsFaulted)
                         {
-                            NCLogging.Log($"An error occurred while downloading {foundUrl}!", ConsoleColor.Red);
+                            NCLogging.Log($"An error occurred while scanning for {foundUrl}!", ConsoleColor.Red);
                             failedUrls++;
                         }
                         else
@@ -295,19 +298,15 @@ namespace SymX
                 tasks.Clear();
             }
 
-            // calculate download information
-            timeElapsed = timer.ElapsedMilliseconds / 1000;
+            timeElapsedMs = timer.ElapsedMilliseconds;
+            timeElapsed = timeElapsedMs / 1000;
             numSuccessfulUrls = successfulUrls.Count;
-            urlsPerSecond = UrlList.Count / timeElapsed;
+            urlsPerSecond = (double)(UrlList.Count / (timeElapsedMs / (double)1000));
 
             if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Took {timeElapsed} seconds to check {UrlList.Count} URLs, found {numSuccessfulUrls} files ({urlsPerSecond.ToString("F1")} URLs per second)");
 
-            if (!CommandLine.DontGenerateTempFile)
-            {
-                // delete SuccessfulURLs.log if we created it
-                tempFile.Close();
-
-            }
+            // close successfulurls.log (it is deleted later)
+            if (!CommandLine.DontGenerateTempFile) tempFile.Close();
 
             return successfulUrls;
         }
@@ -330,8 +329,6 @@ namespace SymX
                 catch { };
 
                 string clearCurrentLineString = "\x1b[2K";
-
-                foreach (string successfulUrl in successfulUrls) NCLogging.Log(successfulUrl);
 
                 // draw it last so we draw over the top of the successful urls if necessary so the user can always see the progress
 
@@ -358,12 +355,16 @@ namespace SymX
                 Console.Write("█\n\n");
 
                 // start at (0, 2) so that this is always visible
-                Console.SetCursorPosition(0, 2);
+                Console.SetCursorPosition(0, 3);
 
                 // clear current line again. this will be in nucore later on
                 Console.Write(clearCurrentLineString);
 
-                NCLogging.Log("Latest successful URLs (SuccessfulURLs.log contains all successful URLs):");
+                Console.Write("Latest successful URLs:");
+
+                if (!CommandLine.DontGenerateTempFile) Console.WriteLine(" (SuccessfulURLs.log contains all successful URLs):");
+
+                foreach (string successfulUrl in successfulUrls) Console.WriteLine(successfulUrl);
             }
             else
             {
@@ -442,13 +443,29 @@ namespace SymX
 
                     try
                     {
-                        DownloadSuccessfulFile(url, outFileName);
+                        FileInformation metadata = DownloadSuccessfulFile(url, outFileName);
                         // reset the number of retries for each file
+
+                        if (CommandLine.Verbosity >= Verbosity.Verbose
+                            && CommandLine.IsDefaultSymbolServer())
+                        {
+                            if (metadata.LastModifiedDate > new DateTime(2017, 06, 11, 23, 59, 59, 999))
+                            {
+                                NCLogging.Log($"Last modified date: {metadata.LastModifiedDate.ToString("yyyy-MM-dd HH:mm:ss")}");
+                            }
+                            else
+                            {
+                                NCLogging.Log("WARNING: Invalid last modified date - file was uploaded before Azure move!", ConsoleColor.Yellow);
+                            }
+                        }
+
+                        NCLogging.Log($"File size: {metadata.FileSize} (took {metadata.DownloadTime}ms to download, {metadata.DownloadSpeed.ToString("F1")} KB/s)");
+
                         numOfRetries = 0;
                     }
                     catch
                     {
-                        if (numOfRetries > CommandLine.MaxRetries)
+                        if (numOfRetries >= CommandLine.MaxRetries)
                         {
                             // reset the number of retries. we will skip the url by doing this
                             NCLogging.Log($"Reached {CommandLine.MaxRetries} tries, giving up on {url}...", ConsoleColor.Red);
@@ -457,10 +474,14 @@ namespace SymX
                         }
                         else
                         {
+                            numOfRetries++;
                             NCLogging.Log($"An error occurred while downloading. Retrying ({numOfRetries}/{CommandLine.MaxRetries})...", ConsoleColor.Yellow);
+                            // delete any partially downloaded files
+                            if (File.Exists(outFileName)) File.Delete(outFileName);
+
                             // decrement curURL to retry the current URL
                             curUrl--;
-                            numOfRetries++;
+
                         }
 
                         continue;
@@ -478,18 +499,49 @@ namespace SymX
             }
         }
 
-        private static void DownloadSuccessfulFile(string url, string outFileName)
+        private static FileInformation DownloadSuccessfulFile(string url, string outFileName)
         {
-            var stream = httpClient.GetByteArrayAsync(url);
+            FileInformation fileInfo = new FileInformation();
+
+            if (CommandLine.Verbosity >= Verbosity.Verbose)
+            {
+                var stream = httpClient.GetAsync(url);
+
+                while (!stream.IsCompleted) { };
+
+                HttpResponseMessage message = stream.Result;
+
+                if (message.Content.Headers.LastModified != null)
+                {
+                    DateTimeOffset dateTimeOffset = (DateTimeOffset)message.Content.Headers.LastModified;
+                    DateTime lastModified = dateTimeOffset.UtcDateTime;
+
+                    fileInfo.LastModifiedDate = lastModified;
+                }
+            }
+
+            Stopwatch downloadStopwatch = new Stopwatch();
+            downloadStopwatch.Start();
+
+            var downloadStream = httpClient.GetByteArrayAsync(url);
 
             // Wait for download to complete (we do this basically synchronously to reduce server load)
             // Get a stream of the file 
-            while (!stream.IsCompleted) { };
+            while (!downloadStream.IsCompleted) { };
+
+            downloadStopwatch.Stop();
+
+            byte[] fileArray = downloadStream.Result;
+
+            fileInfo.FileSize = fileArray.LongLength;
+            fileInfo.DownloadTime = downloadStopwatch.ElapsedMilliseconds;
 
             using (FileStream fileStream = new FileStream(outFileName, FileMode.Create))
             {
-                fileStream.Write(stream.Result);
+                fileStream.Write(fileArray);
             }
+
+            return fileInfo;
         }
     }
 }

@@ -332,6 +332,15 @@ namespace SymX
                     return true;
                 }
 
+
+                // Check for invalid or DDOSing thread count options. 
+                if (NumThreads < 1
+                    || NumThreads > 30)
+                {
+                    Console.WriteLine("-numthreads: must be between 1-30 - no DDOSing the servers!");
+                    return false; // don't DDOS the servers
+                }
+
                 if (!GenerateCsv) // non-massview mode
                 {
                     // Check for valid start, end, and filename
@@ -359,13 +368,6 @@ namespace SymX
                         }
                     }
 
-                    // Check for invalid or DDOSing thread count options. 
-                    if (NumThreads < 1
-                        || NumThreads > 30)
-                    {
-                        Console.WriteLine("-numthreads: must be between 1-30 - no DDOSing the servers!");
-                        return false; // don't DDOS the servers
-                    }
 
                     // The user has specified they want hex time format, reconvert to it
                     if (HexTime)
@@ -429,6 +431,7 @@ namespace SymX
             }
         }
 
+        public static bool IsDefaultSymbolServer() => (SymbolServerUrl == DEFAULT_SYMSRV_URL);
         #endregion
     }
 }
