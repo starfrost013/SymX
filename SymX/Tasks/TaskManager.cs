@@ -141,11 +141,19 @@ namespace SymX
 
             foreach (string fileName in Directory.GetFiles(currentDirectory))
             {
-                // only delete nucore-*.log files
-                if (fileName.Contains("NuCore")
-                    && fileName.Contains(".log"))
+                try
                 {
-                    File.Delete(fileName);
+                    // only delete nucore-*.log files
+                    if (fileName.Contains("NuCore")
+                        && fileName.Contains(".log"))
+                    {
+                        File.Delete(fileName);
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // don't delete the current file.s
+                    continue; 
                 }
             }
         }
