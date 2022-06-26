@@ -5,7 +5,7 @@
     /// 
     /// Holds file information and download metadata.
     /// </summary>
-    public class FileInformation
+    public class FileMetadata
     {
 
         /// <summary>

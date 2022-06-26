@@ -35,8 +35,13 @@
         Report = 8,
 
         /// <summary>
+        /// Clear any log files that may exist
+        /// </summary>
+        ClearLogs = 9,
+
+        /// <summary>
         /// Exit the application.
         /// </summary>
-        Exit = 9
+        Exit = 10
     }
 }

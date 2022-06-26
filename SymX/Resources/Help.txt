@@ -54,4 +54,8 @@ Ignored if the default symbol server is specified.
 
 -recursive [-recurse, -r]: Recursively scan a download folder for files to download.
 
+-keepoldlogs [-keeplogs, -kl]: Do not automatically delete old log files.
+
+-nologo: Don't print versioning information. Ignores verbosity.
+
 Feature suggestions are welcome!

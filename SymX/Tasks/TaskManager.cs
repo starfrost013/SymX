@@ -54,7 +54,9 @@ namespace SymX
 
         public static void GenerateListOfTasks()
         {
-            if (CommandLine.Verbosity == Verbosity.Verbose) Console.WriteLine("Initialising HTTP client...");
+            if (CommandLine.Verbosity == Verbosity.Verbose) NCLogging.Log("Initialising HTTP client...");
+
+            if (!CommandLine.KeepOldLogs) TaskList.Add(Tasks.ClearLogs);
 
             if (!CommandLine.GenerateCsv)
             {
@@ -95,6 +97,10 @@ namespace SymX
                 // perform the current task
                 switch (currentTask)
                 {
+                    // Clear all old log files
+                    case Tasks.ClearLogs:
+                        ClearLogs();
+                        continue; 
                     // Generate a list of URLs from comman-dline options or CSV.
                     case Tasks.GenerateListOfUrls:
                         UrlList = GenerateUrlList();
@@ -120,6 +126,25 @@ namespace SymX
             }
 
             return (TaskList.Count > 0);  // if there are no remaining tasks return false.
+        }
+
+        private static void ClearLogs()
+        {
+            // Logs are only created in the current directory currently.
+            // If anyone requests a feature to change logging dir then we will change this code
+
+            // Get the current directory
+            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            foreach (string fileName in Directory.GetFiles(currentDirectory))
+            {
+                // only delete nucore-*.log files
+                if (fileName.Contains("NuCore")
+                    && fileName.Contains(".log"))
+                {
+                    File.Delete(fileName);
+                }
+            }
         }
 
         private static List<string> GenerateUrlList()
@@ -323,24 +348,21 @@ namespace SymX
                 {
                     // clear the *ENTIRE* console, not just visible stuff. this fixes display issues
                     // BUT may cause garbage <Win10 1507. We have to use a VTS here for now because Console doesn't have this functionality
-                    Console.Clear();
-                    Console.Write($"\x1b[3J"); // clear console when not in verbose mode
+                    NCConsole.Clear(true);
                 }
                 catch { };
 
-                string clearCurrentLineString = "\x1b[2K";
-
                 // draw it last so we draw over the top of the successful urls if necessary so the user can always see the progress
 
-                Console.SetCursorPosition(0, 0);
+                NCConsole.SetCursorPosition(0, 0);
 
                 // clear current line 
-                Console.Write(clearCurrentLineString);
+                NCConsole.ClearCurrentLine();
 
-                Console.WriteLine(reportString);
+                NCLogging.Log(reportString, ConsoleColor.White, false, false);
 
                 // clear current line again
-                Console.Write(clearCurrentLineString);
+                NCConsole.ClearCurrentLine();
 
                 int numberOfBarsToDraw = (int)(PROGRESS_BAR_LENGTH * (percentageCompletion / 100));
 
@@ -352,15 +374,15 @@ namespace SymX
 
                 for (int curBar = numberOfBarsToDraw; curBar < (PROGRESS_BAR_LENGTH - 1); curBar++) Console.Write(" ");
 
-                Console.Write("█\n\n");
+                NCLogging.Log("█\n\n", ConsoleColor.White, false, false);
 
                 // start at (0, 2) so that this is always visible
-                Console.SetCursorPosition(0, 3);
+                NCConsole.SetCursorPosition(0, 3);
 
                 // clear current line again. this will be in nucore later on
-                Console.Write(clearCurrentLineString);
+                NCConsole.ClearCurrentLine();
 
-                Console.Write("Latest successful URLs:");
+                NCLogging.Log("Latest valid links: ", ConsoleColor.White, false, false);
 
                 if (!CommandLine.DontGenerateTempFile) Console.WriteLine(" (SuccessfulURLs.log contains all successful URLs):");
 
@@ -393,12 +415,15 @@ namespace SymX
             }
         }
 
+        #region Successful download task
         private static bool DownloadSuccessfulFiles(List<string> urls)
         {
             try
             {
                 int numOfRetries = 0;
                 int numFailedUrls = 0;
+                int maxDownloads = CommandLine.NumDownloads;
+                List<Task> downloads = new List<Task>();
 
                 if (CommandLine.Verbosity >= Verbosity.Verbose) Console.Clear(); // clear console
 
@@ -406,40 +431,12 @@ namespace SymX
 
                 for (int curUrl = 0; curUrl < urls.Count; curUrl++)
                 {
+                    // Perform the download.
                     string url = urls[curUrl];
 
-                    string outFileName = CommandLine.OutFile;
-
-                    int urlId = 0;
-                    string inFileName = null;
-
-                    string[] fileNameSplit = url.Split('/');
-
-                    // get the last section of the path (the filename)
-                    inFileName = fileNameSplit[fileNameSplit.Length - 1];
-
-                    // prevent downloading the same file several times 
-                    if (urls.Count > 1)
-                    {
-                        urlId = curUrl + 1;
-
-                        outFileName = $"{urlId}_{inFileName}";
-                    }
-
-                    // Prepend the output folder.
-                    outFileName = $"{CommandLine.OutFolder}\\{outFileName}";
-
-                    // Prevent files with the same number and filename in the folder overwriing each other.
-                    // If the filename exists, increment it.
-                    while (File.Exists(outFileName))
-                    {
-                        urlId++;
-                        outFileName = $"{CommandLine.OutFolder}\\{urlId}_{inFileName}";
-                    }
+                    string outFileName = GetOutFileName(curUrl, urls);
 
                     if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {url} to {outFileName}...");
-
-                    // Perform the download.
 
                     try
                     {
@@ -499,6 +496,42 @@ namespace SymX
             }
         }
 
+        private static string GetOutFileName(int curUrl, List<string> urls)
+        {
+            string url = urls[curUrl];
+
+            string outFileName = CommandLine.OutFile;
+
+            int urlId = 0;
+            string inFileName = null;
+
+            string[] fileNameSplit = url.Split('/');
+
+            // get the last section of the path (the filename)
+            inFileName = fileNameSplit[fileNameSplit.Length - 1];
+
+            // prevent downloading the same file several times 
+            if (urls.Count > 1)
+            {
+                urlId = curUrl + 1;
+
+                outFileName = $"{urlId}_{inFileName}";
+            }
+
+            // Prepend the output folder.
+            outFileName = $"{CommandLine.OutFolder}\\{outFileName}";
+
+            // Prevent files with the same number and filename in the folder overwriing each other.
+            // If the filename exists, increment it.
+            while (File.Exists(outFileName))
+            {
+                urlId++;
+                outFileName = $"{CommandLine.OutFolder}\\{urlId}_{inFileName}";
+            }
+
+            return outFileName;
+        }
+
         private static FileInformation DownloadSuccessfulFile(string url, string outFileName)
         {
             FileInformation fileInfo = new FileInformation();
@@ -543,5 +576,7 @@ namespace SymX
 
             return fileInfo;
         }
+
+        #endregion
     }
 }

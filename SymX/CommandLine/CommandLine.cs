@@ -130,13 +130,22 @@ namespace SymX
         /// <summary>
         /// The number of simultaneous downloads.
         /// </summary>
-        public static int NumOfDownloads { get; set; }
+        public static int NumDownloads { get; set; }
 
         /// <summary>
-        /// MassView: Recurse
+        /// MassView: Recursively search for binaries.
         /// </summary>
         public static bool Recurse { get; set; }
 
+        /// <summary>
+        /// Don't automatically delete old log files on startup.
+        /// </summary>
+        public static bool KeepOldLogs { get; set; }
+
+        /// <summary>
+        /// Don't print branding information.
+        /// </summary>
+        public static bool NoLogo { get; set; }
         #region Defaults
         /// <summary>
         /// Private: Default user agent vendor string to use while sending requests.
@@ -179,8 +188,8 @@ namespace SymX
 
             SymbolServerUrl = DEFAULT_SYMSRV_URL;
 
-            NumOfDownloads = NumThreads;
-            if (NumOfDownloads > 10) NumOfDownloads = 10;
+            NumDownloads = NumThreads;
+            if (NumDownloads > 10) NumDownloads = 10;
         }
 
         #region Parser
@@ -313,7 +322,15 @@ namespace SymX
                             case "-recurse":
                             case "-r":
                                 Recurse = true;
-                                continue; 
+                                continue;
+                            case "-keepoldlogs":
+                            case "-keeplogs":
+                            case "-kl":
+                                KeepOldLogs = true;
+                                continue;
+                            case "-nologo":
+                                NoLogo = true;
+                                continue;
                         }
                     }
                 }
@@ -420,7 +437,8 @@ namespace SymX
         public static void PrintVersion()
         {
             // this always succeeds as we set it to normal in the static constructor of CommandLine()
-            if (Verbosity >= Verbosity.Normal)
+            if (Verbosity >= Verbosity.Normal
+                && !NoLogo)
             {
                 // temp until nucore allows you to turn off function name
                 Console.ForegroundColor = ConsoleColor.Green;

@@ -54,6 +54,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Reference Include="NuCore.Utilities">
+	    <HintPath>NuCore.Utilities.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Update="Content\icon.png">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
@@ -66,12 +72,6 @@
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>AssemblyInfo.cs</LastGenOutput>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<Reference Include="NuCore.Utilities">
-			<HintPath>NuCore.Utilities.dll</HintPath>
-		</Reference>
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
