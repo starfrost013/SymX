@@ -255,9 +255,8 @@ namespace SymX
                             case "-g":
                                 GenerateCsv = true;
                                 continue;
-                            case "-numdownloads":
+                            case "-numthreads":
                             case "-threads":
-                            case "-num":
                             case "-t":
                                 NumThreads = Convert.ToInt32(nextArg);
                                 continue;
@@ -328,6 +327,10 @@ namespace SymX
                             case "-nologo":
                                 NoLogo = true;
                                 continue;
+                            case "-numdownloads":
+                            case "-nd":
+                                NumDownloads = Convert.ToInt32(nextArg);
+                                continue; 
                         }
                     }
                 }

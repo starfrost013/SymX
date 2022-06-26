@@ -150,7 +150,7 @@ namespace SymX
                         File.Delete(fileName);
                     }
                 }
-                catch (UnauthorizedAccessException)
+                catch
                 {
                     // don't delete the current file.s
                     continue; 

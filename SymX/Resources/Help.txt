@@ -26,7 +26,9 @@ Required if -imagesize is not provided.
 
 -verbose [-v]: Verbose mode. Find nothing going out in a blaze of glory!
 
--numdownloads [-threads, -t, -num]: Change the number of threads used for downloading. A lower number of threads will reduce URL scanning performance. Range is 1-30, as this isn't DDOSX. The default value is 12.
+-numthreads [-threads, -t]: Change the number of threads used for scanning. A lower number of threads will reduce URL scanning performance. Range is 1-30, as this isn't DDOSX. The default value is 12.
+
+-numdownloads [=downloads, -nd]: Change the number of threads used for downloading. Default is -numthreads and the range is 1-15 due to performance concerns.
 
 -logtofile [-l, -log]: Log output to file. This respects -q and -v.
 
@@ -56,6 +58,6 @@ Ignored if the default symbol server is specified.
 
 -keepoldlogs [-keeplogs, -k]: Do not automatically delete old log files.
 
--nologo: Don't print versioning information before running. Ignores verbosity.
+-nologo: Don't print versioning information before running\. Ignores verbosity.
 
 Feature suggestions are welcome!

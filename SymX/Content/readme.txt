@@ -15,9 +15,9 @@
               *%@%,                                                            
 
 A Microsoft Symbol Server bulk download tool
-Version 4.0 Alpha 3
+Version 4.0 Alpha 2.1
 
-xx June 2022
+26 June 2022
 
 SymX is a bulk download tool for binaries stored on the Microsoft Symbol Server. It has been used to find files from unleaked builds of Windows as well as dumping all the binaries from a Windows version.
 It is a merger of msdlurlgen and MassView that adds many new features to both, is far faster (100+ URLs per second at max threads, vs. <5), and is far more robust.
@@ -47,6 +47,9 @@ Verbose mode and, in future, the SymX 4 UI will be a lot slower in conhost than 
 Also, excel converts any "xe000" string to scientific notation. Either turn off scientific notation or use a different tool (Notepad, klogg) to work around this. 
 
 RELEASE NOTES:
+4.0.0 Alpha 2.1 (June 26, 2022):
+* Fixed -numdownloads
+
 4.0.0 Alpha 2 (June 26, 2022):
 * Downloads are now multithreaded! By default, the number of threads used for downloading will be set to -numthreads. However, if you want to override the value, you can use -numdownloads.
 * SymX now measures download speed and file size and displays it when verbosity is verbose.
