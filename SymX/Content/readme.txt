@@ -23,20 +23,21 @@ SymX is a bulk download tool for binaries stored on the Microsoft Symbol Server.
 It is a merger of msdlurlgen and MassView that adds many new features to both, is far faster (100+ URLs per second at max threads, vs. <5), and is far more robust.
 
 It is not intended as a replacement for symchk and cannot at present be used to download symbols, only binaries.
-THIS IS AN ALPHA VERSION OF SYMX AND DOES NOT HAVE THE SAME GUARANTEED STABILITY AS THE FINAL PRODUCT!
+THIS IS AN ALPHA VERSION OF SYMX AND DOES NOT HAVE THE SAME GUARANTEED STABILITY AS A FINAL VERSION!
 
 Minimum Requirements:
 x86-64 or ARM64 architecture
 .NET 6.0 runtime
 x86-64: Windows 7, Windows 8.1, Windows 10 version 1607 or later, or Windows 11
-ARM64: Windows 10, build 21277 or later (SymX-UI.exe not supported)
+ARM64: Windows 10, build 21277 or later (SymX-UI.exe ia not supported)
 An internet or intranet connection in order to download files. 
-Windows Console Host
+Windows Console Host 
 
 Recommended Requirements:
 x86-64 or ARM64 architeture
 .NET 6.0 runtime
 x86-64: Windows 10, version 1607 and later or Windows 11
+Windows Terminal (faster text drawing)
 
 Warning: On Windows 10, version 1507 (10240) and earlier operating systems, using the SymX 3.1 UI (normal verbosity) will cause SEVERE rendering issues due to a lack of support for virtual terminal sequences. 
 Please use a newer operating system or verbose mode in order to get correct functioning.
@@ -47,13 +48,15 @@ Also, excel converts any "xe000" string to scientific notation. Either turn off 
 
 RELEASE NOTES:
 4.0.0 Alpha 2 (June 26, 2022):
-* SymX now measures download speed and displays it on verbose verbosity.
+* Downloads are now multithreaded! By default, the number of threads used for downloading will be set to -numthreads. However, if you want to override the value, you can use -numdownloads.
+* SymX now measures download speed and file size and displays it when verbosity is verbose.
 * SymX now obtains the Last-Modified date (only valid for dates after 6/11/2017 due to the Azure move) and displays it on verbose verbosity.
 * Old logs are now automatically deleted on startup.
-* Reduced log size a bit on normal verbosity
-* Now deletes partially downloaded files.
-* Refactoring in NuCore
+* Reduced log size a bit on normal verbosity by not logging as many things to file.
+* Refactoring in NuCore and additional logging functionality
 * Added -nologo if you hate version numbers for some reason 
+* SymX now deletes partially downloaded files if they fail to download. This fixes the "zero-byte" file issue.
+* Fixed -numthreads not being bounded when using -infile
 
 3.1.0 Alpha 1 (June 10, 2022):
 * Added a proper user interface with a progress bar

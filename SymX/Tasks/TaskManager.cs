@@ -54,11 +54,11 @@ namespace SymX
 
         public static void GenerateListOfTasks()
         {
-            if (CommandLine.Verbosity == Verbosity.Verbose) NCLogging.Log("Initialising HTTP client...");
+            if (Configuration.Verbosity == Verbosity.Verbose) NCLogging.Log("Initialising HTTP client...");
 
-            if (!CommandLine.KeepOldLogs) TaskList.Add(Tasks.ClearLogs);
+            if (!Configuration.KeepOldLogs) TaskList.Add(Tasks.ClearLogs);
 
-            if (!CommandLine.GenerateCsv)
+            if (!Configuration.GenerateCsv)
             {
                 TaskList.Add(Tasks.GenerateListOfUrls);
             }
@@ -67,8 +67,8 @@ namespace SymX
                 TaskList.Add(Tasks.GenerateCsv);
             }
 
-            if (!CommandLine.DontDownload
-                && !CommandLine.GenerateCsv) TaskList.Add(Tasks.TryDownload);
+            if (!Configuration.DontDownload
+                && !Configuration.GenerateCsv) TaskList.Add(Tasks.TryDownload);
 
             TaskList.Add(Tasks.Exit);
         }
@@ -79,7 +79,7 @@ namespace SymX
             int curTask = 1;
 
             // delete temp file
-            if (File.Exists(DEFAULT_TEMP_FILE_NAME) && !CommandLine.DontGenerateTempFile) File.Delete(DEFAULT_TEMP_FILE_NAME);
+            if (File.Exists(DEFAULT_TEMP_FILE_NAME) && !Configuration.DontGenerateTempFile) File.Delete(DEFAULT_TEMP_FILE_NAME);
 
             // perform each task in sequence
             for (int i = 0; i < TaskList.Count; i++)
@@ -91,7 +91,7 @@ namespace SymX
 
                 Console.Title = $"{SymXVersion.SYMX_APPLICATION_NAME} - {taskString}";
 
-                if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log(taskString);
+                if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log(taskString);
                 curTask++;
 
                 // perform the current task
@@ -154,29 +154,29 @@ namespace SymX
         {
             List<string> urlList = new List<string>();
 
-            if (CommandLine.InFile == null)
+            if (Configuration.InFile == null)
             {
-                if (CommandLine.ImageSizeMin == 0
-                    || CommandLine.ImageSizeMax == 0)
+                if (Configuration.ImageSizeMin == 0
+                    || Configuration.ImageSizeMax == 0)
                 {
-                    for (ulong curTime = CommandLine.Start; curTime < CommandLine.End; curTime++)
+                    for (ulong curTime = Configuration.Start; curTime < Configuration.End; curTime++)
                     {
-                        string fileUrl = $"{CommandLine.SymbolServerUrl}/{CommandLine.FileName}/{curTime.ToString("x")}{CommandLine.ImageSize}/{CommandLine.FileName}";
-                        if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
+                        string fileUrl = $"{Configuration.SymbolServerUrl}/{Configuration.FileName}/{curTime.ToString("x")}{Configuration.ImageSize}/{Configuration.FileName}";
+                        if (Configuration.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
                         urlList.Add(fileUrl);
                     }
                 }
                 else
                 {
-                    ulong imageSizeMin = CommandLine.ImageSizeMin;
-                    ulong imageSizeMax = CommandLine.ImageSizeMax;
+                    ulong imageSizeMin = Configuration.ImageSizeMin;
+                    ulong imageSizeMax = Configuration.ImageSizeMax;
 
-                    for (ulong curTime = CommandLine.Start; curTime < CommandLine.End; curTime++)
+                    for (ulong curTime = Configuration.Start; curTime < Configuration.End; curTime++)
                     {
                         for (ulong curImageSize = imageSizeMin; curImageSize <= imageSizeMax; curImageSize += IMAGESIZE_PADDING)
                         {
-                            string fileUrl = $"{CommandLine.SymbolServerUrl}/{CommandLine.FileName}/{curTime.ToString("x")}{curImageSize.ToString("x")}/{CommandLine.FileName}";
-                            if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
+                            string fileUrl = $"{Configuration.SymbolServerUrl}/{Configuration.FileName}/{curTime.ToString("x")}{curImageSize.ToString("x")}/{Configuration.FileName}";
+                            if (Configuration.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
                             urlList.Add(fileUrl);
                         }
                     }
@@ -185,7 +185,7 @@ namespace SymX
             else
             {
                 // generate the URL list using massview
-                return MassView.ParseUrls(CommandLine.InFile);
+                return MassView.ParseUrls(Configuration.InFile);
             }
 
             return urlList;
@@ -197,7 +197,7 @@ namespace SymX
         /// <returns>A list of the URLs that resolved with a success code, not necessarily 200 OK.</returns>
         private static List<string> ScanForFiles()
         {
-            if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log("Initialising HttpClient...");
+            if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log("Initialising HttpClient...");
 
             // initialise the http client (we already instantiate it as a private field)
             // this is so we don't have to add a check for dontdownload
@@ -205,12 +205,12 @@ namespace SymX
 
             // Fake a DbgX UA.
             // Just in case (thanks pivotman319)
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(CommandLine.UserAgentVendor, CommandLine.UserAgentVersion));
+            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Configuration.UserAgentVendor, Configuration.UserAgentVersion));
 
             StreamWriter tempFile = null;
 
             // create a temporary file if the user has not explicitly specified to do this
-            if (!CommandLine.DontGenerateTempFile)
+            if (!Configuration.DontGenerateTempFile)
             {
                 try
                 {
@@ -220,17 +220,17 @@ namespace SymX
                 {
                     NCLogging.Log("Warning: Failed to create temp file - another instance of SymX is likely running!", ConsoleColor.Yellow);
                     // don't run temp file commands to prevent crashing
-                    CommandLine.DontGenerateTempFile = true;
+                    Configuration.DontGenerateTempFile = true;
                 }
             }
 
-            if (CommandLine.Verbosity >= Verbosity.Quiet) NCLogging.Log($"Trying {UrlList.Count} URLs...");
+            if (Configuration.Verbosity >= Verbosity.Quiet) NCLogging.Log($"Trying {UrlList.Count} URLs...");
 
             timer = Stopwatch.StartNew();
 
             List<string> successfulUrls = new List<string>();
 
-            int noDownloadsAtOnce = CommandLine.NumThreads;
+            int noDownloadsAtOnce = Configuration.NumThreads;
             int failedUrls = 0; // The number of failed URLs
 
             // create a list of tasks
@@ -252,7 +252,7 @@ namespace SymX
 
                 // Performance improvement: don't dump to the console so often (only dump it every time a set of threads complets)
                 // we should allow the user to control this in future
-                if (curUrlSet % noDownloadsAtOnce == 0 && CommandLine.Verbosity >= Verbosity.Normal)
+                if (curUrlSet % noDownloadsAtOnce == 0 && Configuration.Verbosity >= Verbosity.Normal)
                 {
                     string reportString = $"{percentageCompletionString}% complete ({curUrlSet}/{UrlList.Count} URLs scanned, {failedUrls} failed), {successfulUrls.Count} files found";
                     ScanDrawDownloadUi(reportString, percentageCompletion, successfulUrls);
@@ -267,7 +267,7 @@ namespace SymX
                     {
                         string curUrl = UrlList[curUrlSet + curUrlInUrlSet];
                       
-                        if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {curUrl}...");
+                        if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {curUrl}...");
                         Task<bool> worker = Task<bool>.Run(() => CheckFileExists(curUrl));
                         tasks.Add(worker);
                     }
@@ -302,9 +302,9 @@ namespace SymX
                     if (task.Result) // get the current url
                     {
                         // If we haven't specified we don't want a temporary file, write it to successful_urls.log
-                        if (!CommandLine.DontGenerateTempFile) tempFile.WriteLine(foundUrl);
+                        if (!Configuration.DontGenerateTempFile) tempFile.WriteLine(foundUrl);
 
-                        if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Found a valid link at {foundUrl}!", ConsoleColor.Green);
+                        if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Found a valid link at {foundUrl}!", ConsoleColor.Green);
                         successfulUrls.Add(foundUrl); // add it
                     }
                     else
@@ -318,7 +318,7 @@ namespace SymX
                         }
                         else
                         {
-                            if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"URL not found: {foundUrl}", ConsoleColor.Yellow);
+                            if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"URL not found: {foundUrl}", ConsoleColor.Yellow);
                         }
                     }
                 }
@@ -331,10 +331,10 @@ namespace SymX
             numSuccessfulUrls = successfulUrls.Count;
             urlsPerSecond = (double)(UrlList.Count / (timeElapsedMs / (double)1000));
 
-            if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Took {timeElapsed} seconds to check {UrlList.Count} URLs, found {numSuccessfulUrls} files ({urlsPerSecond.ToString("F1")} URLs per second)");
+            if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"Took {timeElapsed} seconds to check {UrlList.Count} URLs, found {numSuccessfulUrls} files ({urlsPerSecond.ToString("F1")} URLs per second)");
 
             // close successfulurls.log (it is deleted later)
-            if (!CommandLine.DontGenerateTempFile) tempFile.Close();
+            if (!Configuration.DontGenerateTempFile) tempFile.Close();
 
             return successfulUrls;
         }
@@ -342,7 +342,7 @@ namespace SymX
         private static void ScanDrawDownloadUi(string reportString, double percentageCompletion, List<string> successfulUrls)
         {
             // don't log this (nucore will allow optional logging)
-            if (CommandLine.Verbosity < Verbosity.Verbose)
+            if (Configuration.Verbosity < Verbosity.Verbose)
             {
                 // the reason that there is an empty catch block here
                 // is that console.clear throws an exception if the console is piped to a file
@@ -387,7 +387,7 @@ namespace SymX
 
                 NCLogging.Log("Latest valid links: ", ConsoleColor.White, false, false);
 
-                if (!CommandLine.DontGenerateTempFile) Console.WriteLine(" (SuccessfulURLs.log contains all successful URLs):");
+                if (!Configuration.DontGenerateTempFile) Console.WriteLine(" (SuccessfulURLs.log contains all successful URLs):");
 
                 foreach (string successfulUrl in successfulUrls) Console.WriteLine(successfulUrl);
             }
@@ -425,13 +425,13 @@ namespace SymX
             {
                 int numOfRetries = 0; // number of retries for the current file
                 int numFailedUrls = 0; // number of URLs that have failed
-                int numDownloads = CommandLine.NumDownloads; // number of simultaneous downloads
+                int numDownloads = Configuration.NumDownloads; // number of simultaneous downloads
 
                 List<Task> downloads = new List<Task>();
 
-                if (CommandLine.Verbosity >= Verbosity.Verbose) Console.Clear(); // clear console
+                if (Configuration.Verbosity >= Verbosity.Verbose) Console.Clear(); // clear console
 
-                if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {urls.Count} successful URLs...");
+                if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {urls.Count} successful URLs...");
 
                 // 
                 for (int curUrl = 0; curUrl < urls.Count; curUrl += numDownloads)
@@ -456,7 +456,7 @@ namespace SymX
                                 
                                 outFileName = GetOutFileName(curUrlWithinTask, urls);
 
-                                if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {url} to {outFileName}...");
+                                if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {url} to {outFileName}...");
 
                                 Task<FileMetadata> downloadTask = Task<FileMetadata>.Run(() => DownloadSuccessfulFile(url, outFileName));
                                 downloads.Add(downloadTask);
@@ -465,17 +465,17 @@ namespace SymX
                         }
                         catch
                         {
-                            if (numOfRetries >= CommandLine.MaxRetries)
+                            if (numOfRetries >= Configuration.MaxRetries)
                             {
                                 // reset the number of retries. we will skip the url by doing this
-                                NCLogging.Log($"Reached {CommandLine.MaxRetries} tries, giving up on {url}...", ConsoleColor.Red);
+                                NCLogging.Log($"Reached {Configuration.MaxRetries} tries, giving up on {url}...", ConsoleColor.Red);
                                 numFailedUrls++;
                                 numOfRetries = 0;
                             }
                             else
                             {
                                 numOfRetries++;
-                                NCLogging.Log($"An error occurred while downloading. Retrying ({numOfRetries}/{CommandLine.MaxRetries})...", ConsoleColor.Yellow);
+                                NCLogging.Log($"An error occurred while downloading. Retrying ({numOfRetries}/{Configuration.MaxRetries})...", ConsoleColor.Yellow);
                                 // delete any partially downloaded files
                                 if (File.Exists(outFileName)) File.Delete(outFileName);
 
@@ -505,8 +505,8 @@ namespace SymX
                     {
                         FileMetadata metadata = download.Result;
 
-                        if (CommandLine.Verbosity >= Verbosity.Verbose
-                            && CommandLine.IsDefaultSymbolServer())
+                        if (Configuration.Verbosity >= Verbosity.Verbose
+                            && Configuration.IsDefaultSymbolServer())
                         {
                             if (metadata.LastModifiedDate > new DateTime(2017, 06, 11, 23, 59, 59, 999))
                             {
@@ -543,7 +543,7 @@ namespace SymX
         {
             string url = urls[curUrl];
 
-            string outFileName = CommandLine.OutFile;
+            string outFileName = Configuration.OutFile;
 
             int urlId = 0;
             string inFileName = null;
@@ -562,14 +562,14 @@ namespace SymX
             }
 
             // Prepend the output folder.
-            outFileName = $"{CommandLine.OutFolder}\\{outFileName}";
+            outFileName = $"{Configuration.OutFolder}\\{outFileName}";
 
             // Prevent files with the same number and filename in the folder overwriing each other.
             // If the filename exists, increment it.
             while (File.Exists(outFileName))
             {
                 urlId++;
-                outFileName = $"{CommandLine.OutFolder}\\{urlId}_{inFileName}";
+                outFileName = $"{Configuration.OutFolder}\\{urlId}_{inFileName}";
             }
 
             return outFileName;
@@ -579,7 +579,7 @@ namespace SymX
         {
             FileMetadata fileInfo = new FileMetadata();
 
-            if (CommandLine.Verbosity >= Verbosity.Verbose)
+            if (Configuration.Verbosity >= Verbosity.Verbose)
             {
                 var stream = httpClient.GetAsync(url);
 

@@ -7,7 +7,6 @@
     /// </summary>
     public class FileMetadata
     {
-
         /// <summary>
         /// The date this file was last modified on the Symbol Server.
         /// </summary>

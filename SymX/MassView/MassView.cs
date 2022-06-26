@@ -41,8 +41,8 @@ namespace SymX
         /// <returns></returns>
         public static bool Run()
         {
-            string inFolder = CommandLine.CsvInFolder;
-            string outFile = CommandLine.OutFile;
+            string inFolder = Configuration.CsvInFolder;
+            string outFile = Configuration.OutFile;
 
             if (!Directory.Exists(inFolder))
             {
@@ -51,7 +51,7 @@ namespace SymX
             }
             else
             {
-                if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"MassView: Checking folder {inFolder}, dumping to {outFile}");
+                if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"MassView: Checking folder {inFolder}, dumping to {outFile}");
                 StreamWriter bw = null;
 
                 bw = new StreamWriter(new FileStream(outFile, FileMode.Create));
@@ -62,7 +62,7 @@ namespace SymX
                 // set up the list of files to get files frmo
                 string[] dirFiles = null;
 
-                if (!CommandLine.Recurse)
+                if (!Configuration.Recurse)
                 { 
                     dirFiles = Directory.GetFiles(inFolder);
                 }
@@ -120,7 +120,7 @@ namespace SymX
                                     uint sizeOfImage = br.ReadUInt32();
                                     string sizeOfImageHex = sizeOfImage.ToString("x");
 
-                                    if (CommandLine.Verbosity >= Verbosity.Verbose) Console.WriteLine($"{fileName}: {dateIso} (hex: {dateHex}, unix: {timeDateStamp}), ImageSize: {sizeOfImageHex}");
+                                    if (Configuration.Verbosity >= Verbosity.Verbose) Console.WriteLine($"{fileName}: {dateIso} (hex: {dateHex}, unix: {timeDateStamp}), ImageSize: {sizeOfImageHex}");
 
                                     // truncate the path so that we generate valid URLs
                                     string[] fileNameFolders = fileName.Split('\\');
@@ -130,7 +130,7 @@ namespace SymX
 
                                     // 0x5C = \
                                     // This escapes the string so that Excel does not interpret any e000 as scientific notation
-                                    string finalString = $"{fileName},{timeDateStamp},{dateIso},{dateHex},{sizeOfImageHex},{CommandLine.SymbolServerUrl}/{fileNameOnly}/{dateHex}{sizeOfImageHex}/{fileNameOnly}";
+                                    string finalString = $"{fileName},{timeDateStamp},{dateIso},{dateHex},{sizeOfImageHex},{Configuration.SymbolServerUrl}/{fileNameOnly}/{dateHex}{sizeOfImageHex}/{fileNameOnly}";
                                     
                                     if (outFile != null) bw.WriteLine(finalString);
                                 }
@@ -150,7 +150,7 @@ namespace SymX
         private static List<string> BuildListOfUrlsRecursively(string directory = null, List<string> urls = null)
         {
             if (urls == null) urls = new List<string>();
-            if (directory == null) directory = CommandLine.CsvInFolder;
+            if (directory == null) directory = Configuration.CsvInFolder;
 
             foreach (string fileName in Directory.GetFiles(directory))
             {
@@ -182,9 +182,9 @@ namespace SymX
 
                 if (csvLineSections.Length < URL_COLUMN_NUMBER)
                 {
-                    if (CommandLine.Verbosity >= Verbosity.Normal)
+                    if (Configuration.Verbosity >= Verbosity.Normal)
                     {
-                        NCLogging.Log($"Warning: Rejected line {curLine} as it does not have URL section", ConsoleColor.Yellow);
+                        NCLogging.Log($"Warning: Rejected CSV line {curLine} as it does not have URL section", ConsoleColor.Yellow);
                         numRejectedLines++;
                     }
                 }
@@ -192,14 +192,14 @@ namespace SymX
                 {
                     string csvLineUrl = csvLineSections[URL_COLUMN_NUMBER - 1];
 
-                    if (CommandLine.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Found URL: {csvLineUrl}");
+                    if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Found URL: {csvLineUrl}");
 
                     urls.Add(csvLineUrl);
                 }
             }
 
             // take away 1 as we don't count the first line
-            if (numRejectedLines > 0 && CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Warning: {numRejectedLines + 1} of {csvLines.Length - 1} lines (excluding the first line) did not have a valid URL column and were skipped!", ConsoleColor.Yellow);
+            if (numRejectedLines > 0 && Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"Warning: {numRejectedLines + 1} of {csvLines.Length - 1} lines (excluding the first line) did not have a valid URL column and were skipped!", ConsoleColor.Yellow);
             return urls;
         }
     }

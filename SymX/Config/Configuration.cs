@@ -9,7 +9,7 @@ namespace SymX
     /// Defines the command-line options that SymX can use,
     /// and methods to parse them.
     /// </summary>
-    public static class CommandLine
+    public static class Configuration
     {
         /// <summary>
         /// The start (in 64-bit unix time format) time to scan for files in.
@@ -171,9 +171,9 @@ namespace SymX
         #endregion
 
         /// <summary>
-        /// Constructor for <see cref="CommandLine"/> that sets up the default values.
+        /// Constructor for <see cref="Configuration"/> that sets up the default values.
         /// </summary>
-        static CommandLine()
+        static Configuration()
         {
             // Set up default values
             NumThreads = 12;
@@ -187,9 +187,6 @@ namespace SymX
             OutFolder = DEFAULT_OUTPUT_FOLDER;
 
             SymbolServerUrl = DEFAULT_SYMSRV_URL;
-
-            NumDownloads = NumThreads;
-            if (NumDownloads > 10) NumDownloads = 10;
         }
 
         #region Parser
@@ -204,12 +201,12 @@ namespace SymX
         {
             try
             {
-                for (int i = 0; i < args.Length; i++)
+                for (int curArgId = 0; curArgId < args.Length; curArgId++)
                 {
-                    string curArg = args[i];
+                    string curArg = args[curArgId];
 
                     string nextArg = null;
-                    if (args.Length - i > 1) nextArg = args[i + 1];
+                    if (args.Length - curArgId > 1) nextArg = args[curArgId + 1];
 
                     curArg = curArg.ToLower();
 
@@ -338,6 +335,21 @@ namespace SymX
                 if (OutFolder != null
                 && !Directory.Exists(OutFolder)) Directory.CreateDirectory(OutFolder);
 
+
+                // Check for invalid or DDOSing thread count options. 
+                if (NumThreads < 1
+                    || NumThreads > 30)
+                {
+                    Console.WriteLine("-numthreads: must be between 1-30 - no DDOSing the servers!");
+                    return false; // don't DDOS the servers
+                }
+
+                if (NumDownloads <= 0) // -numdownloads not provided or somehow we provided a negative number
+                {
+                    NumDownloads = NumThreads;
+                    if (NumDownloads > 15) NumDownloads = 15; // "soft" limit to 15 to prevent ddosing
+                }
+
                 if (InFile != null)
                 {
                     if (!File.Exists(InFile))
@@ -349,14 +361,6 @@ namespace SymX
                     return true;
                 }
 
-
-                // Check for invalid or DDOSing thread count options. 
-                if (NumThreads < 1
-                    || NumThreads > 30)
-                {
-                    Console.WriteLine("-numthreads: must be between 1-30 - no DDOSing the servers!");
-                    return false; // don't DDOS the servers
-                }
 
                 if (!GenerateCsv) // non-massview mode
                 {
@@ -441,11 +445,10 @@ namespace SymX
                 && !NoLogo)
             {
                 // temp until nucore allows you to turn off function name
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"{SymXVersion.SYMX_APPLICATION_NAME} {SymXVersion.SYMX_VERSION_EXTENDED_STRING}");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("A Microsoft Symbol Server bulk download tool");
-                Console.WriteLine("© 2022 starfrost");
+                NCLogging.Log($"{SymXVersion.SYMX_APPLICATION_NAME}", ConsoleColor.Green, false, false);
+                NCLogging.Log($"Version {SymXVersion.SYMX_VERSION_EXTENDED_STRING}", ConsoleColor.White, false, false);
+                NCLogging.Log("A Microsoft Symbol Server bulk download tool", ConsoleColor.White, false, false);
+                NCLogging.Log("© 2022 starfrost\n", ConsoleColor.White, false, false);
             }
         }
 

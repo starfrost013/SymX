@@ -56,6 +56,6 @@ Ignored if the default symbol server is specified.
 
 -keepoldlogs [-keeplogs, -k]: Do not automatically delete old log files.
 
--nologo: Don't print versioning information. Ignores verbosity.
+-nologo: Don't print versioning information before running. Ignores verbosity.
 
 Feature suggestions are welcome!

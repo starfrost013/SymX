@@ -5,18 +5,18 @@
 using NuCore.Utilities;
 using SymX;
 
-if (CommandLine.Parse(args))
+if (Configuration.Parse(args))
 {
     // Initialise NuCore logging with logging based on the status of the -l option
-    NCLogging.Settings.WriteToLog = CommandLine.LogToFile;
+    NCLogging.Settings.WriteToLog = Configuration.LogToFile;
     NCLogging.Init();
 
-    CommandLine.PrintVersion();
+    Configuration.PrintVersion();
     TaskManager.GenerateListOfTasks();
 
     while (TaskManager.Run()) ;
 }
 else
 {
-    CommandLine.ShowHelp();
+    Configuration.ShowHelp();
 }
