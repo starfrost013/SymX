@@ -325,7 +325,7 @@ namespace SymX
                                 continue;
                             case "-keepoldlogs":
                             case "-keeplogs":
-                            case "-kl":
+                            case "-k":
                                 KeepOldLogs = true;
                                 continue;
                             case "-nologo":

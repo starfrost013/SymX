@@ -128,6 +128,9 @@ namespace SymX
             return (TaskList.Count > 0);  // if there are no remaining tasks return false.
         }
 
+        /// <summary>
+        /// Clears old log files. Not called if -keeplogs [-k] is provided.
+        /// </summary>
         private static void ClearLogs()
         {
             // Logs are only created in the current directory currently.
@@ -198,7 +201,7 @@ namespace SymX
 
             // initialise the http client (we already instantiate it as a private field)
             // this is so we don't have to add a check for dontdownload
-            httpClient.BaseAddress = new Uri("https://msdl.microsoft.com");
+            httpClient.BaseAddress = new Uri("https://msdl.microsoft.com"); // placeholder value
 
             // Fake a DbgX UA.
             // Just in case (thanks pivotman319)
@@ -420,28 +423,87 @@ namespace SymX
         {
             try
             {
-                int numOfRetries = 0;
-                int numFailedUrls = 0;
-                int maxDownloads = CommandLine.NumDownloads;
+                int numOfRetries = 0; // number of retries for the current file
+                int numFailedUrls = 0; // number of URLs that have failed
+                int numDownloads = CommandLine.NumDownloads; // number of simultaneous downloads
+
                 List<Task> downloads = new List<Task>();
 
                 if (CommandLine.Verbosity >= Verbosity.Verbose) Console.Clear(); // clear console
 
                 if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {urls.Count} successful URLs...");
 
-                for (int curUrl = 0; curUrl < urls.Count; curUrl++)
+                // 
+                for (int curUrl = 0; curUrl < urls.Count; curUrl += numDownloads)
                 {
                     // Perform the download.
-                    string url = urls[curUrl];
 
-                    string outFileName = GetOutFileName(curUrl, urls);
-
-                    if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {url} to {outFileName}...");
-
-                    try
+                    // Download every file, downloading (numDownloads) at once.
+                    for (int curTask = 0; curTask < numDownloads; curTask++)
                     {
-                        FileInformation metadata = DownloadSuccessfulFile(url, outFileName);
-                        // reset the number of retries for each file
+                        string url = urls[curUrl];
+
+                        // current URL ID in task
+                        int curUrlWithinTask = curUrl + curTask;
+
+                        string outFileName = null;
+
+                        try
+                        {
+                            if (curUrlWithinTask < urls.Count)
+                            {
+                                url = urls[curUrl + curTask];
+                                
+                                outFileName = GetOutFileName(curUrlWithinTask, urls);
+
+                                if (CommandLine.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {url} to {outFileName}...");
+
+                                Task<FileMetadata> downloadTask = Task<FileMetadata>.Run(() => DownloadSuccessfulFile(url, outFileName));
+                                downloads.Add(downloadTask);
+
+                            }
+                        }
+                        catch
+                        {
+                            if (numOfRetries >= CommandLine.MaxRetries)
+                            {
+                                // reset the number of retries. we will skip the url by doing this
+                                NCLogging.Log($"Reached {CommandLine.MaxRetries} tries, giving up on {url}...", ConsoleColor.Red);
+                                numFailedUrls++;
+                                numOfRetries = 0;
+                            }
+                            else
+                            {
+                                numOfRetries++;
+                                NCLogging.Log($"An error occurred while downloading. Retrying ({numOfRetries}/{CommandLine.MaxRetries})...", ConsoleColor.Yellow);
+                                // delete any partially downloaded files
+                                if (File.Exists(outFileName)) File.Delete(outFileName);
+
+                                // decrement curURL to retry the current URL
+                                curUrl--;
+
+                            }
+                        }
+                    }
+
+                    bool waiting = true;
+
+                    // Wait for all download tasks to complete.
+                    while (waiting)
+                    {
+                        bool needToWait = false;
+
+                        foreach (Task download in downloads)
+                        {
+                            if (!download.IsCompleted) needToWait = true;
+                        }
+
+                        waiting = needToWait;
+                    }
+
+                    foreach (Task<FileMetadata> download in downloads)
+                    {
+                        FileMetadata metadata = download.Result;
 
                         if (CommandLine.Verbosity >= Verbosity.Verbose
                             && CommandLine.IsDefaultSymbolServer())
@@ -457,36 +519,17 @@ namespace SymX
                         }
 
                         NCLogging.Log($"File size: {metadata.FileSize} (took {metadata.DownloadTime}ms to download, {metadata.DownloadSpeed.ToString("F1")} KB/s)");
-
-                        numOfRetries = 0;
                     }
-                    catch
-                    {
-                        if (numOfRetries >= CommandLine.MaxRetries)
-                        {
-                            // reset the number of retries. we will skip the url by doing this
-                            NCLogging.Log($"Reached {CommandLine.MaxRetries} tries, giving up on {url}...", ConsoleColor.Red);
-                            numFailedUrls++;
-                            numOfRetries = 0;
-                        }
-                        else
-                        {
-                            numOfRetries++;
-                            NCLogging.Log($"An error occurred while downloading. Retrying ({numOfRetries}/{CommandLine.MaxRetries})...", ConsoleColor.Yellow);
-                            // delete any partially downloaded files
-                            if (File.Exists(outFileName)) File.Delete(outFileName);
 
-                            // decrement curURL to retry the current URL
-                            curUrl--;
+                    // reset the number of retries for each file
+                    numOfRetries = 0;
 
-                        }
-
-                        continue;
-                    }
+                    continue;
 
                 }
 
-                if (numFailedUrls > 0) NCLogging.Log($"{numFailedUrls} URLs failed to download!", ConsoleColor.Yellow);
+                if (numFailedUrls > 0) NCLogging.Log($"{numFailedUrls}/{urls.Count} URLs failed to download!", ConsoleColor.Yellow);
+
                 return true;
             }
             catch (Exception ex)
@@ -532,9 +575,9 @@ namespace SymX
             return outFileName;
         }
 
-        private static FileInformation DownloadSuccessfulFile(string url, string outFileName)
+        private static FileMetadata DownloadSuccessfulFile(string url, string outFileName)
         {
-            FileInformation fileInfo = new FileInformation();
+            FileMetadata fileInfo = new FileMetadata();
 
             if (CommandLine.Verbosity >= Verbosity.Verbose)
             {
