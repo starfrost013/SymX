@@ -435,13 +435,13 @@ namespace SymX
                 int numFailedUrls = 0; // number of URLs that have failed
                 int numDownloads = Configuration.NumDownloads; // number of simultaneous downloads
 
-                List<Task> downloads = new List<Task>();
+                List<Task<FileMetadata>> downloads = new List<Task<FileMetadata>>();
 
                 if (Configuration.Verbosity >= Verbosity.Verbose) Console.Clear(); // clear console
 
                 if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {urls.Count} successful URLs...");
 
-                // 
+                // loop through each url set
                 for (int curUrl = 0; curUrl < urls.Count; curUrl += numDownloads)
                 {
                     // Perform the download.
@@ -458,7 +458,7 @@ namespace SymX
 
                         try
                         {
-                            if (curUrlWithinTask < urls.Count)
+                            if (curUrlWithinTask < urls.Count) // don't try to download an invalid url
                             {
                                 url = urls[curUrl + curTask];
                                 
@@ -469,6 +469,20 @@ namespace SymX
                                 Task<FileMetadata> downloadTask = Task<FileMetadata>.Run(() => DownloadSuccessfulFile(url, outFileName));
                                 downloads.Add(downloadTask);
 
+                            }
+
+                            bool waiting = true;
+
+                            while (waiting)
+                            {
+                                bool needToWait = false;
+
+                                foreach (Task download in downloads)
+                                {
+                                    if (!download.IsCompleted) needToWait = true;
+                                }
+
+                                waiting = needToWait;
                             }
                         }
                         catch
@@ -494,23 +508,10 @@ namespace SymX
                         }
                     }
 
-                    bool waiting = true;
-
-                    // Wait for all download tasks to complete.
-                    while (waiting)
+                    for (int curDownloadTask = 0; curDownloadTask < downloads.Count; curDownloadTask++)
                     {
-                        bool needToWait = false;
+                        Task<FileMetadata> download = downloads[curDownloadTask];
 
-                        foreach (Task download in downloads)
-                        {
-                            if (!download.IsCompleted) needToWait = true;
-                        }
-
-                        waiting = needToWait;
-                    }
-
-                    foreach (Task<FileMetadata> download in downloads)
-                    {
                         FileMetadata metadata = download.Result;
 
                         if (Configuration.Verbosity >= Verbosity.Verbose
@@ -524,10 +525,14 @@ namespace SymX
                             {
                                 NCLogging.Log("WARNING: Invalid last modified date - file was uploaded before Azure move!", ConsoleColor.Yellow);
                             }
+
+                            downloads.Remove(download);
+                            curDownloadTask--; // don't skip the next one
                         }
 
                         NCLogging.Log($"File size: {metadata.FileSize} (took {metadata.DownloadTime}ms to download, {metadata.DownloadSpeed.ToString("F1")} KB/s)");
                     }
+
 
                     // reset the number of retries for each file
                     numOfRetries = 0;
