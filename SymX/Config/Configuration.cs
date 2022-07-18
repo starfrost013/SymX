@@ -32,11 +32,6 @@ namespace SymX
         public static string OutFile { get; set; }
 
         /// <summary>
-        /// If this string is not null, the list of URLs will be dumped to this filename. 
-        /// </summary>
-        public static string UrlOutFile { get; set; }
-
-        /// <summary>
         /// The image size to search for on the symbol server.
         /// Ignored if both <see cref="ImageSizeMin"/> and <see cref="ImageSizeMax"/> are set.
         /// </summary>
@@ -146,6 +141,13 @@ namespace SymX
         /// Don't print branding information.
         /// </summary>
         public static bool NoLogo { get; set; }
+
+        /// <summary>
+        /// Optional: Load from a different INI file than SymX.ini.
+        /// </summary>
+        public static string IniPath { get; set; }
+
+
         #region Defaults
         /// <summary>
         /// Private: Default user agent vendor string to use while sending requests.
@@ -168,6 +170,11 @@ namespace SymX
         /// Private: The default output folder.
         /// </summary>
         private static string DEFAULT_OUTPUT_FOLDER = "download";
+
+        /// <summary>
+        /// Private: The default INI path.
+        /// </summary>
+        private static string DEFAULT_INI_PATH = "SymX.ini";
         #endregion
 
         /// <summary>
@@ -189,6 +196,21 @@ namespace SymX
             SymbolServerUrl = DEFAULT_SYMSRV_URL;
         }
 
+        /// <summary>
+        /// <para>Parses arguments passed to SymX in this order:</para>
+        /// 
+        /// <para>SymX.ini</para>
+        /// <para>The user's provided command-line arguments.</para>
+        /// </summary>
+        /// <param name="args">The command-line arguments in the form of a string array.</param>
+        /// <returns></returns>
+        public static bool Parse(string[] args)
+        {
+            if (!ParseIni()) return false;
+
+            return ParseArgs(args);
+        }
+
         #region Parser
         /// <summary>
         /// Parses command line arguments.
@@ -197,7 +219,7 @@ namespace SymX
         /// </summary>
         /// <param name="args">The arguments in the form of a string array.</param>
         /// <returns></returns>
-        public static bool Parse(string[] args)
+        public static bool ParseArgs(string[] args)
         {
             try
             {
@@ -238,10 +260,6 @@ namespace SymX
                             case "-out":
                             case "-o":
                                 OutFile = nextArg;
-                                continue;
-                            case "-urloutfile":
-                            case "-url":
-                                UrlOutFile = nextArg;
                                 continue;
                             case "-quiet":
                             case "-q":
@@ -330,7 +348,11 @@ namespace SymX
                             case "-numdownloads":
                             case "-nd":
                                 NumDownloads = Convert.ToInt32(nextArg);
-                                continue; 
+                                continue;
+                            case "-inipath":
+                            case "-ini":
+                                IniPath = nextArg;
+                                continue;
                         }
                     }
                 }
@@ -418,8 +440,14 @@ namespace SymX
                     if (CsvInFolder == null
                     || OutFile == null)
                     {
-                        Console.WriteLine("-csvinfolder and -outfile: both must be provided if -generatecsv is provided!");
+                        NCLogging.Log("-csvinfolder and -outfile: both must be provided if -generatecsv is provided!", ConsoleColor.Red, false, false);
                         return false;
+                    }
+
+                    if (Directory.Exists(OutFile)
+                        || File.Exists(OutFile))
+                    {
+                        NCLogging.Log("-outfile: cannot be an existing file or directory!", ConsoleColor.Red, false, false);
                     }
                 }
 
@@ -435,6 +463,44 @@ namespace SymX
             }
         }
 
+        /// <summary>
+        /// Parses SymX.ini.
+        /// </summary>
+        /// <returns>A boolean value determining if SymX.ini parsed successfully.</returns>
+        public static bool ParseIni()
+        {
+            if (!File.Exists(IniPath)) return true;
+
+            NCINIFile iniFile = NCINIFile.Parse("SymX.ini");
+
+            NCINIFileSection settingsSection = iniFile.GetSection("Settings");
+
+            string start = settingsSection.GetValue("Start");
+            string end = settingsSection.GetValue("End");
+            string fileName = settingsSection.GetValue("FileName");
+            string outFile = settingsSection.GetValue("OutFile");
+            string imageSize = settingsSection.GetValue("ImageSize");
+            string imageSizeMin = settingsSection.GetValue("ImageSizeMin");
+            string imageSizeMax = settingsSection.GetValue("ImageSizeMax");
+            string dontDownload = settingsSection.GetValue("DontDownload");
+            string logToFile = settingsSection.GetValue("LogToFile");
+            string numThreads = settingsSection.GetValue("NumThreads");
+            string hexTime = settingsSection.GetValue("HexTime");
+            string dontGenerateTempFile = settingsSection.GetValue("DontGenerateTempFile");
+            string maxRetries = settingsSection.GetValue("MaxRetries");
+            string outFolder = settingsSection.GetValue("OutFolder");
+            string userAgentVendor = settingsSection.GetValue("UserAgentVendor");
+            string userAgentVersion = settingsSection.GetValue("UserAgentVersion");
+            string symbolServerUrl = settingsSection.GetValue("SymbolServerUrl");
+            string numDownloads = settingsSection.GetValue("NumDownloads");
+            string recurse = settingsSection.GetValue("Recurse");
+            string keepOldLogs = settingsSection.GetValue("KeepOldLogs");
+            string noLogo = settingsSection.GetValue("NoLogo");
+        }
+
+        /// <summary>
+        /// Shows the help file.
+        /// </summary>
         public static void ShowHelp()
         {
             PrintVersion();

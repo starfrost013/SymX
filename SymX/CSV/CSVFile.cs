@@ -3,11 +3,11 @@
 namespace SymX
 {
     /// <summary>
-    /// MassView
+    /// CSVFile
     /// 
     /// Dumps required information for Microsoft Symbol Server links to a CSV file.
     /// </summary>
-    public static class MassView
+    public static class CSVFile
     {
         /// <summary>
         /// PE magic bytes
@@ -52,9 +52,8 @@ namespace SymX
             else
             {
                 if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"MassView: Checking folder {inFolder}, dumping to {outFile}");
-                StreamWriter bw = null;
 
-                bw = new StreamWriter(new FileStream(outFile, FileMode.Create));
+                StreamWriter bw = new StreamWriter(new FileStream(outFile, FileMode.Create));
 
                 // Write the CSV elements
                 bw.WriteLine("FileName,TimeDateStamp,ISO8601,Hex,SizeOfImage,Url");

@@ -115,7 +115,7 @@ namespace SymX
                         continue;
                     // Generate a CSV file from a folder.
                     case Tasks.GenerateCsv:
-                        if (!MassView.Run()) NCLogging.Log("MassView failed to generate CSV file!", ConsoleColor.Red);
+                        if (!CSVFile.Run()) NCLogging.Log("MassView failed to generate CSV file!", ConsoleColor.Red);
                         continue;
                     // Exit the program.
                     case Tasks.Exit:
@@ -193,7 +193,7 @@ namespace SymX
             else
             {
                 // generate the URL list using massview
-                return MassView.ParseUrls(Configuration.InFile);
+                return CSVFile.ParseUrls(Configuration.InFile);
             }
 
             return urlList;
