@@ -1,0 +1,6 @@
+﻿Q&A:
+Q. Does this support other symbol servers?
+A. Yes!
+
+Q. I found a bug!
+A. DM me (Starfrost#9088) with what happened, OS, architecture, and your CL args. Feature suggestions are welcome!

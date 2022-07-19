@@ -18,7 +18,9 @@
 
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TextTemplating\Microsoft.TextTemplating.targets" />
   <ItemGroup>
+    <None Remove="Content\qanda.txt" />
     <None Remove="Content\readme.txt" />
+    <None Remove="Content\ReleaseNotes.txt" />
     <None Remove="Content\SymX.ini" />
   </ItemGroup>
 
@@ -49,8 +51,14 @@
 		<Content Include="Content\logo.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Include="Content\qanda.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 		<Content Include="Content\readme.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Content\ReleaseNotes.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Content\SymX.ini">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

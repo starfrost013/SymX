@@ -151,6 +151,10 @@ namespace SymX
         /// </summary>
         public static string IniPath { get; set; }
 
+        /// <summary>
+        /// Determines if the pdb file will be acquired
+        /// </summary>
+        public static bool GetPdb { get; set; }
 
         #region Defaults
         /// <summary>
@@ -370,6 +374,10 @@ namespace SymX
                         case "-ini":
                             IniPath = nextArg;
                             continue;
+                        case "-pdbpath":
+                        case "-pdb":
+                            GetPdb = true;
+                            continue;
                     }
                 }
             }
@@ -508,6 +516,10 @@ namespace SymX
                 string imageSize = settingsSection.GetValue("ImageSize");
                 string imageSizeMin = settingsSection.GetValue("ImageSizeMin");
                 string imageSizeMax = settingsSection.GetValue("ImageSizeMax");
+                string inFile = settingsSection.GetValue("InFile");
+                string generateCsv = settingsSection.GetValue("GenerateCsv");
+                string csvInFolder = settingsSection.GetValue("CsvInFolder");
+                string verbosity = settingsSection.GetValue("Verbosity");
                 string dontDownload = settingsSection.GetValue("DontDownload");
                 string logToFile = settingsSection.GetValue("LogToFile");
                 string numThreads = settingsSection.GetValue("NumThreads");
@@ -532,7 +544,11 @@ namespace SymX
                 ImageSize = imageSize;
                 if (imageSizeMin != null) ImageSizeMin = ulong.Parse(imageSizeMin, NumberStyles.HexNumber);
                 if (imageSizeMax != null) ImageSizeMax = ulong.Parse(imageSizeMax, NumberStyles.HexNumber);
+                InFile = inFile;
                 // user may explicitly specify false for booleans so we need to use Convert.ToBoolean()
+                if (generateCsv != null) GenerateCsv = Convert.ToBoolean(generateCsv);
+                CsvInFolder = csvInFolder;
+                Verbosity = (Verbosity)Enum.Parse(typeof(Verbosity), verbosity);
                 if (dontDownload != null) DontDownload = Convert.ToBoolean(dontDownload);
                 if (logToFile != null) LogToFile = Convert.ToBoolean(logToFile);
                 if (numThreads != null) NumThreads = Convert.ToInt32(numThreads);

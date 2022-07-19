@@ -5,7 +5,7 @@ namespace SymX
     /// <summary>
     /// CSVFile
     /// 
-    /// Dumps required information for Microsoft Symbol Server links to a CSV file.
+    /// Dumps required information for symbol server links to a CSV file.
     /// </summary>
     public static class CSVFile
     {
