@@ -19,6 +19,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TextTemplating\Microsoft.TextTemplating.targets" />
   <ItemGroup>
     <None Remove="Content\readme.txt" />
+    <None Remove="Content\SymX.ini" />
   </ItemGroup>
 
 
@@ -50,6 +51,9 @@
 		</Content>
 		<Content Include="Content\readme.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Content\SymX.ini">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
 

@@ -89,51 +89,57 @@ namespace SymX
                     {
                         using (BinaryReader br = new BinaryReader(File.OpenRead(fileName)))
                         {
-                            // read e_lfanew
-                            br.BaseStream.Seek(e_lfanewOffset, SeekOrigin.Begin);
-
-                            uint e_lfanew = br.ReadUInt32();
-
-                            // check for the PE header 
-                            // not exactly foolproof, but should work 99.99% of the time. and in worse case we will get invalid values and skip the file anyway
-                            if (e_lfanew < br.BaseStream.Length - 4)
+                            // make sure the file is long enough to be a PE
+                            // fix bug
+                            if (br.BaseStream.Length > e_lfanewOffset)
                             {
-                                br.BaseStream.Seek(e_lfanew, SeekOrigin.Begin);
+                                // read e_lfanew
+                                br.BaseStream.Seek(e_lfanewOffset, SeekOrigin.Begin);
 
-                                byte[] peMagic = br.ReadBytes(2);
+                                uint e_lfanew = br.ReadUInt32();
 
-                                // Skip files that aren't Portable Executables
-                                if (peMagic[0] == PEMagicData[0]
-                                    && peMagic[1] == PEMagicData[1])
+                                // check for the PE header 
+                                // not exactly foolproof, but should work 99.99% of the time. and in worse case we will get invalid values and skip the file anyway
+                                if (e_lfanew < br.BaseStream.Length - 4)
                                 {
-                                    br.BaseStream.Seek(e_lfanew + TimeDateStampOffset, SeekOrigin.Begin); // timestamp is at 0x08
+                                    br.BaseStream.Seek(e_lfanew, SeekOrigin.Begin);
 
-                                    // convert the date to hex formats
-                                    ulong timeDateStamp = br.ReadUInt64();
-                                    DateTime date = new DateTime(1970, 1, 1, 1, 1, 1).AddSeconds(timeDateStamp);
-                                    string dateIso = date.ToString("yyyy-MM-dd HH:mm:ss");
-                                    string dateHex = timeDateStamp.ToString("x");
+                                    byte[] peMagic = br.ReadBytes(2);
 
-                                    br.BaseStream.Seek(e_lfanew + SizeOfImageOffset, SeekOrigin.Begin); // we don't need to distinguish between PE32 (x86) and PE32+ (x86-64) here, as the offsets just happen to line up where we need it
+                                    // Skip files that aren't Portable Executables
+                                    if (peMagic[0] == PEMagicData[0]
+                                        && peMagic[1] == PEMagicData[1])
+                                    {
+                                        br.BaseStream.Seek(e_lfanew + TimeDateStampOffset, SeekOrigin.Begin); // timestamp is at 0x08
 
-                                    uint sizeOfImage = br.ReadUInt32();
-                                    string sizeOfImageHex = sizeOfImage.ToString("x");
+                                        // convert the date to hex formats
+                                        ulong timeDateStamp = br.ReadUInt64();
+                                        DateTime date = new DateTime(1970, 1, 1, 1, 1, 1).AddSeconds(timeDateStamp);
+                                        string dateIso = date.ToString("yyyy-MM-dd HH:mm:ss");
+                                        string dateHex = timeDateStamp.ToString("x");
 
-                                    if (Configuration.Verbosity >= Verbosity.Verbose) Console.WriteLine($"{fileName}: {dateIso} (hex: {dateHex}, unix: {timeDateStamp}), ImageSize: {sizeOfImageHex}");
+                                        br.BaseStream.Seek(e_lfanew + SizeOfImageOffset, SeekOrigin.Begin); // we don't need to distinguish between PE32 (x86) and PE32+ (x86-64) here, as the offsets just happen to line up where we need it
 
-                                    // truncate the path so that we generate valid URLs
-                                    string[] fileNameFolders = fileName.Split('\\');
+                                        uint sizeOfImage = br.ReadUInt32();
+                                        string sizeOfImageHex = sizeOfImage.ToString("x");
 
-                                    // i don't think there's any possible situation where there could NOT be slashes in this path
-                                    string fileNameOnly = fileNameFolders[fileNameFolders.Length - 1];
+                                        if (Configuration.Verbosity >= Verbosity.Verbose) Console.WriteLine($"{fileName}: {dateIso} (hex: {dateHex}, unix: {timeDateStamp}), ImageSize: {sizeOfImageHex}");
 
-                                    // 0x5C = \
-                                    // This escapes the string so that Excel does not interpret any e000 as scientific notation
-                                    string finalString = $"{fileName},{timeDateStamp},{dateIso},{dateHex},{sizeOfImageHex},{Configuration.SymbolServerUrl}/{fileNameOnly}/{dateHex}{sizeOfImageHex}/{fileNameOnly}";
-                                    
-                                    if (outFile != null) bw.WriteLine(finalString);
+                                        // truncate the path so that we generate valid URLs
+                                        string[] fileNameFolders = fileName.Split('\\');
+
+                                        // i don't think there's any possible situation where there could NOT be slashes in this path
+                                        string fileNameOnly = fileNameFolders[fileNameFolders.Length - 1];
+
+                                        // 0x5C = \
+                                        // This escapes the string so that Excel does not interpret any e000 as scientific notation
+                                        string finalString = $"{fileName},{timeDateStamp},{dateIso},{dateHex},{sizeOfImageHex},{Configuration.SymbolServerUrl}/{fileNameOnly}/{dateHex}{sizeOfImageHex}/{fileNameOnly}";
+
+                                        if (outFile != null) bw.WriteLine(finalString);
+                                    }
                                 }
                             }
+
                         }
                     }
                 }

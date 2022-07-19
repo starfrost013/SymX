@@ -14,12 +14,12 @@
                   &@(                                                           
               *%@%,                                                            
 
-A Microsoft Symbol Server bulk download tool
+A SymStore bulk download tool (MSDL-compatible)
 Version 4.0 Alpha 3
 
 xx July 2022
 
-SymX is a bulk download tool for binaries stored on the Microsoft Symbol Server. It has been used to find files from unleaked builds of Windows as well as dumping all the binaries from a Windows version.
+SymX is a bulk download tool for binaries stored on symbol servers created using SymStore.exe, including the Microsoft Symbol Server, It has been used to find files from unleaked builds of Windows as well as dumping all the binaries from a particular Windows version.
 It is a merger of msdlurlgen and MassView that adds many new features to both, is far faster (100+ URLs per second at max threads, vs. <5), and is far more robust.
 
 It is not intended as a replacement for symchk and cannot at present be used to download symbols, only binaries.
@@ -49,8 +49,10 @@ Also, excel converts any "xe000" string to scientific notation. Either turn off 
 4.0.0 Alpha 3 (July xx, 2022):
 * Added configurability. Settings can be optionally stored in SymX.ini, and will be loaded from it if it exists. Additionally, you can use the -inipath option in order to specify a custom INI to load.
 * Fixed a crash when -outfile specified a folder or file that already existed.
+* Fixed a crash on zero byte files
 * Minor refactoring to remove some redundant code in the CSV generation mode
 * Got rid of all remaining independent MassView branding
+* Rewrote help to specify it by section
 
 RELEASE NOTES:
 4.0.0 Alpha 2.2 (July 14, 2022):

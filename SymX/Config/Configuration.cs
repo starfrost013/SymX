@@ -176,7 +176,7 @@ namespace SymX
         /// <summary>
         /// Private: The default INI path.
         /// </summary>
-        private static string DEFAULT_INI_PATH = "SymX.ini";
+        private static string DEFAULT_INI_PATH = @"Content\SymX.ini";
         #endregion
 
         /// <summary>
@@ -196,6 +196,8 @@ namespace SymX
             OutFolder = DEFAULT_OUTPUT_FOLDER;
 
             SymbolServerUrl = DEFAULT_SYMSRV_URL;
+
+            IniPath = DEFAULT_INI_PATH;
         }
 
         /// <summary>
@@ -208,11 +210,22 @@ namespace SymX
         /// <returns></returns>
         public static bool Parse(string[] args)
         {
-            if (!ParseIni()) return false;
+            try
+            {
+                if (!ParseIni()) return false;
 
-            if (!ParseArgs(args)) return false;
+                if (!ParseArgs(args)) return false;
 
-            return ParseVerify();
+                return ParseVerify();
+            }
+            catch (Exception ex)
+            {
+                NCLogging.Log($"An error occurred while parsing command-line arguments: {ex.Message}", ConsoleColor.Red);
+
+                if (Verbosity >= Verbosity.Verbose) NCLogging.Log($"\n\nStacktrace: {ex.StackTrace}", ConsoleColor.Red);
+
+                return false; 
+            }
         }
 
         #region Parser
@@ -225,152 +238,141 @@ namespace SymX
         /// <returns></returns>
         public static bool ParseArgs(string[] args)
         {
-            try
+            for (int curArgId = 0; curArgId < args.Length; curArgId++)
             {
-                for (int curArgId = 0; curArgId < args.Length; curArgId++)
+                string curArg = args[curArgId];
+
+                string nextArg = null;
+                if (args.Length - curArgId > 1) nextArg = args[curArgId + 1];
+
+                curArg = curArg.ToLower();
+
+                if (curArg.StartsWith("-"))
                 {
-                    string curArg = args[curArgId];
-
-                    string nextArg = null;
-                    if (args.Length - curArgId > 1) nextArg = args[curArgId + 1];
-
-                    curArg = curArg.ToLower();
-
-                    if (curArg.StartsWith("-"))
+                    switch (curArg)
                     {
-                        switch (curArg)
-                        {
-                            case "-start":
-                            case "-s":
-                                Start = Convert.ToUInt64(nextArg);
-                                continue;
-                            case "-end":
-                            case "-e":
-                                End = Convert.ToUInt64(nextArg);
-                                continue;
-                            case "-filename":
-                            case "-f":
-                                FileName = nextArg;
-                                continue;
-                            case "-imagesize":
-                            case "-i":
-                                ImageSize = nextArg;
-                                continue;
-                            case "-infile":
-                            case "-in":
-                                InFile = nextArg;
-                                continue;
-                            case "-outfile":
-                            case "-out":
-                            case "-o":
-                                OutFile = nextArg;
-                                continue;
-                            case "-quiet":
-                            case "-q":
-                                Verbosity = Verbosity.Quiet;
-                                continue;
-                            case "-verbose":
-                            case "-v":
-                                Verbosity = Verbosity.Verbose;
-                                continue;
-                            case "-generatecsv":
-                            case "-g":
-                                GenerateCsv = true;
-                                continue;
-                            case "-numthreads":
-                            case "-threads":
-                            case "-t":
-                                NumThreads = Convert.ToInt32(nextArg);
-                                continue;
-                            case "-csvinfolder":
-                            case "-ci":
-                                CsvInFolder = nextArg;
-                                continue;
-                            case "-logtofile":
-                            case "-log":
-                            case "-l":
-                                LogToFile = true;
-                                continue;
-                            case "-imagesizemin":
-                            case "-imin":
-                                // more concise than ulong Convert.ToHexString, as no byte array conversion is necessary
-                                ImageSizeMin = ulong.Parse(nextArg, NumberStyles.HexNumber);
-                                continue;
-                            case "-imagesizemax":
-                            case "-imax":
-                                ImageSizeMax = ulong.Parse(nextArg, NumberStyles.HexNumber);
-                                continue;
-                            case "-dontdownload":
-                            case "-d":
-                                DontDownload = true;
-                                continue;
-                            case "-hextime":
-                            case "-h":
-                                HexTime = true;
-                                continue;
-                            case "-dontgeneratetempfile":
-                            case "-dt":
-                            case "-dtemp":
-                                DontGenerateTempFile = true;
-                                continue;
-                            case "-maxretries":
-                            case "-retries":
-                            case "-max":
-                            case "-m":
-                                MaxRetries = Convert.ToUInt32(nextArg);
-                                continue;
-                            case "-outfolder":
-                            case "-of":
-                                OutFolder = nextArg;
-                                continue;
-                            case "-useragentvendor":
-                            case "-uavendor":
-                                UserAgentVendor = nextArg;
-                                continue;
-                            case "-useragentversion":
-                            case "-uaversion":
-                                UserAgentVersion = nextArg;
-                                continue;
-                            case "-symbolserverurl":
-                            case "-symsrvurl":
-                            case "-symsrv":
-                                SymbolServerUrl = nextArg;
-                                continue;
-                            case "-recursive":
-                            case "-recurse":
-                            case "-r":
-                                Recurse = true;
-                                continue;
-                            case "-keepoldlogs":
-                            case "-keeplogs":
-                            case "-k":
-                                KeepOldLogs = true;
-                                continue;
-                            case "-nologo":
-                                NoLogo = true;
-                                continue;
-                            case "-numdownloads":
-                            case "-nd":
-                                NumDownloads = Convert.ToInt32(nextArg);
-                                continue;
-                            case "-inipath":
-                            case "-ini":
-                                IniPath = nextArg;
-                                continue;
-                        }
+                        case "-start":
+                        case "-s":
+                            Start = Convert.ToUInt64(nextArg);
+                            continue;
+                        case "-end":
+                        case "-e":
+                            End = Convert.ToUInt64(nextArg);
+                            continue;
+                        case "-filename":
+                        case "-f":
+                            FileName = nextArg;
+                            continue;
+                        case "-imagesize":
+                        case "-i":
+                            ImageSize = nextArg;
+                            continue;
+                        case "-infile":
+                        case "-in":
+                            InFile = nextArg;
+                            continue;
+                        case "-outfile":
+                        case "-out":
+                        case "-o":
+                            OutFile = nextArg;
+                            continue;
+                        case "-quiet":
+                        case "-q":
+                            Verbosity = Verbosity.Quiet;
+                            continue;
+                        case "-verbose":
+                        case "-v":
+                            Verbosity = Verbosity.Verbose;
+                            continue;
+                        case "-generatecsv":
+                        case "-g":
+                            GenerateCsv = true;
+                            continue;
+                        case "-numthreads":
+                        case "-threads":
+                        case "-t":
+                            NumThreads = Convert.ToInt32(nextArg);
+                            continue;
+                        case "-csvinfolder":
+                        case "-ci":
+                            CsvInFolder = nextArg;
+                            continue;
+                        case "-logtofile":
+                        case "-log":
+                        case "-l":
+                            LogToFile = true;
+                            continue;
+                        case "-imagesizemin":
+                        case "-imin":
+                            // more concise than ulong Convert.ToHexString, as no byte array conversion is necessary
+                            ImageSizeMin = ulong.Parse(nextArg, NumberStyles.HexNumber);
+                            continue;
+                        case "-imagesizemax":
+                        case "-imax":
+                            ImageSizeMax = ulong.Parse(nextArg, NumberStyles.HexNumber);
+                            continue;
+                        case "-dontdownload":
+                        case "-d":
+                            DontDownload = true;
+                            continue;
+                        case "-hextime":
+                        case "-h":
+                            HexTime = true;
+                            continue;
+                        case "-dontgeneratetempfile":
+                        case "-dt":
+                        case "-dtemp":
+                            DontGenerateTempFile = true;
+                            continue;
+                        case "-maxretries":
+                        case "-retries":
+                        case "-max":
+                        case "-m":
+                            MaxRetries = Convert.ToUInt32(nextArg);
+                            continue;
+                        case "-outfolder":
+                        case "-of":
+                            OutFolder = nextArg;
+                            continue;
+                        case "-useragentvendor":
+                        case "-uavendor":
+                            UserAgentVendor = nextArg;
+                            continue;
+                        case "-useragentversion":
+                        case "-uaversion":
+                            UserAgentVersion = nextArg;
+                            continue;
+                        case "-symbolserverurl":
+                        case "-symsrvurl":
+                        case "-symsrv":
+                            SymbolServerUrl = nextArg;
+                            continue;
+                        case "-recursive":
+                        case "-recurse":
+                        case "-r":
+                            Recurse = true;
+                            continue;
+                        case "-keepoldlogs":
+                        case "-keeplogs":
+                        case "-k":
+                            KeepOldLogs = true;
+                            continue;
+                        case "-nologo":
+                            NoLogo = true;
+                            continue;
+                        case "-numdownloads":
+                        case "-nd":
+                            NumDownloads = Convert.ToInt32(nextArg);
+                            continue;
+                        case "-inipath":
+                        case "-ini":
+                            IniPath = nextArg;
+                            continue;
                     }
                 }
-
-                return true;
             }
-            catch (Exception ex)
-            {
-                NCLogging.Log($"An error occurred while parsing command-line arguments: {ex.Message}", ConsoleColor.Red);
 
-                if (Verbosity >= Verbosity.Verbose) NCLogging.Log($"\n\nStacktrace: {ex.StackTrace}", ConsoleColor.Red);
-
-                return false;
-            }
+            return true;
         }
 
         public static bool ParseVerify()
@@ -478,59 +480,72 @@ namespace SymX
         /// <returns>A boolean value determining if SymX.ini parsed successfully.</returns>
         public static bool ParseIni()
         {
-            if (!File.Exists(IniPath)) return true;
+            if (!File.Exists(IniPath))
+            {
+                NCLogging.Log($"No INI file, skipping INI loading ({IniPath} doesn't exist)");
+                return true;
+            }
 
-            NCINIFile iniFile = NCINIFile.Parse("SymX.ini");
+            NCINIFile iniFile = NCINIFile.Parse(IniPath);
 
             NCINIFileSection settingsSection = iniFile.GetSection("Settings");
 
-            // todo: use attributes here
-            string start = settingsSection.GetValue("Start");
-            string end = settingsSection.GetValue("End");
-            string fileName = settingsSection.GetValue("FileName");
-            string outFile = settingsSection.GetValue("OutFile");
-            string imageSize = settingsSection.GetValue("ImageSize");
-            string imageSizeMin = settingsSection.GetValue("ImageSizeMin");
-            string imageSizeMax = settingsSection.GetValue("ImageSizeMax");
-            string dontDownload = settingsSection.GetValue("DontDownload");
-            string logToFile = settingsSection.GetValue("LogToFile");
-            string numThreads = settingsSection.GetValue("NumThreads");
-            string hexTime = settingsSection.GetValue("HexTime");
-            string dontGenerateTempFile = settingsSection.GetValue("DontGenerateTempFile");
-            string maxRetries = settingsSection.GetValue("MaxRetries");
-            string outFolder = settingsSection.GetValue("OutFolder");
-            string userAgentVendor = settingsSection.GetValue("UserAgentVendor");
-            string userAgentVersion = settingsSection.GetValue("UserAgentVersion");
-            string symbolServerUrl = settingsSection.GetValue("SymbolServerUrl");
-            string numDownloads = settingsSection.GetValue("NumDownloads");
-            string recurse = settingsSection.GetValue("Recurse");
-            string keepOldLogs = settingsSection.GetValue("KeepOldLogs");
-            string noLogo = settingsSection.GetValue("NoLogo");
+            if (settingsSection != null)
+            {
+                // todo: use attributes here
+                string start = settingsSection.GetValue("Start");
+                string end = settingsSection.GetValue("End");
+                string fileName = settingsSection.GetValue("FileName");
+                string outFile = settingsSection.GetValue("OutFile");
+                string imageSize = settingsSection.GetValue("ImageSize");
+                string imageSizeMin = settingsSection.GetValue("ImageSizeMin");
+                string imageSizeMax = settingsSection.GetValue("ImageSizeMax");
+                string dontDownload = settingsSection.GetValue("DontDownload");
+                string logToFile = settingsSection.GetValue("LogToFile");
+                string numThreads = settingsSection.GetValue("NumThreads");
+                string hexTime = settingsSection.GetValue("HexTime");
+                string dontGenerateTempFile = settingsSection.GetValue("DontGenerateTempFile");
+                string maxRetries = settingsSection.GetValue("MaxRetries");
+                string outFolder = settingsSection.GetValue("OutFolder");
+                string userAgentVendor = settingsSection.GetValue("UserAgentVendor");
+                string userAgentVersion = settingsSection.GetValue("UserAgentVersion");
+                string symbolServerUrl = settingsSection.GetValue("SymbolServerUrl");
+                string numDownloads = settingsSection.GetValue("NumDownloads");
+                string recurse = settingsSection.GetValue("Recurse");
+                string keepOldLogs = settingsSection.GetValue("KeepOldLogs");
+                string noLogo = settingsSection.GetValue("NoLogo");
 
-            if (start != null) Start = Convert.ToUInt64(start);
-            if (end != null) End = Convert.ToUInt64(end);
-            FileName = fileName;
-            OutFile = outFile;
-            ImageSize = imageSize;
-            if (imageSizeMin != null) ImageSizeMin = ulong.Parse(imageSizeMin, NumberStyles.HexNumber);
-            if (imageSizeMax != null) ImageSizeMax = ulong.Parse(imageSizeMax, NumberStyles.HexNumber);
-            // user may explicitly specify false for booleans so we need to use Convert.ToBoolean()
-            if (dontDownload != null) DontDownload = Convert.ToBoolean(dontDownload);
-            if (logToFile != null) LogToFile = Convert.ToBoolean(logToFile);
-            if (numThreads != null) NumThreads = Convert.ToInt32(numThreads);
-            if (hexTime != null) HexTime = Convert.ToBoolean(hexTime);
-            if (dontGenerateTempFile != null) DontGenerateTempFile = Convert.ToBoolean(dontDownload);
-            if (maxRetries != null) MaxRetries = Convert.ToUInt32(maxRetries);
-            OutFolder = outFolder;
-            UserAgentVendor = userAgentVendor;
-            UserAgentVersion = userAgentVersion;
-            SymbolServerUrl = symbolServerUrl;
-            if (numDownloads != null) NumDownloads = Convert.ToInt32(numDownloads);
-            if (recurse != null) Recurse = Convert.ToBoolean(recurse);
-            if (keepOldLogs != null) KeepOldLogs = Convert.ToBoolean(keepOldLogs);
-            if (noLogo != null) NoLogo = Convert.ToBoolean(noLogo);
+                if (start != null) Start = Convert.ToUInt64(start);
+                if (end != null) End = Convert.ToUInt64(end);
+                FileName = fileName;
+                OutFile = outFile;
+                ImageSize = imageSize;
+                if (imageSizeMin != null) ImageSizeMin = ulong.Parse(imageSizeMin, NumberStyles.HexNumber);
+                if (imageSizeMax != null) ImageSizeMax = ulong.Parse(imageSizeMax, NumberStyles.HexNumber);
+                // user may explicitly specify false for booleans so we need to use Convert.ToBoolean()
+                if (dontDownload != null) DontDownload = Convert.ToBoolean(dontDownload);
+                if (logToFile != null) LogToFile = Convert.ToBoolean(logToFile);
+                if (numThreads != null) NumThreads = Convert.ToInt32(numThreads);
+                if (hexTime != null) HexTime = Convert.ToBoolean(hexTime);
+                if (dontGenerateTempFile != null) DontGenerateTempFile = Convert.ToBoolean(dontDownload);
+                if (maxRetries != null) MaxRetries = Convert.ToUInt32(maxRetries);
+                OutFolder = outFolder;
+                UserAgentVendor = userAgentVendor;
+                UserAgentVersion = userAgentVersion;
+                SymbolServerUrl = symbolServerUrl;
+                if (numDownloads != null) NumDownloads = Convert.ToInt32(numDownloads);
+                if (recurse != null) Recurse = Convert.ToBoolean(recurse);
+                if (keepOldLogs != null) KeepOldLogs = Convert.ToBoolean(keepOldLogs);
+                if (noLogo != null) NoLogo = Convert.ToBoolean(noLogo);
 
-            return true;
+                return true;
+            }
+            else
+            {
+                NCLogging.Log($"Warning: No Settings section in {IniPath}!", ConsoleColor.Yellow, false, false);
+                return true;
+            }
+           
         }
 
         /// <summary>
