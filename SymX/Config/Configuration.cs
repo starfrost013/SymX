@@ -40,6 +40,8 @@ namespace SymX
         /// <summary>
         /// Optional minimum image size to search for on the symbol server. 
         /// If this and <see cref="ImageSizeMax"/> are set, <see cref="ImageSize"/> is ignored.
+        /// 
+        /// Not a string because this simplifies conversion code later down the line
         /// </summary>
         public static ulong ImageSizeMin { get; set; }
 
@@ -208,7 +210,9 @@ namespace SymX
         {
             if (!ParseIni()) return false;
 
-            return ParseArgs(args);
+            if (!ParseArgs(args)) return false;
+
+            return ParseVerify();
         }
 
         #region Parser
@@ -357,100 +361,6 @@ namespace SymX
                     }
                 }
 
-                if (OutFolder != null
-                && !Directory.Exists(OutFolder)) Directory.CreateDirectory(OutFolder);
-
-
-                // Check for invalid or DDOSing thread count options. 
-                if (NumThreads < 1
-                    || NumThreads > 30)
-                {
-                    Console.WriteLine("-numthreads: must be between 1-30 - no DDOSing the servers!");
-                    return false; // don't DDOS the servers
-                }
-
-                if (NumDownloads <= 0) // -numdownloads not provided or somehow we provided a negative number
-                {
-                    NumDownloads = NumThreads;
-                    if (NumDownloads > 15) NumDownloads = 15; // "soft" limit to 15 to prevent ddosing
-                }
-
-                if (InFile != null)
-                {
-                    if (!File.Exists(InFile))
-                    {
-                        Console.WriteLine($"-infile: The file {InFile} does not exist!");
-                        return false;
-                    }
-
-                    return true;
-                }
-
-
-                if (!GenerateCsv) // non-massview mode
-                {
-                    // Check for valid start, end, and filename
-                    if (Start <= 0
-                        || End <= 0)
-                    {
-                        Console.WriteLine("-start or end: Required option not present!");
-                        return false;
-                    }
-
-                    if (FileName == null)
-                    {
-                        Console.WriteLine("-filename: Required option not present!");
-                        return false;
-                    }
-
-                    // Check for invalid image size.
-                    if (ImageSize == null)
-                    {
-                        if (ImageSizeMin == 0
-                            || ImageSizeMax == 0)
-                        {
-                            Console.WriteLine("Either -imagesize or both -imagesizemin and -imagesizemax must be present!");
-                            return false;
-                        }
-                    }
-
-
-                    // The user has specified they want hex time format, reconvert to it
-                    if (HexTime)
-                    {
-                        string startString = Start.ToString();
-                        string endString = End.ToString();
-
-                        Start = ulong.Parse(startString, NumberStyles.HexNumber);
-                        End = ulong.Parse(endString, NumberStyles.HexNumber);
-                    }
-
-                    // Only allow official DbgX user agent with official symsrv
-                    if (SymbolServerUrl == DEFAULT_SYMSRV_URL)
-                    {
-                        UserAgentVendor = DEFAULT_UA_VENDOR;
-                        UserAgentVersion = DEFAULT_UA_VERSION;
-                    }
-
-                    // default filename
-                    if (OutFile == null) OutFile = FileName;
-                }
-                else // massview mode
-                {
-                    if (CsvInFolder == null
-                    || OutFile == null)
-                    {
-                        NCLogging.Log("-csvinfolder and -outfile: both must be provided if -generatecsv is provided!", ConsoleColor.Red, false, false);
-                        return false;
-                    }
-
-                    if (Directory.Exists(OutFile)
-                        || File.Exists(OutFile))
-                    {
-                        NCLogging.Log("-outfile: cannot be an existing file or directory!", ConsoleColor.Red, false, false);
-                    }
-                }
-
                 return true;
             }
             catch (Exception ex)
@@ -462,6 +372,105 @@ namespace SymX
                 return false;
             }
         }
+
+        public static bool ParseVerify()
+        {
+            if (OutFolder != null
+               && !Directory.Exists(OutFolder)) Directory.CreateDirectory(OutFolder);
+
+            // Check for invalid or DDOSing thread count options. 
+            if (NumThreads < 1
+                || NumThreads > 30)
+            {
+                Console.WriteLine("-numthreads: must be between 1-30 - no DDOSing the servers!");
+                return false; // don't DDOS the servers
+            }
+
+            if (NumDownloads <= 0) // -numdownloads not provided or somehow we provided a negative number
+            {
+                NumDownloads = NumThreads;
+                if (NumDownloads > 15) NumDownloads = 15; // "soft" limit to 15 to prevent ddosing
+            }
+
+            if (InFile != null)
+            {
+                if (!File.Exists(InFile))
+                {
+                    Console.WriteLine($"-infile: The file {InFile} does not exist!");
+                    return false;
+                }
+
+                return true;
+            }
+
+
+            if (!GenerateCsv) // non-massview mode
+            {
+                // Check for valid start, end, and filename
+                if (Start <= 0
+                    || End <= 0)
+                {
+                    Console.WriteLine("-start or end: Required option not present!");
+                    return false;
+                }
+
+                if (FileName == null)
+                {
+                    Console.WriteLine("-filename: Required option not present!");
+                    return false;
+                }
+
+                // Check for invalid image size.
+                if (ImageSize == null)
+                {
+                    if (ImageSizeMin == 0
+                        || ImageSizeMax == 0)
+                    {
+                        Console.WriteLine("Either -imagesize or both -imagesizemin and -imagesizemax must be present!");
+                        return false;
+                    }
+                }
+
+
+                // The user has specified they want hex time format, reconvert to it
+                if (HexTime)
+                {
+                    string startString = Start.ToString();
+                    string endString = End.ToString();
+
+                    Start = ulong.Parse(startString, NumberStyles.HexNumber);
+                    End = ulong.Parse(endString, NumberStyles.HexNumber);
+                }
+
+                // Only allow official DbgX user agent with official symsrv
+                if (SymbolServerUrl == DEFAULT_SYMSRV_URL)
+                {
+                    UserAgentVendor = DEFAULT_UA_VENDOR;
+                    UserAgentVersion = DEFAULT_UA_VERSION;
+                }
+
+                // default filename
+                if (OutFile == null) OutFile = FileName;
+            }
+            else // massview mode
+            {
+                if (CsvInFolder == null
+                || OutFile == null)
+                {
+                    NCLogging.Log("-csvinfolder and -outfile: both must be provided if -generatecsv is provided!", ConsoleColor.Red, false, false);
+                    return false;
+                }
+
+                if (Directory.Exists(OutFile)
+                    || File.Exists(OutFile))
+                {
+                    NCLogging.Log("-outfile: cannot be an existing file or directory!", ConsoleColor.Red, false, false);
+                }
+            }
+
+            return true;
+        }
+
 
         /// <summary>
         /// Parses SymX.ini.
@@ -475,6 +484,7 @@ namespace SymX
 
             NCINIFileSection settingsSection = iniFile.GetSection("Settings");
 
+            // todo: use attributes here
             string start = settingsSection.GetValue("Start");
             string end = settingsSection.GetValue("End");
             string fileName = settingsSection.GetValue("FileName");
@@ -496,6 +506,31 @@ namespace SymX
             string recurse = settingsSection.GetValue("Recurse");
             string keepOldLogs = settingsSection.GetValue("KeepOldLogs");
             string noLogo = settingsSection.GetValue("NoLogo");
+
+            if (start != null) Start = Convert.ToUInt64(start);
+            if (end != null) End = Convert.ToUInt64(end);
+            FileName = fileName;
+            OutFile = outFile;
+            ImageSize = imageSize;
+            if (imageSizeMin != null) ImageSizeMin = ulong.Parse(imageSizeMin, NumberStyles.HexNumber);
+            if (imageSizeMax != null) ImageSizeMax = ulong.Parse(imageSizeMax, NumberStyles.HexNumber);
+            // user may explicitly specify false for booleans so we need to use Convert.ToBoolean()
+            if (dontDownload != null) DontDownload = Convert.ToBoolean(dontDownload);
+            if (logToFile != null) LogToFile = Convert.ToBoolean(logToFile);
+            if (numThreads != null) NumThreads = Convert.ToInt32(numThreads);
+            if (hexTime != null) HexTime = Convert.ToBoolean(hexTime);
+            if (dontGenerateTempFile != null) DontGenerateTempFile = Convert.ToBoolean(dontDownload);
+            if (maxRetries != null) MaxRetries = Convert.ToUInt32(maxRetries);
+            OutFolder = outFolder;
+            UserAgentVendor = userAgentVendor;
+            UserAgentVersion = userAgentVersion;
+            SymbolServerUrl = symbolServerUrl;
+            if (numDownloads != null) NumDownloads = Convert.ToInt32(numDownloads);
+            if (recurse != null) Recurse = Convert.ToBoolean(recurse);
+            if (keepOldLogs != null) KeepOldLogs = Convert.ToBoolean(keepOldLogs);
+            if (noLogo != null) NoLogo = Convert.ToBoolean(noLogo);
+
+            return true;
         }
 
         /// <summary>
