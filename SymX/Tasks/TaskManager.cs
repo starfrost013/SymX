@@ -321,7 +321,7 @@ namespace SymX
                         // if the task caused an exception then fail checking the URL
                         if (task.IsFaulted)
                         {
-                            NCLogging.Log($"An error occurred while scanning for {foundUrl}!", ConsoleColor.Red);
+                            NCLogging.Log($"An error occurred while scanning for the URL {foundUrl}!", ConsoleColor.Red);
                             failedUrls++;
                         }
                         else
@@ -383,21 +383,22 @@ namespace SymX
                     Console.Write("█");
                 }
 
+                // draw spaces as placeholders for the areas of the bar that are not yet completed
                 for (int curBar = numberOfBarsToDraw; curBar < (PROGRESS_BAR_LENGTH - 1); curBar++) Console.Write(" ");
 
                 NCLogging.Log("█\n\n", ConsoleColor.White, false, false);
 
                 // start at (0, 2) so that this is always visible
-                NCConsole.SetCursorPosition(0, 3);
+                NCConsole.SetCursorPosition(0, 4);
 
                 // clear current line again. this will be in nucore later on
                 NCConsole.ClearCurrentLine();
 
                 NCLogging.Log("Latest valid links: ", ConsoleColor.White, false, false);
 
-                if (!Configuration.DontGenerateTempFile) Console.WriteLine(" (SuccessfulURLs.log contains all successful URLs):");
+                if (!Configuration.DontGenerateTempFile) NCLogging.Log("SuccessfulURLs.log contains all successfully resolved URLs", ConsoleColor.White, false, false);
 
-                foreach (string successfulUrl in successfulUrls) Console.WriteLine(successfulUrl);
+                foreach (string successfulUrl in successfulUrls) NCLogging.Log(successfulUrl, ConsoleColor.White, false, false);
             }
             else
             {
@@ -468,7 +469,6 @@ namespace SymX
 
                                 Task<FileMetadata> downloadTask = Task<FileMetadata>.Run(() => DownloadSuccessfulFile(url, outFileName));
                                 downloads.Add(downloadTask);
-
                             }
 
                             bool waiting = true;
@@ -514,31 +514,33 @@ namespace SymX
 
                         FileMetadata metadata = download.Result;
 
-                        if (Configuration.Verbosity >= Verbosity.Verbose
-                            && Configuration.IsDefaultSymbolServer())
+                        // check if the download was successful
+                        if (metadata.Successful)
                         {
-                            if (metadata.LastModifiedDate > new DateTime(2017, 06, 11, 23, 59, 59, 999))
+                            if (Configuration.Verbosity >= Verbosity.Verbose
+                                && Configuration.IsDefaultSymbolServer())
                             {
-                                NCLogging.Log($"Last modified date: {metadata.LastModifiedDate.ToString("yyyy-MM-dd HH:mm:ss")}");
-                            }
-                            else
-                            {
-                                NCLogging.Log("WARNING: Invalid last modified date - file was uploaded before Azure move!", ConsoleColor.Yellow);
+                                if (metadata.LastModifiedDate > new DateTime(2017, 06, 11, 23, 59, 59, 999))
+                                {
+                                    NCLogging.Log($"Last modified date: {metadata.LastModifiedDate.ToString("yyyy-MM-dd HH:mm:ss")}");
+                                }
+                                else
+                                {
+                                    NCLogging.Log("WARNING: Invalid last modified date - file was uploaded before Azure move!", ConsoleColor.Yellow);
+                                }
+
+                                downloads.Remove(download);
+                                curDownloadTask--; // don't skip the next one
                             }
 
-                            downloads.Remove(download);
-                            curDownloadTask--; // don't skip the next one
+                            NCLogging.Log($"File size: {metadata.FileSize} (took {metadata.DownloadTime}ms to download, {metadata.DownloadSpeed.ToString("F1")} KB/s)");
                         }
-
-                        NCLogging.Log($"File size: {metadata.FileSize} (took {metadata.DownloadTime}ms to download, {metadata.DownloadSpeed.ToString("F1")} KB/s)");
                     }
-
 
                     // reset the number of retries for each file
                     numOfRetries = 0;
 
                     continue;
-
                 }
 
                 if (numFailedUrls > 0) NCLogging.Log($"{numFailedUrls}/{urls.Count} URLs failed to download!", ConsoleColor.Yellow);
@@ -590,47 +592,58 @@ namespace SymX
 
         private static FileMetadata DownloadSuccessfulFile(string url, string outFileName)
         {
-            FileMetadata fileInfo = new FileMetadata();
+            FileMetadata metadata = new FileMetadata();
 
-            if (Configuration.Verbosity >= Verbosity.Verbose)
+            try
             {
-                var stream = httpClient.GetAsync(url);
-
-                while (!stream.IsCompleted) { };
-
-                HttpResponseMessage message = stream.Result;
-
-                if (message.Content.Headers.LastModified != null)
+                if (Configuration.Verbosity >= Verbosity.Verbose)
                 {
-                    DateTimeOffset dateTimeOffset = (DateTimeOffset)message.Content.Headers.LastModified;
-                    DateTime lastModified = dateTimeOffset.UtcDateTime;
+                    // send a GET request
+                    var stream = httpClient.GetAsync(url);
 
-                    fileInfo.LastModifiedDate = lastModified;
+                    while (!stream.IsCompleted) { };
+
+                    HttpResponseMessage message = stream.Result;
+
+                    if (message.Content.Headers.LastModified != null)
+                    {
+                        DateTimeOffset dateTimeOffset = (DateTimeOffset)message.Content.Headers.LastModified;
+                        DateTime lastModified = dateTimeOffset.UtcDateTime;
+
+                        metadata.LastModifiedDate = lastModified;
+                    }
                 }
+
+                Stopwatch downloadStopwatch = new Stopwatch();
+                downloadStopwatch.Start();
+
+                var downloadStream = httpClient.GetByteArrayAsync(url);
+
+                // Wait for download to complete (we do this basically synchronously for each thread to reduce server load)
+                // Get a stream of the file 
+                while (!downloadStream.IsCompleted) { };
+
+                downloadStopwatch.Stop();
+
+                byte[] fileArray = downloadStream.Result;
+
+                metadata.FileSize = fileArray.LongLength;
+                metadata.DownloadTime = downloadStopwatch.ElapsedMilliseconds;
+
+                using (FileStream fileStream = new FileStream(outFileName, FileMode.Create))
+                {
+                    fileStream.Write(fileArray);
+                }
+
+                metadata.Successful = true;
+
+                return metadata;
             }
-
-            Stopwatch downloadStopwatch = new Stopwatch();
-            downloadStopwatch.Start();
-
-            var downloadStream = httpClient.GetByteArrayAsync(url);
-
-            // Wait for download to complete (we do this basically synchronously to reduce server load)
-            // Get a stream of the file 
-            while (!downloadStream.IsCompleted) { };
-
-            downloadStopwatch.Stop();
-
-            byte[] fileArray = downloadStream.Result;
-
-            fileInfo.FileSize = fileArray.LongLength;
-            fileInfo.DownloadTime = downloadStopwatch.ElapsedMilliseconds;
-
-            using (FileStream fileStream = new FileStream(outFileName, FileMode.Create))
+            catch (Exception ex)
             {
-                fileStream.Write(fileArray);
+                NCLogging.Log($"An exception occurred while downloading {url}!\n\n{ex.Message}");
+                return metadata; //successful always false here
             }
-
-            return fileInfo;
         }
 
         #endregion

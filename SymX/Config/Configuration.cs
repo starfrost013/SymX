@@ -1,5 +1,7 @@
 ﻿using NuCore.Utilities;
+using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 
 namespace SymX
 {
@@ -394,6 +396,13 @@ namespace SymX
                 if (NumDownloads > 15) NumDownloads = 15; // "soft" limit to 15 to prevent ddosing
             }
 
+            if (IsAnotherSymXInstanceRunning() && !DontGenerateTempFile)
+            {
+                Console.WriteLine("Cannot generate temporary file as another instance of SymX is running!");
+                DontGenerateTempFile = true;
+            }
+
+
             if (InFile != null)
             {
                 if (!File.Exists(InFile))
@@ -404,7 +413,6 @@ namespace SymX
 
                 return true;
             }
-
 
             if (!GenerateCsv) // non-massview mode
             {
@@ -515,6 +523,8 @@ namespace SymX
                 string keepOldLogs = settingsSection.GetValue("KeepOldLogs");
                 string noLogo = settingsSection.GetValue("NoLogo");
 
+                // settings that can be null don't check for null
+
                 if (start != null) Start = Convert.ToUInt64(start);
                 if (end != null) End = Convert.ToUInt64(end);
                 FileName = fileName;
@@ -530,9 +540,9 @@ namespace SymX
                 if (dontGenerateTempFile != null) DontGenerateTempFile = Convert.ToBoolean(dontDownload);
                 if (maxRetries != null) MaxRetries = Convert.ToUInt32(maxRetries);
                 OutFolder = outFolder;
-                UserAgentVendor = userAgentVendor;
-                UserAgentVersion = userAgentVersion;
-                SymbolServerUrl = symbolServerUrl;
+                if (userAgentVendor != null) UserAgentVendor = userAgentVendor;
+                if (userAgentVersion != null) UserAgentVersion = userAgentVersion;
+                if (symbolServerUrl != null) SymbolServerUrl = symbolServerUrl;
                 if (numDownloads != null) NumDownloads = Convert.ToInt32(numDownloads);
                 if (recurse != null) Recurse = Convert.ToBoolean(recurse);
                 if (keepOldLogs != null) KeepOldLogs = Convert.ToBoolean(keepOldLogs);
@@ -554,7 +564,8 @@ namespace SymX
         public static void ShowHelp()
         {
             PrintVersion();
-            Console.WriteLine(Properties.Resources.Help);
+            NCConsole.ForegroundColor = ConsoleColor.White;
+            NCConsole.WriteLine(Properties.Resources.Help);
         }
 
         public static void PrintVersion()
@@ -572,6 +583,20 @@ namespace SymX
         }
 
         public static bool IsDefaultSymbolServer() => (SymbolServerUrl == DEFAULT_SYMSRV_URL);
+
+        /// <summary>
+        /// Checks if another SymX instance is running.
+        /// </summary>
+        /// <returns>A boolean indicating if another SymX instance is running.</returns>
+        public static bool IsAnotherSymXInstanceRunning()
+        {
+            // remove extension from filename
+            string curAssemblyName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
+
+            Process[] processes = Process.GetProcessesByName(curAssemblyName);
+
+            return (processes.Length >= 1);
+        }
         #endregion
     }
 }

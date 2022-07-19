@@ -26,5 +26,10 @@
         /// The speed of this download in kilobytes per second.
         /// </summary>
         public double DownloadSpeed => ((double)FileSize / (double)DownloadTime);
+
+        /// <summary>
+        /// Set if the file successfully downloads.
+        /// </summary>
+        public bool Successful { get; set; }
     }
 }

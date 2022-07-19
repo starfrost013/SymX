@@ -47,12 +47,14 @@ Verbose mode and, in future, the SymX 4 UI will be a lot slower in conhost than 
 Also, excel converts any "xe000" string to scientific notation. Either turn off scientific notation or use a different tool (such as Notepad or klogg) to work around this. 
 
 4.0.0 Alpha 3 (July xx, 2022):
-* Added configurability. Settings can be optionally stored in SymX.ini, and will be loaded from it if it exists. Additionally, you can use the -inipath option in order to specify a custom INI to load.
+* Added configurability. Settings can be optionally stored in SymX.ini, and will be loaded from it if it exists. 
+Additionally, you can use the -inipath option in order to specify a custom INI to load.
 * Fixed a crash when -outfile specified a folder or file that already existed.
 * Fixed a crash on zero byte files
 * Minor refactoring to remove some redundant code in the CSV generation mode
 * Got rid of all remaining independent MassView branding
 * Rewrote help to specify it by section
+* SymX will now not create SuccessfulURLs.log if it detects another instance of SymX is running.
 
 RELEASE NOTES:
 4.0.0 Alpha 2.2 (July 14, 2022):
