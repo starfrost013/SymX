@@ -14,10 +14,10 @@
                   &@(                                                           
               *%@%,                                                            
 
-A SymStore bulk download tool (MSDL-compatible)
+A MSDL-compatible SymStore bulk download tool
 Version 4.0 Alpha 3
 
-xx July 2022
+19 July 2022
 
 SymX is a bulk download tool for binaries stored on symbol servers created using SymStore.exe, including the Microsoft Symbol Server, It has been used to find files from unleaked builds of Windows as well as dumping all the binaries from a particular Windows version.
 It is a merger of msdlurlgen and MassView that adds many new features to both, is far faster (100+ URLs per second at max threads, vs. <5), and is far more robust.
@@ -29,7 +29,7 @@ Minimum Requirements:
 x86-64 or ARM64 architecture
 .NET 6.0 runtime
 x86-64: Windows 7, Windows 8.1, Windows 10 version 1607 or later, or Windows 11
-ARM64: Windows 10, build 21277 or later (SymX-UI.exe ia not supported)
+ARM64: Windows 10, build 21277 or later
 An internet or intranet connection in order to download files. 
 Windows Console Host 
 
@@ -39,14 +39,15 @@ x86-64 or ARM64 architeture
 x86-64: Windows 10, version 1607 and later or Windows 11
 Windows Terminal (faster text drawing)
 
-Warning: On Windows 10, version 1507 (10240) and earlier operating systems, using the SymX 3.1 UI (normal verbosity) will cause SEVERE rendering issues due to a lack of support for virtual terminal sequences. 
-Please use a newer operating system or verbose mode in order to get correct functioning.
+WARNING:
+On Windows 10, version 1507 (10240) and earlier operating systems, using normal velocity will cause SEVERE rendering issues due to a lack of support for virtual terminal sequences. 
+Please use a newer operating system (1511 minimum, 1607 recommended) or a different verbosity levels in order to get correct rendering on normal verbosity.
 
-Verbose mode and, in future, the SymX 4 UI will be a lot slower in conhost than Windows Terminal due to Terminal's faster (and non-blocking?) text rendering. Conhost blocks on text render and slows down all threads.
+Normal and verbose mode will be a lot slower in conhost than Windows Terminal due to Terminal's faster (and non-blocking?) text rendering. Conhost blocks on text render and slows down all threads.
 
 Also, excel converts any "xe000" string to scientific notation. Either turn off scientific notation or use a different tool (such as Notepad or klogg) to work around this. 
 
-4.0.0 Alpha 3 (July xx, 2022):
+4.0.0 Alpha 3 (July 19, 2022):
 * Added configurability. Settings can be optionally stored in SymX.ini, and will be loaded from it if it exists. 
 Additionally, you can use the -inipath option in order to specify a custom INI to load.
 * Fixed a crash when -outfile specified a folder or file that already existed.
@@ -55,6 +56,8 @@ Additionally, you can use the -inipath option in order to specify a custom INI t
 * Got rid of all remaining independent MassView branding
 * Rewrote help to specify it by section
 * SymX will now not create SuccessfulURLs.log if it detects another instance of SymX is running.
+* SymX will no longer try to download nonexistent files during the download stage.
+* Changed strings to reflect fact that SymX supports more symbol servers than just the official Microsoft symbol server.
 
 RELEASE NOTES:
 4.0.0 Alpha 2.2 (July 14, 2022):

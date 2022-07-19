@@ -577,7 +577,7 @@ namespace SymX
                 // temp until nucore allows you to turn off function name
                 NCLogging.Log($"{SymXVersion.SYMX_APPLICATION_NAME}", ConsoleColor.Green, false, false);
                 NCLogging.Log($"Version {SymXVersion.SYMX_VERSION_EXTENDED_STRING}", ConsoleColor.White, false, false);
-                NCLogging.Log("A Microsoft Symbol Server bulk download tool", ConsoleColor.White, false, false);
+                NCLogging.Log("A MSDL-compatible SymStore bulk download tool", ConsoleColor.White, false, false);
                 NCLogging.Log("© 2022 starfrost\n", ConsoleColor.White, false, false);
             }
         }

@@ -47,7 +47,8 @@ Required if -imagesize is not provided.
 -useragentversion [-uaversion] and useragentvendor [-uavendor]: Override the user agent. If you are downloading from a custom server that requires a specific useragent, this may be helpful.
 Ignored if the default symbol server is specified.
 -outfolder [-of]: Folder to output downloaded files to. Default is a "download" folder in the current working directory.
--symbolserverurl [-symsrvurl, -symsrv]: Alternative URL to try and acquire files from. Default is http://msdl.microsoft.com/download/symbols. Must be a real symbol server.
+-symbolserverurl [-symsrvurl, -symsrv]: Alternative URL to try and acquire files from. Default is http://msdl.microsoft.com/download/symbols, the Microsoft symbol server. 
+Must be a real symbol server (such as http://symbolserver.unity3d.com/ or https://driver-symbols.nvidia.com).
 
 Miscellaneous options:
 -keepoldlogs [-keeplogs, -k]: Do not automatically delete old log files.
