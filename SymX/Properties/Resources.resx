@@ -121,4 +121,19 @@
   <data name="Help" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Help.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="Help000Admin" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Help000Admin.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="HelpBruteforce" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\HelpBruteforce.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="HelpCsvExport" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\HelpCsvExport.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="HelpCsvImport" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\HelpCsvImport.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="HelpPdbFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\HelpPdbFile.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
 </root>

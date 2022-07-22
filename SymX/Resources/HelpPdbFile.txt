@@ -1,0 +1,8 @@
+PDB file parse mode:
+This mode takes a PDB file and bruteforces imagesize from the TimeDateStamp located within the PDB file. 
+
+Required switches:
+<put the required switches here>
+
+Optional switches:
+<put the optional switches here>

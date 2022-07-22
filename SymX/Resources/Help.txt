@@ -1,47 +1,32 @@
 
 Usage:
-SymX -start <start time> -end <end time> -filename <filename> -imagesize <image size> [options...]
-SymX -generatecsv -csvinfolder <folder> -outfile <filename>
-SymX -infile <filename>
+SymX -mode bruteforce -start <start time> -end <end time> -filename <filename> -imagesize <image size> [options...]
+SymX -mode csvexport -generatecsv -csvinfolder <folder> -outfile <filename>
+SymX -mode csvimport -infile <filename>
+SymX -mode parseadmin -symbolserverurl <symbol server url> <arguments to be determined>
+SymX -mode pdbfile -infile determined <arguments to be determined>
 
 If no switches are provided, SymX will try to load settings from either Content\SymX.ini or the file specified by -inipath.
 
-Required switches:
+For extended help information, use the -help switch.
 
--start [-s]: Start time to scan for (in decimal unix time format)
--end [-e]: End time to scan for (in decimal unix time format)
--filename [-f]: Filename to search for on the Microsoft Symbol Server.
--imagesize [-i]: Imagesize to search for in hex format. DISREGARDED if the -imagesizemin and -imagesizemax options are BOTH specified.
+SymX -help bruteforce: Help for Bruteforce mode (or Classic mode)
+SymX -help csvexport: Help for CSV Export mode (previously -generatecsv)
+SymX -help csvimport: Help for CSV Import mode (previously -infile)
+SymX -help parseadmin: Help for 000Admin parsing mode
+SymX -help pdbfile: Help for PDB File parsing mode
 
-Optional switches:
+Command line switches applicable to ALL modes:
 
 Output options:
 -quiet [-q]: Quiet mode. Find nothing without making too much noise.
 -verbose [-v]: Verbose mode. Find nothing going out in a blaze of glory!
 -logtofile [-l, -log]: Log output to file. This respects -q and -v.
--outfile [-out, -o]: If a file is found, rename it after download to the filename specified.
+-outfile [-out, -o]: If a file is found, rename it after download to the filename specified. If it already exists, a number will be appended to the filename.
 -dontgeneratetempfile [-dt, -dtemp]: If this option is set, the temporary text file containing the successfully downloaded URLs will not be generated.
-
-CSV generation options:
-
--generatecsv [-g]: Generate a CSV containing image size and TimeDateStamp information from a folder, instead of downloading any files. If -generatecsv is specified, -csvinfolder [-ci] and -outfile are required options.
-A list of ImageSizes and TimeDateStamps will be generated from the folder specified by -csvinfolder and dumped to the CSV file specified by -outfile.
--infolder: Input folder to generate a CSV file from.
--recursive [-recurse, -r]: Recursively scan a download folder for files to download.
-
-CSV download options:
-
--infile [-in]: Input to a CSV file generated using -generatecsv to try and download files from.
 
 Searching and download options:
 
--imagesizemin [-imin]: Minimum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded.
-Required if -imagesize is not provided.
--imagesizemax [-imax]: Maximum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded. 
-Required if -imagesize is not provided.
--numthreads [-threads, -t]: Change the number of threads used for scanning. A lower number of threads will reduce URL scanning performance. Range is 1-30, as this isn't DDOSX. The default value is 12.
--numdownloads [=downloads, -nd]: Change the number of threads used for downloading. Default is -numthreads and the range is 1-15 due to performance concerns.
--hextime [-h]: If this option is set, Start and End will be interpreted as hex format strings rather than as decimal Unix time format numbers.
 -dontdownload [-d]: Generate list of URLs and exit, msdlurlgen 1.1 style!
 -maxretries [-retries, -max, -m]: Number of times to retry downloading a file before giving up. Default is 8.
 -useragentversion [-uaversion] and useragentvendor [-uavendor]: Override the user agent. If you are downloading from a custom server that requires a specific useragent, this may be helpful.

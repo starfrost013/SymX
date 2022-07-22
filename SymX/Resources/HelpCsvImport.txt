@@ -1,0 +1,8 @@
+CSV import mode:
+This mode downloads files from URLs contained in a CSV file generated with CSV export mode.
+
+Required switches:
+-infile [-in]: Input to a CSV file generated using the CSV generation mode to try and download files from.
+
+Optional switches:
+None

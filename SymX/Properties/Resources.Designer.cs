@@ -62,14 +62,103 @@ namespace SymX.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to 
-        ///Required options:
+        ///Usage:
+        ///SymX -start &lt;start time&gt; -end &lt;end time&gt; -filename &lt;filename&gt; -imagesize &lt;image size&gt; [options...]
+        ///SymX -generatecsv -csvinfolder &lt;folder&gt; -outfile &lt;filename&gt;
+        ///SymX -infile &lt;filename&gt;
         ///
-        ///-start [-s]: 
-        ///-outfile [-o]:.
+        ///If no switches are provided, SymX will try to load settings from either Content\SymX.ini or the file specified by -inipath.
+        ///
+        ///Required switches:
+        ///
+        ///-start [-s]: Start time to scan for (in decimal unix time format)
+        ///-end [-e]: End time to scan for (in decimal unix time format)
+        ///-filename [-f]: Filename to search  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Help {
             get {
                 return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 000Admin parse mode:
+        ///This mode parses the native /000Admin folder containing an index of all files uploaded to a symbol server. This is not available on MSDL because it is not a standard symbol server.
+        ///
+        ///Required switches:
+        ///&lt;put the required switches here&gt;
+        ///
+        ///Optional switches:
+        ///&lt;put the optional switches here&gt;.
+        /// </summary>
+        internal static string Help000Admin {
+            get {
+                return ResourceManager.GetString("Help000Admin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bruteforce mode:
+        ///
+        ///Bruteforce mode takes a filename, date range, and an imagesize (or imagesize range) and bruteforces URLs, attempting to not make the user go insane by not finding any files. If, in the extremely unlikely situation it DOES find any files, it will automatically download them.
+        ///
+        ///Required switches:
+        ///&lt;put the required switches here&gt;
+        ///
+        ///Optional switches:
+        ///&lt;put the optional switches here&gt;.
+        /// </summary>
+        internal static string HelpBruteforce {
+            get {
+                return ResourceManager.GetString("HelpBruteforce", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CSV export mode:
+        ///This mode generates a CSV file containing imagesizes, TimeDateStamps and URLs from a user-defined folder. 
+        ///
+        ///Required switches:
+        ///&lt;put the required switches here&gt;
+        ///
+        ///Optional switches:
+        ///&lt;put the optional switches here&gt;.
+        /// </summary>
+        internal static string HelpCsvExport {
+            get {
+                return ResourceManager.GetString("HelpCsvExport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CSV import mode:
+        ///This mode downloads files from URLs contained in a CSV file generated with CSV export mode.
+        ///
+        ///Required switches:
+        ///&lt;put the required switches here&gt;
+        ///
+        ///Optional switches:
+        ///&lt;put the optional switches here&gt;.
+        /// </summary>
+        internal static string HelpCsvImport {
+            get {
+                return ResourceManager.GetString("HelpCsvImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PDB file parse mode:
+        ///This mode takes a PDB file and bruteforces imagesize from the TimeDateStamp located within the PDB file. 
+        ///
+        ///Required switches:
+        ///&lt;put the required switches here&gt;
+        ///
+        ///Optional switches:
+        ///&lt;put the optional switches here&gt;.
+        /// </summary>
+        internal static string HelpPdbFile {
+            get {
+                return ResourceManager.GetString("HelpPdbFile", resourceCulture);
             }
         }
     }

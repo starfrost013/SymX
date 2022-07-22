@@ -244,6 +244,32 @@ namespace SymX
         /// <returns></returns>
         public static bool ParseArgs(string[] args)
         {
+            // immediately reject if no mode provided
+            if (args.Length < 3) return false;
+
+            // make every single argument lowercase
+            for (int curArgId = 0; curArgId < args.Length; curArgId++)
+            {
+                args[curArgId] = args[curArgId].ToLower();
+            }
+
+            string firstArg = args[1];
+
+            if (firstArg == "-mode")
+            {
+                ParseMode(args);
+            }
+            else if (firstArg == "-help")
+            {
+                string nextArg = args[2];
+                ParseHelp(nextArg);
+                return true; 
+            }
+            else
+            {
+
+            }
+
             for (int curArgId = 0; curArgId < args.Length; curArgId++)
             {
                 string curArg = args[curArgId];
@@ -383,6 +409,44 @@ namespace SymX
             }
 
             return true;
+        }
+
+        private static void ParseHelp(string helpOption)
+        {
+            PrintVersion();
+
+            SearchMode searchMode = SearchMode.Default;
+
+            if (!Enum.TryParse(helpOption, out searchMode))
+            {
+
+            }
+
+            if (searchMode == SearchMode.ParseAdmin)
+            {
+                NCConsole.WriteLine(Properties.Resources.Help000Admin);
+            }
+            else if (searchMode == SearchMode.Bruteforce)
+            {
+                NCConsole.WriteLine(Properties.Resources.HelpBruteforce);
+            }
+            else if (searchMode == SearchMode.CsvExport)
+            {
+                NCConsole.WriteLine(Properties.Resources.HelpCsvExport);
+            }
+            else if (searchMode == SearchMode.CsvImport)
+            {
+                NCConsole.WriteLine(Properties.Resources.HelpCsvImport);
+            }
+            else if (searchMode == SearchMode.PdbFile)
+            {
+                NCConsole.WriteLine(Properties.Resources.HelpPdbFile);
+            }
+        }
+
+        private static void ParseMode(string[] args)
+        {
+
         }
 
         public static bool ParseVerify()
@@ -548,7 +612,7 @@ namespace SymX
                 // user may explicitly specify false for booleans so we need to use Convert.ToBoolean()
                 if (generateCsv != null) GenerateCsv = Convert.ToBoolean(generateCsv);
                 CsvInFolder = csvInFolder;
-                Verbosity = (Verbosity)Enum.Parse(typeof(Verbosity), verbosity);
+                if (verbosity != null) Verbosity = (Verbosity)Enum.Parse(typeof(Verbosity), verbosity);
                 if (dontDownload != null) DontDownload = Convert.ToBoolean(dontDownload);
                 if (logToFile != null) LogToFile = Convert.ToBoolean(logToFile);
                 if (numThreads != null) NumThreads = Convert.ToInt32(numThreads);
@@ -579,9 +643,7 @@ namespace SymX
         /// </summary>
         public static void ShowHelp()
         {
-            PrintVersion();
-            NCConsole.ForegroundColor = ConsoleColor.White;
-            NCConsole.WriteLine(Properties.Resources.Help);
+
         }
 
         public static void PrintVersion()

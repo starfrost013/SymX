@@ -1,0 +1,8 @@
+000Admin parse mode:
+This mode parses the native /000Admin folder containing an index of all files uploaded to a symbol server. This is not available on MSDL because it is not a standard symbol server.
+
+Required switches:
+<put the required switches here>
+
+Optional switches:
+<put the optional switches here>

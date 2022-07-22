@@ -1,0 +1,22 @@
+Bruteforce mode:
+
+Bruteforce mode takes a filename, date range, and an imagesize (or imagesize range) and bruteforces URLs, attempting to not make the user go insane by not finding any files. If, in the extremely unlikely situation it DOES find any files, it will automatically download them.
+
+Required switches:
+
+-start [-s]: Start time to scan for (in decimal unix time format)
+-end [-e]: End time to scan for (in decimal unix time format)
+-filename [-f]: Filename to search for on the Microsoft Symbol Server.
+
+EITHER
+-imagesize [-i]: The SizeOfImage to search for, in hex string format. DISREGARDED if the -imagesizemin and -imagesizemax options are BOTH specified.
+OR
+-imagesizemin [-imin]: Minimum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded.
+Required if -imagesize is not provided.
+-imagesizemax [-imax]: Maximum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded. 
+Required if -imagesize is not provided.
+
+Optional switches:
+-numthreads [-threads, -t]: Change the number of threads used for scanning. A lower number of threads will reduce URL scanning performance. Range is 1-30, as this isn't DDOSX. The default value is 12.
+-numdownloads [=downloads, -nd]: Change the number of threads used for downloading. Default is -numthreads and the range is 1-15 due to performance concerns.
+-hextime [-h]: If this option is set, Start and End will be interpreted as hex format strings rather than as decimal Unix time format numbers.
