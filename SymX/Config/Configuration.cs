@@ -59,11 +59,6 @@ namespace SymX
         public static string InFile { get; set; }
 
         /// <summary>
-        /// If true, a CSV will be generated, then the program will exit.
-        /// </summary>
-        public static bool GenerateCsv { get; set; }
-
-        /// <summary>
         /// The folder to input CSV files from. Ignored if <see cref="GenerateCsv"/> is not set to true.
         /// </summary>
         public static string CsvInFolder { get; set; }
@@ -152,9 +147,14 @@ namespace SymX
         public static string IniPath { get; set; }
 
         /// <summary>
-        /// Determines if the pdb file will be acquired
+        /// Determines if the pdb file will be acquired (in Bruteforce mode only)
         /// </summary>
         public static bool GetPdb { get; set; }
+
+        /// <summary>
+        /// The search mode to use while running.
+        /// </summary>
+        public static SearchMode SearchMode { get; set; }
 
         #region Defaults
         /// <summary>
@@ -209,8 +209,8 @@ namespace SymX
         /// <summary>
         /// <para>Parses arguments passed to SymX in this order:</para>
         /// 
-        /// <para>SymX.ini</para>
-        /// <para>The user's provided command-line arguments.</para>
+        /// <para>- SymX.ini</para>
+        /// <para>- The user's provided command-line arguments.</para>
         /// </summary>
         /// <param name="args">The command-line arguments in the form of a string array.</param>
         /// <returns></returns>
@@ -255,9 +255,11 @@ namespace SymX
 
             string firstArg = args[1];
 
+            // User specified a mode
             if (firstArg == "-mode")
             {
-                ParseMode(args);
+                return ParseMode(args);
+                
             }
             else if (firstArg == "-help")
             {
@@ -267,9 +269,93 @@ namespace SymX
             }
             else
             {
+                return false;
+            }
+        }
+
+        private static bool ParseHelp(string helpOption)
+        {
+            PrintVersion();
+
+            SearchMode = SearchMode.Default;
+
+            if (!Enum.TryParse(helpOption, out SearchMode searchMode))
+            {
+                NCConsole.WriteLine("Invalid mode provided!\n");
+                return false;
+            }
+
+            SearchMode = searchMode;
+
+            switch (searchMode)
+            {
+                case SearchMode.ParseAdmin:
+                    NCConsole.WriteLine(Properties.Resources.Help000Admin);
+                    return true;
+                case SearchMode.Bruteforce:
+                    NCConsole.WriteLine(Properties.Resources.HelpBruteforce);
+                    return true;
+                case SearchMode.CsvExport:
+                    NCConsole.WriteLine(Properties.Resources.HelpCsvExport);
+                    return true;
+                case SearchMode.CsvImport:
+                    NCConsole.WriteLine(Properties.Resources.HelpCsvImport);
+                    return true;
+                case SearchMode.PdbFile:
+                    NCConsole.WriteLine(Properties.Resources.HelpPdbFile);
+                    return true; 
 
             }
 
+            return true;
+        }
+
+        /// <summary>
+        /// Parses the -mode command-line option.
+        /// </summary>
+        /// <param name="args">The command-line arguments provided to the application.</param>
+        /// <returns>A boolean determining if the arguments were parsed successfully.</returns>
+        private static bool ParseMode(string[] args)
+        {
+            // we already check for < 3 so this will never throw an exception
+            string mode = args[2];
+
+            if (!Enum.TryParse(mode, out SearchMode searchMode))
+            {
+                NCConsole.WriteLine("Invalid mode provided!\n");
+                NCConsole.WriteLine(Properties.Resources.Help);
+                return false;
+            }
+
+            SearchMode = searchMode;
+
+            // parse universal arguments shared between all modes=
+            if (!ParseUniversalArgs(args)) return false;
+
+            switch (SearchMode) // parse all search modes
+            {
+                case SearchMode.Bruteforce:
+                    return ParseBruteforceArgs(args);
+                case SearchMode.CsvExport:
+                    return ParseCsvExportArgs(args);
+                case SearchMode.CsvImport:
+                    return ParseCsvImportArgs(args);
+                case SearchMode.ParseAdmin:
+                    return Parse000AdminArgs(args);
+                case SearchMode.PdbFile:
+                    return ParsePdbFileArgs(args);
+            }
+
+            return true; 
+        }
+
+        /// <summary>
+        /// Parse the command-line arguments shared across all or several modes.
+        /// </summary>
+        /// <param name="args">The command-line arguments provided to the application.</param>
+        /// <returns>A boolean determining if the arguments were parsed successfully.</returns>
+        private static bool ParseUniversalArgs(string[] args)
+        {
             for (int curArgId = 0; curArgId < args.Length; curArgId++)
             {
                 string curArg = args[curArgId];
@@ -283,31 +369,6 @@ namespace SymX
                 {
                     switch (curArg)
                     {
-                        case "-start":
-                        case "-s":
-                            Start = Convert.ToUInt64(nextArg);
-                            continue;
-                        case "-end":
-                        case "-e":
-                            End = Convert.ToUInt64(nextArg);
-                            continue;
-                        case "-filename":
-                        case "-f":
-                            FileName = nextArg;
-                            continue;
-                        case "-imagesize":
-                        case "-i":
-                            ImageSize = nextArg;
-                            continue;
-                        case "-infile":
-                        case "-in":
-                            InFile = nextArg;
-                            continue;
-                        case "-outfile":
-                        case "-out":
-                        case "-o":
-                            OutFile = nextArg;
-                            continue;
                         case "-quiet":
                         case "-q":
                             Verbosity = Verbosity.Quiet;
@@ -315,10 +376,6 @@ namespace SymX
                         case "-verbose":
                         case "-v":
                             Verbosity = Verbosity.Verbose;
-                            continue;
-                        case "-generatecsv":
-                        case "-g":
-                            GenerateCsv = true;
                             continue;
                         case "-numthreads":
                         case "-threads":
@@ -334,22 +391,14 @@ namespace SymX
                         case "-l":
                             LogToFile = true;
                             continue;
-                        case "-imagesizemin":
-                        case "-imin":
-                            // more concise than ulong Convert.ToHexString, as no byte array conversion is necessary
-                            ImageSizeMin = ulong.Parse(nextArg, NumberStyles.HexNumber);
-                            continue;
-                        case "-imagesizemax":
-                        case "-imax":
-                            ImageSizeMax = ulong.Parse(nextArg, NumberStyles.HexNumber);
-                            continue;
                         case "-dontdownload":
                         case "-d":
                             DontDownload = true;
                             continue;
-                        case "-hextime":
-                        case "-h":
-                            HexTime = true;
+                        case "-outfile":
+                        case "-out":
+                        case "-o":
+                            OutFile = nextArg;
                             continue;
                         case "-dontgeneratetempfile":
                         case "-dt":
@@ -361,10 +410,6 @@ namespace SymX
                         case "-max":
                         case "-m":
                             MaxRetries = Convert.ToUInt32(nextArg);
-                            continue;
-                        case "-outfolder":
-                        case "-of":
-                            OutFolder = nextArg;
                             continue;
                         case "-useragentvendor":
                         case "-uavendor":
@@ -400,7 +445,7 @@ namespace SymX
                         case "-ini":
                             IniPath = nextArg;
                             continue;
-                        case "-pdbpath":
+                        case "-getpdb": // used by several modes
                         case "-pdb":
                             GetPdb = true;
                             continue;
@@ -411,42 +456,138 @@ namespace SymX
             return true;
         }
 
-        private static void ParseHelp(string helpOption)
+        /// <summary>
+        /// Parse the command-line arguments for the Bruteforce mode.
+        /// </summary>
+        /// <param name="args">The command-line arguments provided to the applicatio.</param>
+        /// <returns>A boolean determining if the arguments were parsed successfully.</returns>
+        private static bool ParseBruteforceArgs(string[] args)
         {
-            PrintVersion();
+            for (int curArgId = 0; curArgId < args.Length; curArgId++)
+            {
+                string curArg = args[curArgId];
 
-            SearchMode searchMode = SearchMode.Default;
+                string nextArg = null;
+                if (args.Length - curArgId > 1) nextArg = args[curArgId + 1];
 
-            if (!Enum.TryParse(helpOption, out searchMode))
-            {
+                curArg = curArg.ToLower();
 
+                if (curArg.StartsWith("-"))
+                {
+                    switch (curArg)
+                    {
+                        case "-start":
+                        case "-s":
+                            Start = Convert.ToUInt64(nextArg);
+                            continue;
+                        case "-end":
+                        case "-e":
+                            End = Convert.ToUInt64(nextArg);
+                            continue;
+                        case "-filename":
+                        case "-f":
+                            FileName = nextArg;
+                            continue;
+                        case "-imagesize":
+                        case "-i":
+                            ImageSize = nextArg;
+                            continue;
+                        case "-imagesizemin":
+                        case "-imin":
+                            // more concise than ulong Convert.ToHexString, as no byte array conversion is necessary
+                            ImageSizeMin = ulong.Parse(nextArg, NumberStyles.HexNumber);
+                            continue;
+                        case "-imagesizemax":
+                        case "-imax":
+                            ImageSizeMax = ulong.Parse(nextArg, NumberStyles.HexNumber);
+                            continue;
+                        case "-outfolder":
+                        case "-of":
+                            OutFolder = nextArg;
+                            continue;
+                        case "-hextime":
+                        case "-h":
+                            HexTime = true;
+                            continue;
+                    }
+                }
             }
 
-            if (searchMode == SearchMode.ParseAdmin)
-            {
-                NCConsole.WriteLine(Properties.Resources.Help000Admin);
-            }
-            else if (searchMode == SearchMode.Bruteforce)
-            {
-                NCConsole.WriteLine(Properties.Resources.HelpBruteforce);
-            }
-            else if (searchMode == SearchMode.CsvExport)
-            {
-                NCConsole.WriteLine(Properties.Resources.HelpCsvExport);
-            }
-            else if (searchMode == SearchMode.CsvImport)
-            {
-                NCConsole.WriteLine(Properties.Resources.HelpCsvImport);
-            }
-            else if (searchMode == SearchMode.PdbFile)
-            {
-                NCConsole.WriteLine(Properties.Resources.HelpPdbFile);
-            }
+            return true;
         }
 
-        private static void ParseMode(string[] args)
+        /// <summary>
+        /// Parse the command-line arguments for the CSV Export mode.
+        /// </summary>
+        /// <param name="args">The command-line arguments provided to the applicatio.</param>
+        /// <returns>A boolean determining if the CSV Export arguments were parsed successfully.</returns>
+        private static bool ParseCsvExportArgs(string[] args)
         {
+            for (int curArgId = 0; curArgId < args.Length; curArgId++)
+            {
+                string curArg = args[curArgId];
 
+                string nextArg = null;
+                if (args.Length - curArgId > 1) nextArg = args[curArgId + 1];
+
+                curArg = curArg.ToLower();
+
+                if (curArg.StartsWith("-"))
+                {
+                    switch (curArg)
+                    {
+                        case "-csvinfolder":
+                        case "-ci":
+                            CsvInFolder = nextArg;
+                            continue;
+                        case "-recursive":
+                        case "-recurse":
+                        case "-r":
+                            Recurse = true;
+                            continue;
+                    }
+                }
+            }
+             
+            return true;
+        }
+
+        private static bool ParseCsvImportArgs(string[] args)
+        {
+            for (int curArgId = 0; curArgId < args.Length; curArgId++)
+            {
+                string curArg = args[curArgId];
+
+                string nextArg = null;
+                if (args.Length - curArgId > 1) nextArg = args[curArgId + 1];
+
+                curArg = curArg.ToLower();
+
+                if (curArg.StartsWith("-"))
+                {
+                    switch (curArg)
+                    {
+                        case "-infile":
+                        case "-in":
+                            InFile = nextArg;
+                            continue;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private static bool Parse000AdminArgs(string[] args)
+        {
+            NCConsole.WriteLine("000admin mode is not implemented yet!");
+            return true;
+        }
+
+        private static bool ParsePdbFileArgs(string[] args)
+        {
+            NCConsole.WriteLine("PDB File mode is not implemented yet!");
+            return true;
         }
 
         public static bool ParseVerify()
@@ -474,85 +615,84 @@ namespace SymX
                 DontGenerateTempFile = true;
             }
 
-
-            if (InFile != null)
+            switch (SearchMode)
             {
-                if (!File.Exists(InFile))
-                {
-                    Console.WriteLine($"-infile: The file {InFile} does not exist!");
-                    return false;
-                }
-
-                return true;
-            }
-
-            if (!GenerateCsv) // non-massview mode
-            {
-                // Check for valid start, end, and filename
-                if (Start <= 0
-                    || End <= 0)
-                {
-                    Console.WriteLine("-start or end: Required option not present!");
-                    return false;
-                }
-
-                if (FileName == null)
-                {
-                    Console.WriteLine("-filename: Required option not present!");
-                    return false;
-                }
-
-                // Check for invalid image size.
-                if (ImageSize == null)
-                {
-                    if (ImageSizeMin == 0
-                        || ImageSizeMax == 0)
+                case SearchMode.Bruteforce:
+                    // Check for valid start, end, and filename
+                    if (Start <= 0
+                        || End <= 0)
                     {
-                        Console.WriteLine("Either -imagesize or both -imagesizemin and -imagesizemax must be present!");
+                        Console.WriteLine("-start or end: Required option not present!");
                         return false;
                     }
-                }
+
+                    if (FileName == null)
+                    {
+                        Console.WriteLine("-filename: Required option not present!");
+                        return false;
+                    }
+
+                    // Check for invalid image size.
+                    if (ImageSize == null)
+                    {
+                        if (ImageSizeMin == 0
+                            || ImageSizeMax == 0)
+                        {
+                            Console.WriteLine("Either -imagesize or both -imagesizemin and -imagesizemax must be present!");
+                            return false;
+                        }
+                    }
 
 
-                // The user has specified they want hex time format, reconvert to it
-                if (HexTime)
-                {
-                    string startString = Start.ToString();
-                    string endString = End.ToString();
+                    // The user has specified they want hex time format, reconvert to it
+                    if (HexTime)
+                    {
+                        string startString = Start.ToString();
+                        string endString = End.ToString();
 
-                    Start = ulong.Parse(startString, NumberStyles.HexNumber);
-                    End = ulong.Parse(endString, NumberStyles.HexNumber);
-                }
+                        Start = ulong.Parse(startString, NumberStyles.HexNumber);
+                        End = ulong.Parse(endString, NumberStyles.HexNumber);
+                    }
 
-                // Only allow official DbgX user agent with official symsrv
-                if (SymbolServerUrl == DEFAULT_SYMSRV_URL)
-                {
-                    UserAgentVendor = DEFAULT_UA_VENDOR;
-                    UserAgentVersion = DEFAULT_UA_VERSION;
-                }
+                    // Only allow official DbgX user agent with official symsrv
+                    if (SymbolServerUrl == DEFAULT_SYMSRV_URL)
+                    {
+                        UserAgentVendor = DEFAULT_UA_VENDOR;
+                        UserAgentVersion = DEFAULT_UA_VERSION;
+                    }
 
-                // default filename
-                if (OutFile == null) OutFile = FileName;
-            }
-            else // massview mode
-            {
-                if (CsvInFolder == null
-                || OutFile == null)
-                {
-                    NCLogging.Log("-csvinfolder and -outfile: both must be provided if -generatecsv is provided!", ConsoleColor.Red, false, false);
-                    return false;
-                }
+                    // default filename
+                    if (OutFile == null) OutFile = FileName;
+                    return true;
+                case SearchMode.CsvExport: // csv export arguments
+                    if (CsvInFolder == null
+                    || OutFile == null)
+                    {
+                        NCLogging.Log("-csvinfolder and -outfile: both must be provided if -generatecsv is provided!", ConsoleColor.Red, false, false);
+                        return false;
+                    }
 
-                if (Directory.Exists(OutFile)
-                    || File.Exists(OutFile))
-                {
-                    NCLogging.Log("-outfile: cannot be an existing file or directory!", ConsoleColor.Red, false, false);
-                }
+                    if (Directory.Exists(OutFile)
+                        || File.Exists(OutFile))
+                    {
+                        NCLogging.Log("-outfile: cannot be an existing file or directory!", ConsoleColor.Red, false, false);
+                    }
+                    return true;
+                case SearchMode.CsvImport:
+                    if (!File.Exists(InFile))
+                    {
+                        Console.WriteLine($"-infile: The file {InFile} does not exist!");
+                        return false;
+                    }
+
+                    return true;
+                case SearchMode.ParseAdmin:
+                case SearchMode.PdbFile:
+                    return true; // not yet implemented
             }
 
             return true;
         }
-
 
         /// <summary>
         /// Parses SymX.ini.
@@ -581,7 +721,7 @@ namespace SymX
                 string imageSizeMin = settingsSection.GetValue("ImageSizeMin");
                 string imageSizeMax = settingsSection.GetValue("ImageSizeMax");
                 string inFile = settingsSection.GetValue("InFile");
-                string generateCsv = settingsSection.GetValue("GenerateCsv");
+                string searchMode = settingsSection.GetValue("SearchMode");
                 string csvInFolder = settingsSection.GetValue("CsvInFolder");
                 string verbosity = settingsSection.GetValue("Verbosity");
                 string dontDownload = settingsSection.GetValue("DontDownload");
@@ -610,7 +750,7 @@ namespace SymX
                 if (imageSizeMax != null) ImageSizeMax = ulong.Parse(imageSizeMax, NumberStyles.HexNumber);
                 InFile = inFile;
                 // user may explicitly specify false for booleans so we need to use Convert.ToBoolean()
-                if (generateCsv != null) GenerateCsv = Convert.ToBoolean(generateCsv);
+                if (searchMode != null) SearchMode = (SearchMode)Enum.Parse(typeof(SearchMode), searchMode);
                 CsvInFolder = csvInFolder;
                 if (verbosity != null) Verbosity = (Verbosity)Enum.Parse(typeof(Verbosity), verbosity);
                 if (dontDownload != null) DontDownload = Convert.ToBoolean(dontDownload);
@@ -639,11 +779,11 @@ namespace SymX
         }
 
         /// <summary>
-        /// Shows the help file.
+        /// Shows the universal help file.
         /// </summary>
         public static void ShowHelp()
         {
-
+            NCConsole.WriteLine(Properties.Resources.Help);
         }
 
         public static void PrintVersion()

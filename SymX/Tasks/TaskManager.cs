@@ -54,11 +54,11 @@ namespace SymX
 
         public static void GenerateListOfTasks()
         {
-            if (Configuration.Verbosity == Verbosity.Verbose) NCLogging.Log("Initialising HTTP client...");
+            if (Configuration.Verbosity == Verbosity.Verbose) NCLogging.Log("Initialising task list...");
 
             if (!Configuration.KeepOldLogs) TaskList.Add(Tasks.ClearLogs);
 
-            if (!Configuration.GenerateCsv)
+            if (Configuration.SearchMode != SearchMode.CsvExport)
             {
                 TaskList.Add(Tasks.GenerateListOfUrls);
             }
@@ -68,7 +68,7 @@ namespace SymX
             }
 
             if (!Configuration.DontDownload
-                && !Configuration.GenerateCsv) TaskList.Add(Tasks.TryDownload);
+                && Configuration.SearchMode != SearchMode.CsvExport) TaskList.Add(Tasks.TryDownload);
 
             TaskList.Add(Tasks.Exit);
         }

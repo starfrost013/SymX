@@ -20,3 +20,4 @@ Optional switches:
 -numthreads [-threads, -t]: Change the number of threads used for scanning. A lower number of threads will reduce URL scanning performance. Range is 1-30, as this isn't DDOSX. The default value is 12.
 -numdownloads [=downloads, -nd]: Change the number of threads used for downloading. Default is -numthreads and the range is 1-15 due to performance concerns.
 -hextime [-h]: If this option is set, Start and End will be interpreted as hex format strings rather than as decimal Unix time format numbers.
+-getpdb [-pdb]: Acquire the corresponding PDB file for all successfully identified links if it exists.
