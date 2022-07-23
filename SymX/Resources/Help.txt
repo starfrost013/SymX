@@ -18,14 +18,15 @@ SymX -help pdbfile: Help for PDB File parsing mode
 
 Command line switches applicable to ALL modes:
 
-Output options:
+OUTPUT OPTIONS:
+
 -quiet [-q]: Quiet mode. Find nothing without making too much noise.
 -verbose [-v]: Verbose mode. Find nothing going out in a blaze of glory!
 -logtofile [-l, -log]: Log output to file. This respects -q and -v.
 -outfile [-out, -o]: If a file is found, rename it after download to the filename specified. If it already exists, a number will be appended to the filename.
 -dontgeneratetempfile [-dt, -dtemp]: If this option is set, the temporary text file containing the successfully downloaded URLs will not be generated.
 
-Searching and download options:
+SEARCHING AND DOWNLOAD OPTIONS:
 
 -dontdownload [-d]: Generate list of URLs and exit, msdlurlgen 1.1 style!
 -maxretries [-retries, -max, -m]: Number of times to retry downloading a file before giving up. Default is 8.
@@ -35,7 +36,8 @@ Ignored if the default symbol server is specified.
 -symbolserverurl [-symsrvurl, -symsrv]: Alternative URL to try and acquire files from. Default is http://msdl.microsoft.com/download/symbols, the Microsoft symbol server. 
 Must be a real symbol server (such as http://symbolserver.unity3d.com/ or https://driver-symbols.nvidia.com).
 
-Miscellaneous options:
+MISCELLANEOUS OPTIONS:
+
 -keepoldlogs [-keeplogs, -k]: Do not automatically delete old log files.
 -nologo: Don't print versioning information before running. Ignores verbosity.
 -inipath [-ini]: Load configuration options from a custom INI path instead of the default SymX.ini.

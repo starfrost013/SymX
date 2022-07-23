@@ -11,7 +11,7 @@
 using System.Reflection;
 
 [assembly: AssemblyTitle("<#= SYMX_APPLICATION_NAME #>")]
-[assembly: AssemblyDescription("A Microsoft Symbol Server bulk download tool")]
+[assembly: AssemblyDescription("An MSDL-compatible SymStore bulk download tool")]
 [assembly: AssemblyVersion("<#= SYMX_VERSION_MAJOR #>.<#= SYMX_VERSION_MINOR #>.<#= SYMX_VERSION_REVISION #>.<#= SYMX_VERSION_BUILD #>")]
 [assembly: AssemblyFileVersion("<#= SYMX_VERSION_MAJOR #>.<#= SYMX_VERSION_MINOR #>.<#= SYMX_VERSION_REVISION #>.<#= SYMX_VERSION_BUILD #>")]
 [assembly: AssemblyInformationalVersion("<#= SYMX_VERSION_EXTENDED_STRING #>")]

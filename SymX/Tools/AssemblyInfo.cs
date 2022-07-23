@@ -4,10 +4,10 @@
 using System.Reflection;
 
 [assembly: AssemblyTitle("SymX")]
-[assembly: AssemblyDescription("A Microsoft Symbol Server bulk download tool")]
+[assembly: AssemblyDescription("An MSDL-compatible SymStore bulk download tool")]
 [assembly: AssemblyVersion("4.0.0.86")]
 [assembly: AssemblyFileVersion("4.0.0.86")]
-[assembly: AssemblyInformationalVersion("4.0.0-alpha4 (build 86, built 2022-07-23 14:28:02)")]
+[assembly: AssemblyInformationalVersion("4.0.0-alpha4 (build 86, built 2022-07-23 14:46:07)")]
 
 
 namespace SymX
@@ -22,7 +22,7 @@ namespace SymX
 		public static string SYMX_VERSION_SPECIFIER = "alpha4";
 
 		public static string SYMX_VERSION_STRING = "4.0.0-alpha4";
-		public static string SYMX_VERSION_EXTENDED_STRING = "4.0.0-alpha4 (build 86, built 2022-07-23 14:28:02)";
+		public static string SYMX_VERSION_EXTENDED_STRING = "4.0.0-alpha4 (build 86, built 2022-07-23 14:46:07)";
 	}
 }
 

@@ -156,6 +156,11 @@ namespace SymX
         /// </summary>
         public static SearchMode SearchMode { get; set; }
 
+        /// <summary>
+        /// Determines if only the context-specific hlep is to be displayed.
+        /// </summary>
+        internal static bool HelpOnly { get; set; }
+
         #region Defaults
         /// <summary>
         /// Private: Default user agent vendor string to use while sending requests.
@@ -222,6 +227,9 @@ namespace SymX
 
                 if (!ParseArgs(args)) return false;
 
+                // don't display multiple help 
+                if (HelpOnly) return true;
+
                 return ParseVerify();
             }
             catch (Exception ex)
@@ -265,6 +273,7 @@ namespace SymX
             {
                 string nextArg = args[2];
                 ParseHelp(nextArg);
+                HelpOnly = true;
                 return true; 
             }
             else
@@ -279,7 +288,7 @@ namespace SymX
 
             SearchMode = SearchMode.Default;
 
-            if (!Enum.TryParse(helpOption, out SearchMode searchMode))
+            if (!Enum.TryParse(helpOption, true, out SearchMode searchMode))
             {
                 NCConsole.WriteLine("Invalid mode provided!\n");
                 return false;
@@ -642,7 +651,6 @@ namespace SymX
                             return false;
                         }
                     }
-
 
                     // The user has specified they want hex time format, reconvert to it
                     if (HexTime)

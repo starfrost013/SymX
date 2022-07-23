@@ -7,6 +7,8 @@ using SymX;
 
 if (Configuration.Parse(args))
 {
+    if (Configuration.HelpOnly) return;
+
     // Initialise NuCore logging with logging based on the status of the -l option
     NCLogging.Settings.WriteToLog = Configuration.LogToFile;
     NCLogging.Init();
