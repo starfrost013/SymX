@@ -298,7 +298,7 @@ namespace SymX
 
             switch (searchMode)
             {
-                case SearchMode.ParseAdmin:
+                case SearchMode.Parse000Admin:
                     NCConsole.WriteLine(Properties.Resources.Help000Admin);
                     return true;
                 case SearchMode.Bruteforce:
@@ -310,7 +310,7 @@ namespace SymX
                 case SearchMode.CsvImport:
                     NCConsole.WriteLine(Properties.Resources.HelpCsvImport);
                     return true;
-                case SearchMode.PdbFile:
+                case SearchMode.ParsePdbFile:
                     NCConsole.WriteLine(Properties.Resources.HelpPdbFile);
                     return true; 
 
@@ -329,7 +329,7 @@ namespace SymX
             // we already check for < 3 so this will never throw an exception
             string mode = args[2];
 
-            if (!Enum.TryParse(mode, out SearchMode searchMode))
+            if (!Enum.TryParse(mode, true, out SearchMode searchMode))
             {
                 NCConsole.WriteLine("Invalid mode provided!\n");
                 NCConsole.WriteLine(Properties.Resources.Help);
@@ -349,9 +349,9 @@ namespace SymX
                     return ParseCsvExportArgs(args);
                 case SearchMode.CsvImport:
                     return ParseCsvImportArgs(args);
-                case SearchMode.ParseAdmin:
+                case SearchMode.Parse000Admin:
                     return Parse000AdminArgs(args);
-                case SearchMode.PdbFile:
+                case SearchMode.ParsePdbFile:
                     return ParsePdbFileArgs(args);
             }
 
@@ -694,8 +694,8 @@ namespace SymX
                     }
 
                     return true;
-                case SearchMode.ParseAdmin:
-                case SearchMode.PdbFile:
+                case SearchMode.Parse000Admin:
+                case SearchMode.ParsePdbFile:
                     return true; // not yet implemented
             }
 

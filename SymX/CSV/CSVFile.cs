@@ -51,7 +51,7 @@ namespace SymX
             }
             else
             {
-                if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"MassView: Checking folder {inFolder}, dumping to {outFile}");
+                if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"CSV Export mode: Checking folder {inFolder}, dumping to {outFile}");
 
                 StreamWriter bw = new StreamWriter(new FileStream(outFile, FileMode.Create));
 

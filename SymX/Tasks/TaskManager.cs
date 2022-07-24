@@ -58,13 +58,22 @@ namespace SymX
 
             if (!Configuration.KeepOldLogs) TaskList.Add(Tasks.ClearLogs);
 
-            if (Configuration.SearchMode != SearchMode.CsvExport)
+            if (Configuration.SearchMode == SearchMode.Bruteforce
+                || Configuration.SearchMode == SearchMode.CsvImport)
             {
                 TaskList.Add(Tasks.GenerateListOfUrls);
             }
-            else
+            else if (Configuration.SearchMode == SearchMode.CsvExport)
             {
                 TaskList.Add(Tasks.GenerateCsv);
+            }
+            else if (Configuration.SearchMode == SearchMode.Parse000Admin)
+            {
+                TaskList.Add(Tasks.Parse000Admin);
+            }
+            else if (Configuration.SearchMode == SearchMode.ParsePdbFile)
+            {
+                TaskList.Add(Tasks.ParsePdbFile);
             }
 
             if (!Configuration.DontDownload
@@ -162,7 +171,8 @@ namespace SymX
         {
             List<string> urlList = new List<string>();
 
-            if (Configuration.InFile == null)
+            // TODO: move infile to separate method
+            if (Configuration.SearchMode != SearchMode.CsvImport)
             {
                 if (Configuration.ImageSizeMin == 0
                     || Configuration.ImageSizeMax == 0)

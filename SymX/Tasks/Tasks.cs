@@ -30,7 +30,7 @@
         LoadListOfUrls = 6,
 
         /// <summary>
-        /// Report download information
+        /// Report download metadata to a HTML file 
         /// </summary>
         Report = 8,
 
@@ -40,8 +40,18 @@
         ClearLogs = 9,
 
         /// <summary>
+        /// Parse a /000admin directory.
+        /// </summary>
+        Parse000Admin = 10,
+
+        /// <summary>
+        /// Parse a PDB file.
+        /// </summary>
+        ParsePdbFile = 11,
+
+        /// <summary>
         /// Exit the application.
         /// </summary>
-        Exit = 10
+        Exit = 12
     }
 }

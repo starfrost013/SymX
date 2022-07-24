@@ -33,11 +33,11 @@ namespace SymX
         /// <summary>
         /// Parse a /000admin folder and download the files in the transaction folders.
         /// </summary>
-        ParseAdmin = 3,
+        Parse000Admin = 3,
 
         /// <summary>
         /// Download an image file from a PDB file.
         /// </summary>
-        PdbFile = 4,
+        ParsePdbFile = 4,
     }
 }

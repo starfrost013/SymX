@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "symx -help bruteforce"
+      "commandLineArgs": "symx -mode csvexport -csvinfolder c:\\windows\\system32 -outfile 25163.csv"
     }
   }
 }

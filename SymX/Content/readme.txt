@@ -25,7 +25,8 @@ It is a merger of msdlurlgen and MassView that adds many new features to both, i
 It is not intended as a replacement for symchk and cannot at present be used to download symbols, only binaries.
 THIS IS AN ALPHA VERSION OF SYMX AND DOES NOT HAVE THE SAME GUARANTEED STABILITY AS A FINAL VERSION!
 
-RELEASE NOTES HAVE BEEN MOVED TO RELEASENOTES.TXT AS OF 4.0.0-ALPHA4!
+RELEASE NOTES HAVE BEEN MOVED TO RELEASENOTES.TXT AS OF 4.0.0-ALPHA4! 
+Command-line syntax has changed with this version! Any batch files, shell scripts, or similar designed to work with SymX 3.x, or 4.0 alpha 3 or earlier, will not work!
 Q&A for this application is in qanda.txt.
 
 CONFIDENTIALITY NOTICE:
