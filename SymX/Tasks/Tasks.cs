@@ -50,8 +50,12 @@
         ParsePdbFile = 11,
 
         /// <summary>
+        /// Parse a CSV file.
+        /// </summary>
+        ParseCsv = 12,
+        /// <summary>
         /// Exit the application.
         /// </summary>
-        Exit = 12
+        Exit = 13
     }
 }

@@ -58,10 +58,13 @@ namespace SymX
 
             if (!Configuration.KeepOldLogs) TaskList.Add(Tasks.ClearLogs);
 
-            if (Configuration.SearchMode == SearchMode.Bruteforce
-                || Configuration.SearchMode == SearchMode.CsvImport)
+            if (Configuration.SearchMode == SearchMode.Bruteforce)
             {
                 TaskList.Add(Tasks.GenerateListOfUrls);
+            }
+            else if (Configuration.SearchMode == SearchMode.CsvImport)
+            {
+                TaskList.Add(Tasks.ParseCsv);
             }
             else if (Configuration.SearchMode == SearchMode.CsvExport)
             {
@@ -126,6 +129,9 @@ namespace SymX
                     case Tasks.GenerateCsv:
                         if (!CSVFile.Run()) NCLogging.Log("MassView failed to generate CSV file!", ConsoleColor.Red);
                         continue;
+                    case Tasks.ParseCsv:
+                        UrlList = CSVFile.ParseUrls(Configuration.InFile);
+                        continue;
                     // Exit the program.
                     case Tasks.Exit:
                         Environment.Exit(0);
@@ -171,39 +177,30 @@ namespace SymX
         {
             List<string> urlList = new List<string>();
 
-            // TODO: move infile to separate method
-            if (Configuration.SearchMode != SearchMode.CsvImport)
-            {
-                if (Configuration.ImageSizeMin == 0
+            if (Configuration.ImageSizeMin == 0
                     || Configuration.ImageSizeMax == 0)
+            {
+                for (ulong curTime = Configuration.Start; curTime < Configuration.End; curTime++)
                 {
-                    for (ulong curTime = Configuration.Start; curTime < Configuration.End; curTime++)
-                    {
-                        string fileUrl = $"{Configuration.SymbolServerUrl}/{Configuration.FileName}/{curTime.ToString("x")}{Configuration.ImageSize}/{Configuration.FileName}";
-                        if (Configuration.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
-                        urlList.Add(fileUrl);
-                    }
-                }
-                else
-                {
-                    ulong imageSizeMin = Configuration.ImageSizeMin;
-                    ulong imageSizeMax = Configuration.ImageSizeMax;
-
-                    for (ulong curTime = Configuration.Start; curTime < Configuration.End; curTime++)
-                    {
-                        for (ulong curImageSize = imageSizeMin; curImageSize <= imageSizeMax; curImageSize += IMAGESIZE_PADDING)
-                        {
-                            string fileUrl = $"{Configuration.SymbolServerUrl}/{Configuration.FileName}/{curTime.ToString("x")}{curImageSize.ToString("x")}/{Configuration.FileName}";
-                            if (Configuration.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
-                            urlList.Add(fileUrl);
-                        }
-                    }
+                    string fileUrl = $"{Configuration.SymbolServerUrl}/{Configuration.FileName}/{curTime.ToString("x")}{Configuration.ImageSize}/{Configuration.FileName}";
+                    if (Configuration.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
+                    urlList.Add(fileUrl);
                 }
             }
             else
             {
-                // generate the URL list using massview
-                return CSVFile.ParseUrls(Configuration.InFile);
+                ulong imageSizeMin = Configuration.ImageSizeMin;
+                ulong imageSizeMax = Configuration.ImageSizeMax;
+
+                for (ulong curTime = Configuration.Start; curTime < Configuration.End; curTime++)
+                {
+                    for (ulong curImageSize = imageSizeMin; curImageSize <= imageSizeMax; curImageSize += IMAGESIZE_PADDING)
+                    {
+                        string fileUrl = $"{Configuration.SymbolServerUrl}/{Configuration.FileName}/{curTime.ToString("x")}{curImageSize.ToString("x")}/{Configuration.FileName}";
+                        if (Configuration.Verbosity >= Verbosity.Verbose) Console.WriteLine(fileUrl);
+                        urlList.Add(fileUrl);
+                    }
+                }
             }
 
             return urlList;
