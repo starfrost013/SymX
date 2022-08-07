@@ -1,0 +1,49 @@
+Known symstores:
+
+AMD:
+https://download.amd.com/dir/bin
+
+BOINC:
+https://boinc.berkeley.edu/symstore/
+http://boinc.bakerlab.org/rosetta/symstore/
+
+Dolphin Emulator:
+https://symbols.dolphin-emu.org/
+
+Microsoft:
+https://msdl.microsoft.com/download/symbols (No 000admin, Azure store, not a symsrv!)
+
+Microsoft (Internal)
+https://symweb.corp.microsoft.com/ (Requires VPN)
+
+Mumble:
+https://dl.mumble.info/symbols/
+
+Nvidia:
+https://driver-symbols.nvidia.com
+
+LibreOffice:
+https://dev-builds.libreoffice.org/daily/master/Win-x86@39/symbols/
+
+Openfabrics:
+https://www.openfabrics.org/downloads/Windows/previous_releases/v1.1/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.0/Server_2003-XP64/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.0/Server_2008-Vista-HPC/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.0/XP32/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.0.2/Server_2008-Vista-HPC/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.0.2/XP32/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.0.2/wnet/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.1/Server_2003-XP64/SymStor
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.1/Server_2008-Vista-HPC/SymStor
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.1/XP32/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.2.1/Svr_2003-XP64/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.2.1/Svr_2008-Vista-HPC/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.2.1/Win7-Svr_2008_R2-HPC_Edition/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.2.1/XP32/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v2.3/SymStor/ (they figured out you can do multiple transactions!)
+https://www.openfabrics.org/downloads/Windows/previous_releases/v3.0/SymStor/
+https://www.openfabrics.org/downloads/Windows/previous_releases/v3.1/SymStor/
+https://www.openfabrics.org/downloads/Windows/latest/SymStor/
+
+Unity3D:
+https://symbolserver.unity3d.com/

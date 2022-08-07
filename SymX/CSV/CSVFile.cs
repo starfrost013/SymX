@@ -91,7 +91,7 @@ namespace SymX
                         {
                             // make sure the file is long enough to be a PE
                             // fix bug
-                            if (br.BaseStream.Length > e_lfanewOffset)
+                            if (br.BaseStream.Length > SizeOfImageOffset)
                             {
                                 // read e_lfanew
                                 br.BaseStream.Seek(e_lfanewOffset, SeekOrigin.Begin);

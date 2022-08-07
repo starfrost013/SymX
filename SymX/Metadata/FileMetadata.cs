@@ -31,5 +31,10 @@
         /// Set if the file successfully downloads.
         /// </summary>
         public bool Successful { get; set; }
+
+        /// <summary>
+        /// The downloaded filename.
+        /// </summary>
+        public string FileName { get; set; }
     }
 }

@@ -458,6 +458,10 @@ namespace SymX
                         case "-pdb":
                             GetPdb = true;
                             continue;
+                        case "-outfolder":
+                        case "-of":
+                            OutFolder = nextArg;
+                            continue;
                     }
                 }
             }
@@ -509,10 +513,6 @@ namespace SymX
                         case "-imagesizemax":
                         case "-imax":
                             ImageSizeMax = ulong.Parse(nextArg, NumberStyles.HexNumber);
-                            continue;
-                        case "-outfolder":
-                        case "-of":
-                            OutFolder = nextArg;
                             continue;
                         case "-hextime":
                         case "-h":
@@ -589,7 +589,6 @@ namespace SymX
 
         private static bool Parse000AdminArgs(string[] args)
         {
-            NCConsole.WriteLine("000admin mode is not implemented yet!");
             return true;
         }
 
@@ -623,6 +622,9 @@ namespace SymX
                 Console.WriteLine("Cannot generate temporary file as another instance of SymX is running!");
                 DontGenerateTempFile = true;
             }
+
+            // initialise the http manager
+            if (!HttpManager.Init(SymbolServerUrl, UserAgentVendor, UserAgentVersion)) return false;
 
             switch (SearchMode)
             {
@@ -684,12 +686,20 @@ namespace SymX
                         || File.Exists(OutFile))
                     {
                         NCLogging.Log("-outfile: cannot be an existing file or directory!", ConsoleColor.Red, false, false);
+                        return false;
                     }
                     return true;
                 case SearchMode.CsvImport:
                     if (!File.Exists(InFile))
                     {
-                        Console.WriteLine($"-infile: The file {InFile} does not exist!");
+                        NCLogging.Log($"-infile: The file {InFile} does not exist!", ConsoleColor.Red, false, false);
+                        return false;
+                    }
+
+                    if (!InFile.Contains(".csv"))
+                    {
+                        // Special request from Xeno. <4.0-alpha 4 didn't specify this 
+                        NCLogging.Log($"-infile: Not a csv file! Xeno is a fucking idiot.", ConsoleColor.Red, false, false);
                         return false;
                     }
 
@@ -767,7 +777,7 @@ namespace SymX
                 if (hexTime != null) HexTime = Convert.ToBoolean(hexTime);
                 if (dontGenerateTempFile != null) DontGenerateTempFile = Convert.ToBoolean(dontDownload);
                 if (maxRetries != null) MaxRetries = Convert.ToUInt32(maxRetries);
-                OutFolder = outFolder;
+                if (outFolder != null) OutFolder = outFolder;
                 if (userAgentVendor != null) UserAgentVendor = userAgentVendor;
                 if (userAgentVersion != null) UserAgentVersion = userAgentVersion;
                 if (symbolServerUrl != null) SymbolServerUrl = symbolServerUrl;
@@ -808,7 +818,7 @@ namespace SymX
             }
         }
 
-        public static bool IsDefaultSymbolServer() => (SymbolServerUrl == DEFAULT_SYMSRV_URL);
+        public static bool IsMsdl() => (SymbolServerUrl == DEFAULT_SYMSRV_URL);
 
         /// <summary>
         /// Checks if another SymX instance is running.
@@ -821,7 +831,7 @@ namespace SymX
 
             Process[] processes = Process.GetProcessesByName(curAssemblyName);
 
-            return (processes.Length >= 1);
+            return (processes.Length > 1);
         }
         #endregion
     }

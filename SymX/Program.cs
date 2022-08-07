@@ -16,6 +16,7 @@ if (Configuration.Parse(args))
     Configuration.PrintVersion();
     TaskManager.GenerateListOfTasks();
 
+    
     while (TaskManager.Run()) ;
 }
 else

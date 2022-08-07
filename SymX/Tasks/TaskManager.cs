@@ -22,11 +22,6 @@ namespace SymX
         private static List<string> UrlList { get; set; }
 
         /// <summary>
-        /// Private: HTTP client used for sending requests
-        /// </summary>
-        private static HttpClient httpClient = new HttpClient();
-
-        /// <summary>
         /// Private: Timer used for measuring how long a download took
         /// </summary>
         private static Stopwatch timer = new Stopwatch();
@@ -52,6 +47,7 @@ namespace SymX
             UrlList = new List<string>();
         }
 
+        #region Task manager
         public static void GenerateListOfTasks()
         {
             if (Configuration.Verbosity == Verbosity.Verbose) NCLogging.Log("Initialising task list...");
@@ -132,6 +128,9 @@ namespace SymX
                     case Tasks.ParseCsv:
                         UrlList = CSVFile.ParseUrls(Configuration.InFile);
                         continue;
+                    case Tasks.Parse000Admin:
+                        AdminParser.Parse000Admin();
+                        continue;
                     // Exit the program.
                     case Tasks.Exit:
                         Environment.Exit(0);
@@ -172,7 +171,7 @@ namespace SymX
                 }
             }
         }
-
+        #endregion
         private static List<string> GenerateUrlList()
         {
             List<string> urlList = new List<string>();
@@ -212,16 +211,6 @@ namespace SymX
         /// <returns>A list of the URLs that resolved with a success code, not necessarily 200 OK.</returns>
         private static List<string> ScanForFiles()
         {
-            if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log("Initialising HttpClient...");
-
-            // initialise the http client (we already instantiate it as a private field)
-            // this is so we don't have to add a check for dontdownload
-            httpClient.BaseAddress = new Uri("https://msdl.microsoft.com"); // placeholder value
-
-            // Fake a DbgX UA.
-            // Just in case (thanks pivotman319)
-            httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Configuration.UserAgentVendor, Configuration.UserAgentVersion));
-
             StreamWriter tempFile = null;
 
             // create a temporary file if the user has not explicitly specified to do this
@@ -365,7 +354,7 @@ namespace SymX
                 try
                 {
                     // clear the *ENTIRE* console, not just visible stuff. this fixes display issues
-                    // BUT may cause garbage <Win10 1507. We have to use a VTS here for now because Console doesn't have this functionality
+                    // BUT may cause garbage <Win10 1507. The NCConsole class is a wrapper for Console that adds VTS functionality.
                     NCConsole.Clear(true);
                 }
                 catch { };
@@ -424,7 +413,7 @@ namespace SymX
             try
             {
                 HttpRequestMessage headRequest = new HttpRequestMessage(HttpMethod.Head, fileName);
-                HttpResponseMessage responseMsg = httpClient.Send(headRequest);
+                HttpResponseMessage responseMsg = HttpManager.Client.Send(headRequest);
 
                 return responseMsg.IsSuccessStatusCode;
             }
@@ -435,221 +424,16 @@ namespace SymX
         }
 
         #region Successful download task
-        private static bool DownloadSuccessfulFiles(List<string> urls)
+        private static bool DownloadSuccessfulFiles(List<string> urlList)
         {
             try
             {
-                int numOfRetries = 0; // number of retries for the current file
-                int numFailedUrls = 0; // number of URLs that have failed
-                int numDownloads = Configuration.NumDownloads; // number of simultaneous downloads
-
-                List<Task<FileMetadata>> downloads = new List<Task<FileMetadata>>();
-
-                if (Configuration.Verbosity >= Verbosity.Verbose) Console.Clear(); // clear console
-
-                if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {urls.Count} successful URLs...");
-
-                // loop through each url set
-                for (int curUrl = 0; curUrl < urls.Count; curUrl += numDownloads)
-                {
-                    // Perform the download.
-
-                    // Download every file, downloading (numDownloads) at once.
-                    for (int curTask = 0; curTask < numDownloads; curTask++)
-                    {
-                        string url = urls[curUrl];
-
-                        // current URL ID in task
-                        int curUrlWithinTask = curUrl + curTask;
-
-                        string outFileName = null;
-
-                        try
-                        {
-                            if (curUrlWithinTask < urls.Count) // don't try to download an invalid url
-                            {
-                                url = urls[curUrl + curTask];
-                                
-                                outFileName = GetOutFileName(curUrlWithinTask, urls);
-
-                                if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"Downloading {url} to {outFileName}...");
-
-                                Task<FileMetadata> downloadTask = Task<FileMetadata>.Run(() => DownloadSuccessfulFile(url, outFileName));
-                                downloads.Add(downloadTask);
-                            }
-
-                            bool waiting = true;
-
-                            while (waiting)
-                            {
-                                bool needToWait = false;
-
-                                foreach (Task download in downloads)
-                                {
-                                    if (!download.IsCompleted) needToWait = true;
-                                }
-
-                                waiting = needToWait;
-                            }
-                        }
-                        catch
-                        {
-                            if (numOfRetries >= Configuration.MaxRetries)
-                            {
-                                // reset the number of retries. we will skip the url by doing this
-                                NCLogging.Log($"Reached {Configuration.MaxRetries} tries, giving up on {url}...", ConsoleColor.Red);
-                                numFailedUrls++;
-                                numOfRetries = 0;
-                            }
-                            else
-                            {
-                                numOfRetries++;
-                                NCLogging.Log($"An error occurred while downloading. Retrying ({numOfRetries}/{Configuration.MaxRetries})...", ConsoleColor.Yellow);
-                                // delete any partially downloaded files
-                                if (File.Exists(outFileName)) File.Delete(outFileName);
-
-                                // decrement curURL to retry the current URL
-                                curUrl--;
-
-                            }
-                        }
-                    }
-
-                    for (int curDownloadTask = 0; curDownloadTask < downloads.Count; curDownloadTask++)
-                    {
-                        Task<FileMetadata> download = downloads[curDownloadTask];
-
-                        FileMetadata metadata = download.Result;
-
-                        // check if the download was successful
-                        if (metadata.Successful)
-                        {
-                            if (Configuration.Verbosity >= Verbosity.Verbose
-                                && Configuration.IsDefaultSymbolServer())
-                            {
-                                if (metadata.LastModifiedDate > new DateTime(2017, 06, 11, 23, 59, 59, 999))
-                                {
-                                    NCLogging.Log($"Last modified date: {metadata.LastModifiedDate.ToString("yyyy-MM-dd HH:mm:ss")}");
-                                }
-                                else
-                                {
-                                    NCLogging.Log("WARNING: Invalid last modified date - file was uploaded before Azure move!", ConsoleColor.Yellow);
-                                }
-
-                                downloads.Remove(download);
-                                curDownloadTask--; // don't skip the next one
-                            }
-
-                            NCLogging.Log($"File size: {metadata.FileSize} (took {metadata.DownloadTime}ms to download, {metadata.DownloadSpeed.ToString("F1")} KB/s)");
-                        }
-                    }
-
-                    // reset the number of retries for each file
-                    numOfRetries = 0;
-
-                    continue;
-                }
-
-                if (numFailedUrls > 0) NCLogging.Log($"{numFailedUrls}/{urls.Count} URLs failed to download!", ConsoleColor.Yellow);
-
-                return true;
+                return FileDownloader.DownloadListOfFiles(urlList);
             }
             catch (Exception ex)
             {
                 NCLogging.Log($"A fatal error occurred while downloading files: {ex}", ConsoleColor.Red);
                 return false;
-            }
-        }
-
-        private static string GetOutFileName(int curUrl, List<string> urls)
-        {
-            string url = urls[curUrl];
-
-            string outFileName = Configuration.OutFile;
-
-            int urlId = 0;
-            string inFileName = null;
-
-            string[] fileNameSplit = url.Split('/');
-
-            // get the last section of the path (the filename)
-            inFileName = fileNameSplit[fileNameSplit.Length - 1];
-
-            // prevent downloading the same file several times 
-            if (urls.Count > 1)
-            {
-                urlId = curUrl + 1;
-
-                outFileName = $"{urlId}_{inFileName}";
-            }
-
-            // Prepend the output folder.
-            outFileName = $"{Configuration.OutFolder}\\{outFileName}";
-
-            // Prevent files with the same number and filename in the folder overwriing each other.
-            // If the filename exists, increment it.
-            while (File.Exists(outFileName))
-            {
-                urlId++;
-                outFileName = $"{Configuration.OutFolder}\\{urlId}_{inFileName}";
-            }
-
-            return outFileName;
-        }
-
-        private static FileMetadata DownloadSuccessfulFile(string url, string outFileName)
-        {
-            FileMetadata metadata = new FileMetadata();
-
-            try
-            {
-                if (Configuration.Verbosity >= Verbosity.Verbose)
-                {
-                    // send a GET request
-                    var stream = httpClient.GetAsync(url);
-
-                    while (!stream.IsCompleted) { };
-
-                    HttpResponseMessage message = stream.Result;
-
-                    if (message.Content.Headers.LastModified != null)
-                    {
-                        DateTimeOffset dateTimeOffset = (DateTimeOffset)message.Content.Headers.LastModified;
-                        DateTime lastModified = dateTimeOffset.UtcDateTime;
-
-                        metadata.LastModifiedDate = lastModified;
-                    }
-                }
-
-                Stopwatch downloadStopwatch = new Stopwatch();
-                downloadStopwatch.Start();
-
-                var downloadStream = httpClient.GetByteArrayAsync(url);
-
-                // Wait for download to complete (we do this basically synchronously for each thread to reduce server load)
-                // Get a stream of the file 
-                while (!downloadStream.IsCompleted) { };
-
-                downloadStopwatch.Stop();
-
-                byte[] fileArray = downloadStream.Result;
-
-                metadata.FileSize = fileArray.LongLength;
-                metadata.DownloadTime = downloadStopwatch.ElapsedMilliseconds;
-
-                using (FileStream fileStream = new FileStream(outFileName, FileMode.Create))
-                {
-                    fileStream.Write(fileArray);
-                }
-
-                metadata.Successful = true;
-
-                return metadata;
-            }
-            catch (Exception ex)
-            {
-                NCLogging.Log($"An exception occurred while downloading {url}!\n\n{ex.Message}");
-                return metadata; //successful always false here
             }
         }
 

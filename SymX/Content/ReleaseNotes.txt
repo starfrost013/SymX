@@ -1,4 +1,14 @@
 ﻿RELEASE NOTES:
+4.0.0 Alpha 4 (August xx, 2022):
+* Fixed bug where some error messages would act as if no error occurred.
+* Added error condition for passing a non-CSV file into CSV Import mode.
+* Removed remaining MassView string.
+* Rewrote command-line handling.
+* Changed command-line syntax - CHECK HELP FOR THE NEW SYNTAX
+* File metadata now prints the filename so that you know what file each piece of metadata is for
+* Fixed bug where SymX always claimed another instance was running
+* Refactored HTTP client handling
+
 4.0.0 Alpha 3 (July 19, 2022):
 * Added configurability. Settings can be optionally stored in SymX.ini, and will be loaded from it if it exists. 
 Additionally, you can use the -inipath option in order to specify a custom INI to load.

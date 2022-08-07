@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "symx -mode csvimport -infile 25163.csv"
+      "commandLineArgs": "symx -mode parse000admin -symbolserverurl https://download.amd.com/dir/bin/ -v"
     }
   }
 }
