@@ -1,5 +1,5 @@
 ﻿RELEASE NOTES:
-4.0.0 Alpha 4 (August xx, 2022):
+4.0.0 Alpha 4 (September 6, 2022):
 * Fixed bug where some error messages would act as if no error occurred.
 * Added error condition for passing a non-CSV file into CSV Import mode.
 * Removed remaining MassView string.
@@ -8,6 +8,12 @@
 * File metadata now prints the filename so that you know what file each piece of metadata is for
 * Fixed bug where SymX always claimed another instance was running
 * Refactored HTTP client handling
+* Fixed INI file loading
+NEW FUNCTIONALITY:
+For real symbol servers (not MSDL), SymX will now parse the /000Admin folder if you use -mode Parse000Admin. 
+This will download all of the symstore in most cases. However, there are some cases (such as nvidia's server) where it wipes history.txt every time they push a new version, so it will only grab the latest version.
+
+Very sorry for the delay. Been busy with other stuff.
 
 4.0.0 Alpha 3 (July 19, 2022):
 * Added configurability. Settings can be optionally stored in SymX.ini, and will be loaded from it if it exists. 
@@ -117,7 +123,7 @@ Alpha 3 (May 23, 2022):
 Alpha 2 (May 22, 2022)
 * Initial release
 
---Changes from msdlurlgen 2.6.0--
+Changes from msdlurlgen 2.6.0:
 * Fully rewritten in C# and .NET 6.0
 * Y2K38 compliance
 * Multithreading! (over an order of magnitude faster)

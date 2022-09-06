@@ -57,10 +57,12 @@ namespace SymX
             if (Configuration.SearchMode == SearchMode.Bruteforce)
             {
                 TaskList.Add(Tasks.GenerateListOfUrls);
+                TaskList.Add(Tasks.TryDownload);
             }
             else if (Configuration.SearchMode == SearchMode.CsvImport)
             {
                 TaskList.Add(Tasks.ParseCsv);
+                TaskList.Add(Tasks.TryDownload);
             }
             else if (Configuration.SearchMode == SearchMode.CsvExport)
             {
@@ -74,9 +76,6 @@ namespace SymX
             {
                 TaskList.Add(Tasks.ParsePdbFile);
             }
-
-            if (!Configuration.DontDownload
-                && Configuration.SearchMode != SearchMode.CsvExport) TaskList.Add(Tasks.TryDownload);
 
             TaskList.Add(Tasks.Exit);
         }

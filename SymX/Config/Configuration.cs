@@ -252,6 +252,8 @@ namespace SymX
         /// <returns></returns>
         public static bool ParseArgs(string[] args)
         {
+            PrintVersion();
+
             // immediately reject if no mode provided
             if (args.Length < 3) return false;
 
@@ -261,31 +263,31 @@ namespace SymX
                 args[curArgId] = args[curArgId].ToLower();
             }
 
+            int iniPathPosition = (Array.IndexOf(args, "-inipath");
+
+            if (iniPathPosition > -1)
+            {
+                IniPath = args[iniPathPosition + 1];
+            }
+
             string firstArg = args[1];
 
-            // User specified a mode
-            if (firstArg == "-mode")
+            switch (firstArg)
             {
-                return ParseMode(args);
-                
-            }
-            else if (firstArg == "-help")
-            {
-                string nextArg = args[2];
-                ParseHelp(nextArg);
-                HelpOnly = true;
-                return true; 
-            }
-            else
-            {
-                return false;
+                case "-mode":
+                    return ParseMode(args);
+                case "-help":
+                    string nextArg = args[2];
+                    ParseHelp(nextArg);
+                    HelpOnly = true;
+                    return true;
+                default:
+                    return false;
             }
         }
 
         private static bool ParseHelp(string helpOption)
         {
-            PrintVersion();
-
             SearchMode = SearchMode.Default;
 
             if (!Enum.TryParse(helpOption, true, out SearchMode searchMode))
@@ -449,10 +451,6 @@ namespace SymX
                         case "-numdownloads":
                         case "-nd":
                             NumDownloads = Convert.ToInt32(nextArg);
-                            continue;
-                        case "-inipath":
-                        case "-ini":
-                            IniPath = nextArg;
                             continue;
                         case "-getpdb": // used by several modes
                         case "-pdb":

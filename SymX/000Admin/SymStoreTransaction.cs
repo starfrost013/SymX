@@ -48,13 +48,5 @@
         /// Comments on the transaction.
         /// </summary>
         public string Comments { get; set; }
-
-        /// <summary>
-        /// Which transaction is deleted by this transaction. 
-        /// Only used if <see cref="SymStoreTransactionType"/> = <see cref="SymStoreTransactionType.Del"/>.
-        /// 
-        /// May refactor this (to use inheritance) if more transaction types emerge
-        /// </summary>
-        public int Deletes { get; set; }
     }
 }

@@ -204,6 +204,8 @@ namespace SymX
                 filesToDownload.Add(downloadUrl);
             }
 
+            // clean up the temp file
+            File.Delete(tempFileName);
 
             //temp
             return FileDownloader.DownloadListOfFiles(filesToDownload);

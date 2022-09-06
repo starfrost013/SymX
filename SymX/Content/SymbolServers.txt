@@ -11,7 +11,7 @@ Dolphin Emulator:
 https://symbols.dolphin-emu.org/
 
 Microsoft:
-https://msdl.microsoft.com/download/symbols (No 000admin, Azure store, not a symsrv!)
+https://msdl.microsoft.com/download/symbols (Not a real symbol server since 2017)
 
 Microsoft (Internal)
 https://symweb.corp.microsoft.com/ (Requires VPN)
@@ -20,7 +20,7 @@ Mumble:
 https://dl.mumble.info/symbols/
 
 Nvidia:
-https://driver-symbols.nvidia.com
+https://driver-symbols.nvidia.com/
 
 LibreOffice:
 https://dev-builds.libreoffice.org/daily/master/Win-x86@39/symbols/
