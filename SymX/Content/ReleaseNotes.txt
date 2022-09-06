@@ -8,10 +8,15 @@
 * File metadata now prints the filename so that you know what file each piece of metadata is for
 * Fixed bug where SymX always claimed another instance was running
 * Refactored HTTP client handling
-* Fixed INI file loading
+* SymX now tells you when it is clearing log files
+* Fixed INI file loading with non-default INI paths
+
 NEW FUNCTIONALITY:
 For real symbol servers (not MSDL), SymX will now parse the /000Admin folder if you use -mode Parse000Admin. 
 This will download all of the symstore in most cases. However, there are some cases (such as nvidia's server) where it wipes history.txt every time they push a new version, so it will only grab the latest version.
+
+KNOWN ISSUE:
+Cosmetic: "NCLogging not initialised" may be printed at start
 
 Very sorry for the delay. Been busy with other stuff.
 

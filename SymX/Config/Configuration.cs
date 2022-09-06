@@ -223,7 +223,6 @@ namespace SymX
         {
             try
             {
-
                 int iniPathPosition = Array.IndexOf(args, "-inipath");
 
                 if (iniPathPosition > -1) IniPath = args[iniPathPosition + 1];
@@ -257,8 +256,6 @@ namespace SymX
         /// <returns></returns>
         public static bool ParseArgs(string[] args)
         {
-            PrintVersion();
-
             // immediately reject if no mode provided
             if (args.Length < 3) return false;
 
@@ -718,7 +715,7 @@ namespace SymX
         {
             if (!File.Exists(IniPath))
             {
-                NCLogging.Log($"No INI file, skipping INI loading ({IniPath} doesn't exist)");
+                NCLogging.Log($"Invalid INI file, skipping INI loading ({IniPath} doesn't exist)", ConsoleColor.White, false, false);
                 return true;
             }
 

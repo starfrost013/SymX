@@ -1,4 +1,3 @@
-
 Usage:
 SymX -mode bruteforce -start <start time> -end <end time> -filename <filename> -imagesize <image size> [options...]
 SymX -mode csvexport -generatecsv -csvinfolder <folder> -outfile <filename>
