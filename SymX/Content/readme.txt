@@ -15,7 +15,7 @@
               *%@%,                                                            
 
 A MSDL-compatible SymStore bulk download tool
-Version 4.0 Alpha 4
+Version 4.0 Alpha 4.1
 
 September 6, 2022
 

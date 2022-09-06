@@ -2,7 +2,7 @@
 This mode parses the /000Admin folder containing an index of all files uploaded to a symbol store. This is not available on MSDL because it is not a standard symbol server.
 
 Required switches:
-<put the required switches here>
+This mode does not have any unique required switches. Use -symsrvurl to determine the symbol server to download.
 
 Optional switches:
-<put the optional switches here>
+This mode does not have any unique optional switches.

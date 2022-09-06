@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "symx -mode parse000admin -symbolserverurl https://download.amd.com/dir/bin/ -v"
+      "commandLineArgs": "-mode bruteforce"
     }
   }
 }

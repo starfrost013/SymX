@@ -225,6 +225,8 @@ namespace SymX
             {
                 int iniPathPosition = Array.IndexOf(args, "-inipath");
 
+                if (iniPathPosition == -1) iniPathPosition = Array.IndexOf(args, "-ini");
+
                 if (iniPathPosition > -1) IniPath = args[iniPathPosition + 1];
 
                 if (!ParseIni()) return false;
@@ -257,7 +259,7 @@ namespace SymX
         public static bool ParseArgs(string[] args)
         {
             // immediately reject if no mode provided
-            if (args.Length < 3) return false;
+            if (args.Length < 2) return false;
 
             // make every single argument lowercase
             for (int curArgId = 0; curArgId < args.Length; curArgId++)
@@ -265,14 +267,14 @@ namespace SymX
                 args[curArgId] = args[curArgId].ToLower();
             }
 
-            string firstArg = args[1];
+            string firstArg = args[0];
 
             switch (firstArg)
             {
                 case "-mode":
                     return ParseMode(args);
                 case "-help":
-                    string nextArg = args[2];
+                    string nextArg = args[1];
                     ParseHelp(nextArg);
                     HelpOnly = true;
                     return true;
@@ -293,25 +295,7 @@ namespace SymX
 
             SearchMode = searchMode;
 
-            switch (searchMode)
-            {
-                case SearchMode.Parse000Admin:
-                    NCConsole.WriteLine(Properties.Resources.Help000Admin);
-                    return true;
-                case SearchMode.Bruteforce:
-                    NCConsole.WriteLine(Properties.Resources.HelpBruteforce);
-                    return true;
-                case SearchMode.CsvExport:
-                    NCConsole.WriteLine(Properties.Resources.HelpCsvExport);
-                    return true;
-                case SearchMode.CsvImport:
-                    NCConsole.WriteLine(Properties.Resources.HelpCsvImport);
-                    return true;
-                case SearchMode.ParsePdbFile:
-                    NCConsole.WriteLine(Properties.Resources.HelpPdbFile);
-                    return true; 
-
-            }
+            ShowHelp();
 
             return true;
         }
@@ -324,7 +308,7 @@ namespace SymX
         private static bool ParseMode(string[] args)
         {
             // we already check for < 3 so this will never throw an exception
-            string mode = args[2];
+            string mode = args[1];
 
             if (!Enum.TryParse(mode, true, out SearchMode searchMode))
             {
@@ -796,7 +780,28 @@ namespace SymX
         /// </summary>
         public static void ShowHelp()
         {
-            NCConsole.WriteLine(Properties.Resources.Help);
+            switch (SearchMode)
+            {
+                case SearchMode.None:
+                    NCConsole.WriteLine(Properties.Resources.Help);
+                    break;
+                case SearchMode.Parse000Admin:
+                    NCConsole.WriteLine(Properties.Resources.Help000Admin);
+                    break;
+                case SearchMode.Bruteforce:
+                    NCConsole.WriteLine(Properties.Resources.HelpBruteforce);
+                    break;
+                case SearchMode.CsvExport:
+                    NCConsole.WriteLine(Properties.Resources.HelpCsvExport);
+                    break;
+                case SearchMode.CsvImport:
+                    NCConsole.WriteLine(Properties.Resources.HelpCsvImport);
+                    break;
+                case SearchMode.ParsePdbFile:
+                    NCConsole.WriteLine(Properties.Resources.HelpPdbFile);
+                    break;
+
+            }
         }
 
         public static void PrintVersion()

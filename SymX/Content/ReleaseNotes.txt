@@ -1,4 +1,10 @@
 ﻿RELEASE NOTES:
+4.0.0 Alpha 4.1 (September 6, 2022):
+* Fixed literally everything being broken unless you put a dummy arg at the start
+* Fixed help text for 000admin
+* Fixed symx -mode <mode name> with nothing else redirecting you to general help (symx -help obviously still works)
+* Fixed shorthand for -inipath
+
 4.0.0 Alpha 4 (September 6, 2022):
 * Fixed bug where some error messages would act as if no error occurred.
 * Added error condition for passing a non-CSV file into CSV Import mode.

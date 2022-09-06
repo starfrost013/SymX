@@ -10,10 +10,16 @@ namespace SymX
     public enum SearchMode
     {
         /// <summary>
+        /// Do not search.
+        /// Used for displaying help.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
         /// Bruteforce mode -
         /// Bruteforces URLs to find files that exist.
         /// </summary>
-        Bruteforce = 0,
+        Bruteforce = 1,
 
         /// <summary>
         /// Default mode when no mode is specified.
@@ -23,21 +29,21 @@ namespace SymX
         /// <summary>
         /// Generate a CSV from an output folder
         /// </summary>
-        CsvExport = 1,
+        CsvExport = 2,
 
         /// <summary>
         /// Import a CSV file and download the URLs it contains.
         /// </summary>
-        CsvImport = 2,
+        CsvImport = 3,
 
         /// <summary>
         /// Parse a /000admin folder and download the files in the transaction folders.
         /// </summary>
-        Parse000Admin = 3,
+        Parse000Admin = 4,
 
         /// <summary>
         /// Download an image file from a PDB file.
         /// </summary>
-        ParsePdbFile = 4,
+        ParsePdbFile = 5,
     }
 }
