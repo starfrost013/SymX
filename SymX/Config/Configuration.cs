@@ -223,6 +223,11 @@ namespace SymX
         {
             try
             {
+
+                int iniPathPosition = Array.IndexOf(args, "-inipath");
+
+                if (iniPathPosition > -1) IniPath = args[iniPathPosition + 1];
+
                 if (!ParseIni()) return false;
 
                 if (!ParseArgs(args)) return false;
@@ -261,13 +266,6 @@ namespace SymX
             for (int curArgId = 0; curArgId < args.Length; curArgId++)
             {
                 args[curArgId] = args[curArgId].ToLower();
-            }
-
-            int iniPathPosition = (Array.IndexOf(args, "-inipath");
-
-            if (iniPathPosition > -1)
-            {
-                IniPath = args[iniPathPosition + 1];
             }
 
             string firstArg = args[1];
@@ -592,7 +590,9 @@ namespace SymX
 
         private static bool ParsePdbFileArgs(string[] args)
         {
+            NCConsole.BackgroundColor = ConsoleColor.Red;
             NCConsole.WriteLine("PDB File mode is not implemented yet!");
+            NCConsole.BackgroundColor = ConsoleColor.White;
             return true;
         }
 
