@@ -11,9 +11,21 @@
 	<TransformOutOfDateOnly>false</TransformOutOfDateOnly>
 	<PackageIcon>logo.png</PackageIcon>
 	<ApplicationIcon>Content\icon.ico</ApplicationIcon>
-	<Configurations>Debug;Release</Configurations>
+	<Configurations>Debug;Release;Debug_Unlimited</Configurations>
 	<NoWarn>1701;1702</NoWarn>
 	<PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Unlimited|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
   </PropertyGroup>
 
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TextTemplating\Microsoft.TextTemplating.targets" />

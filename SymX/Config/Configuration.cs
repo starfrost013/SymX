@@ -582,6 +582,7 @@ namespace SymX
             if (OutFolder != null
                && !Directory.Exists(OutFolder)) Directory.CreateDirectory(OutFolder);
 
+#if !DEBUG_UNLIMITED
             // Check for invalid or DDOSing thread count options. 
             if (NumThreads < 1
                 || NumThreads > 30)
@@ -595,7 +596,7 @@ namespace SymX
                 NumDownloads = NumThreads;
                 if (NumDownloads > 15) NumDownloads = 15; // "soft" limit to 15 to prevent ddosing
             }
-
+#endif
             if (IsAnotherSymXInstanceRunning() && !DontGenerateTempFile)
             {
                 Console.WriteLine("Cannot generate temporary file as another instance of SymX is running!");
@@ -810,8 +811,11 @@ namespace SymX
             if (Verbosity >= Verbosity.Normal
                 && !NoLogo)
             {
-                // temp until nucore allows you to turn off function name
+#if DEBUG_UNLIMITED
+                NCLogging.Log($"{SymXVersion.SYMX_APPLICATION_NAME} [Unlimited Thread Count - WARNING: May be used for DDOS]", ConsoleColor.Green, false, false);
+#else
                 NCLogging.Log($"{SymXVersion.SYMX_APPLICATION_NAME}", ConsoleColor.Green, false, false);
+#endif
                 NCLogging.Log($"Version {SymXVersion.SYMX_VERSION_EXTENDED_STRING}", ConsoleColor.White, false, false);
                 NCLogging.Log("A MSDL-compatible SymStore bulk download tool", ConsoleColor.White, false, false);
                 NCLogging.Log("© 2022 starfrost\n", ConsoleColor.White, false, false);
@@ -833,6 +837,6 @@ namespace SymX
 
             return (processes.Length > 1);
         }
-        #endregion
+#endregion
     }
 }

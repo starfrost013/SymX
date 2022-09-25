@@ -54,27 +54,25 @@ namespace SymX
 
             if (!Configuration.KeepOldLogs) TaskList.Add(Tasks.ClearLogs);
 
-            if (Configuration.SearchMode == SearchMode.Bruteforce)
+            switch (Configuration.SearchMode)
             {
-                TaskList.Add(Tasks.GenerateListOfUrls);
-                TaskList.Add(Tasks.TryDownload);
-            }
-            else if (Configuration.SearchMode == SearchMode.CsvImport)
-            {
-                TaskList.Add(Tasks.ParseCsv);
-                TaskList.Add(Tasks.TryDownload);
-            }
-            else if (Configuration.SearchMode == SearchMode.CsvExport)
-            {
-                TaskList.Add(Tasks.GenerateCsv);
-            }
-            else if (Configuration.SearchMode == SearchMode.Parse000Admin)
-            {
-                TaskList.Add(Tasks.Parse000Admin);
-            }
-            else if (Configuration.SearchMode == SearchMode.ParsePdbFile)
-            {
-                TaskList.Add(Tasks.ParsePdbFile);
+                case SearchMode.Bruteforce:
+                    TaskList.Add(Tasks.GenerateListOfUrls);
+                    TaskList.Add(Tasks.TryDownload);
+                    break;
+                case SearchMode.CsvImport:
+                    TaskList.Add(Tasks.ParseCsv);
+                    TaskList.Add(Tasks.TryDownload);
+                    break;
+                case SearchMode.CsvExport:
+                    TaskList.Add(Tasks.GenerateCsv);
+                    break;
+                case SearchMode.Parse000Admin:
+                    TaskList.Add(Tasks.Parse000Admin);
+                    break;
+                case SearchMode.ParsePdbFile:
+                    TaskList.Add(Tasks.ParsePdbFile);
+                    break;
             }
 
             TaskList.Add(Tasks.Exit);
