@@ -3,6 +3,7 @@ This mode downloads files from URLs contained in a CSV file generated with CSV e
 
 Required switches:
 -infile [-in]: Input to a CSV file generated using the CSV generation mode to try and download files from.
+-outfolder: Output folder for files downloaded from your CSV file
 
 Optional switches:
 None

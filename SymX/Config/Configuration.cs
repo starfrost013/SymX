@@ -657,7 +657,7 @@ namespace SymX
                     if (CsvInFolder == null
                     || OutFile == null)
                     {
-                        NCLogging.Log("-csvinfolder and -outfile: both must be provided if -generatecsv is provided!", ConsoleColor.Red, false, false);
+                        NCLogging.Log("-csvinfolder and -outfile: both must be provided when using CSV Export mode!", ConsoleColor.Red, false, false);
                         return false;
                     }
 

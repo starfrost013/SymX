@@ -2,7 +2,7 @@ CSV export mode:
 This mode generates a CSV file containing imagesizes, TimeDateStamps and URLs from a user-defined folder. 
 
 Required switches:
--generatecsv [-g]: Generate a CSV containing image size and TimeDateStamp information from a folder, instead of downloading any files. If -generatecsv is specified, -csvinfolder [-ci] and -outfile are required options.
+-csvinfolder [-ci] and -outfile are required options.
 A list of ImageSizes and TimeDateStamps will be generated from the folder specified by -csvinfolder and dumped to the CSV file specified by -outfile.
 -infolder: Input folder to generate a CSV file from.
 
