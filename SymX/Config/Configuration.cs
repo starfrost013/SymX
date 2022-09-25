@@ -739,6 +739,8 @@ namespace SymX
 
                 // settings that can be null don't check for null
 
+                // user may explicitly specify false for booleans so we need to use Convert.ToBoolean()
+                if (searchMode != null) SearchMode = (SearchMode)Enum.Parse(typeof(SearchMode), searchMode);
                 if (start != null) Start = Convert.ToUInt64(start);
                 if (end != null) End = Convert.ToUInt64(end);
                 FileName = fileName;
@@ -747,8 +749,6 @@ namespace SymX
                 if (imageSizeMin != null) ImageSizeMin = ulong.Parse(imageSizeMin, NumberStyles.HexNumber);
                 if (imageSizeMax != null) ImageSizeMax = ulong.Parse(imageSizeMax, NumberStyles.HexNumber);
                 InFile = inFile;
-                // user may explicitly specify false for booleans so we need to use Convert.ToBoolean()
-                if (searchMode != null) SearchMode = (SearchMode)Enum.Parse(typeof(SearchMode), searchMode);
                 CsvInFolder = csvInFolder;
                 if (verbosity != null) Verbosity = (Verbosity)Enum.Parse(typeof(Verbosity), verbosity);
                 if (dontDownload != null) DontDownload = Convert.ToBoolean(dontDownload);
