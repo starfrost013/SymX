@@ -2,7 +2,7 @@
   "profiles": {
     "SymX": {
       "commandName": "Project",
-      "commandLineArgs": "-mode bruteforce"
+      "commandLineArgs": "-mode bruteforce -t 60"
     }
   }
 }

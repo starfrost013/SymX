@@ -591,11 +591,14 @@ namespace SymX
                 return false; // don't DDOS the servers
             }
 
-            if (NumDownloads <= 0) // -numdownloads not provided or somehow we provided a negative number
+            if (NumDownloads < 1) // -numdownloads not provided or somehow we provided a negative number
             {
                 NumDownloads = NumThreads;
                 if (NumDownloads > 15) NumDownloads = 15; // "soft" limit to 15 to prevent ddosing
             }
+#else
+            if (NumThreads < 1) NumThreads = 1;
+            if (NumDownloads < 1) NumDownloads = 1;
 #endif
             if (IsAnotherSymXInstanceRunning() && !DontGenerateTempFile)
             {
