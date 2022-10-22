@@ -197,6 +197,7 @@ namespace SymX
         {
             // Set up default values
             NumThreads = 12;
+            NumDownloads = 1;
             MaxRetries = 8;
 
             Verbosity = Verbosity.Normal;
@@ -596,9 +597,6 @@ namespace SymX
                 NumDownloads = NumThreads;
                 if (NumDownloads > 15) NumDownloads = 15; // "soft" limit to 15 to prevent ddosing
             }
-#else
-            if (NumThreads < 1) NumThreads = 1;
-            if (NumDownloads < 1) NumDownloads = 1;
 #endif
             if (IsAnotherSymXInstanceRunning() && !DontGenerateTempFile)
             {
