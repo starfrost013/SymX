@@ -1,4 +1,4 @@
-﻿using NuCore.Utilities;
+﻿
 using System.IO;
 
 namespace SymX
@@ -16,7 +16,7 @@ namespace SymX
         {
             if (Configuration.IsMsdl())
             {
-                NCLogging.Log("MSDL is not supported in this mode. MSDL is not a normal symbol server, " +
+                Logger.Log("MSDL is not supported in this mode. MSDL is not a normal symbol server, " +
                     "and uses a custom Microsoft Azure-based setup for better scalability and reliability, " +
                     "as it is used on the daily for new builds of Windows. Any 000admin folder" +
                     "would have been removed when they moved to this setup in 2017.", ConsoleColor.Red, false, false);
@@ -25,7 +25,7 @@ namespace SymX
 
             string tempFileName = Path.GetTempFileName();
             string historyUrl = $@"{Configuration.SymbolServerUrl}\000Admin\history.txt";
-            NCLogging.Log($"Obtaining symstore history. Downloading {historyUrl} to {tempFileName}...");
+            Logger.Log($"Obtaining symstore history. Downloading {historyUrl} to {tempFileName}...");
 
             // download history.txt
             using (BinaryWriter bw = new BinaryWriter(new FileStream(tempFileName, FileMode.Create)))
@@ -42,11 +42,11 @@ namespace SymX
 
             foreach (SymStoreTransaction transaction in transactions)
             {
-                if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Processing and downloading transaction {transaction.Id}");
+                if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Processing and downloading transaction {transaction.Id}");
                 
                 if (!DownloadTransaction(transaction))
                 {
-                    NCLogging.Log("An error occurred downloading transactions.", ConsoleColor.Red);
+                    Logger.Log("An error occurred downloading transactions.", ConsoleColor.Red);
                     return false; 
                 }
             }
@@ -57,7 +57,7 @@ namespace SymX
 
         private static List<SymStoreTransaction> ParseHistory(string historyFileName)
         {
-            if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log("Reading history...");
+            if (Configuration.Verbosity >= Verbosity.Normal) Logger.Log("Reading history...");
             string[] history = File.ReadAllLines(historyFileName);
             List<SymStoreTransaction> transactions = new List<SymStoreTransaction>();
 
@@ -81,7 +81,7 @@ namespace SymX
                 {
                     case SymStoreTransactionType.Add:
                         // addition transaction
-                        if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Transaction ID {transactionId}");
+                        if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Transaction ID {transactionId}");
 
                         string typeAdded = transactionComponents[2];
                         string date = transactionComponents[3];
@@ -90,7 +90,7 @@ namespace SymX
                         string productVersion = transactionComponents[6];
                         string comment = transactionComponents[7];
 
-                        if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log("Transaction Information:\n" +
+                        if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log("Transaction Information:\n" +
                             $"Type: {typeAdded}\n" +
                             $"Date: {date} {time}\n" +
                             $"Product: {productName}, version {productVersion}\n" +
@@ -108,7 +108,7 @@ namespace SymX
                     case SymStoreTransactionType.Del:
                         string deletedTransactionValue = transactionComponents[2];
                         int deletedTransactionId = Convert.ToInt32(deletedTransactionValue);
-                        if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Transaction ID {transactionId} deleting transaction ID {deletedTransactionId}!");
+                        if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Transaction ID {transactionId} deleting transaction ID {deletedTransactionId}!");
 
                         transactions.Add(transaction);
                         continue;
@@ -134,7 +134,7 @@ namespace SymX
             // try "normal" url
             HttpRequestMessage requestMsg = new HttpRequestMessage(HttpMethod.Head, baseUrl);
 
-            if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying {baseUrl} for transaction information");
+            if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Trying {baseUrl} for transaction information");
             // send sync for now
             HttpResponseMessage response = HttpManager.Client.Send(requestMsg);
 
@@ -143,13 +143,13 @@ namespace SymX
                 // try the "deleted" url
                 HttpRequestMessage deletedMsg = new HttpRequestMessage(HttpMethod.Head, baseDeletedUrl);
 
-                if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying {baseUrl} for transaction information (\"deleted\") transaction");
+                if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Trying {baseUrl} for transaction information (\"deleted\") transaction");
                 // send sync for now
                 HttpResponseMessage deletedResponse = HttpManager.Client.Send(deletedMsg);
 
                 if (!deletedResponse.IsSuccessStatusCode)
                 {
-                    if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Transaction {transaction.Id} failed to download: Likely does not exist. Failed both normal and deleted URL");
+                    if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Transaction {transaction.Id} failed to download: Likely does not exist. Failed both normal and deleted URL");
                     return false;
                 }
 
@@ -157,7 +157,7 @@ namespace SymX
                 historyDownloadUrl = baseDeletedUrl;
             }
 
-            if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Downloading {historyDownloadUrl}...");
+            if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Downloading {historyDownloadUrl}...");
 
             Task<byte[]> downloadPassUrl = HttpManager.Client.GetByteArrayAsync(historyDownloadUrl);
 
@@ -169,11 +169,11 @@ namespace SymX
             // save file
             byte[] fileBytes = downloadPassUrl.Result;
             File.WriteAllBytes(tempFileName, fileBytes);
-            if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Saved to {tempFileName}!");
+            if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Saved to {tempFileName}!");
 
             string[] fileLines = File.ReadAllLines(tempFileName);
 
-            if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log("Parsing transaction data...");
+            if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log("Parsing transaction data...");
 
             List<string> filesToDownload = new List<string>();
 
@@ -198,7 +198,7 @@ namespace SymX
 
                 if (Configuration.Verbosity >= Verbosity.Verbose)
                 {
-                    NCLogging.Log($"Adding {downloadUrl} to download queue (original file name, if available: {originalFileName})...");
+                    Logger.Log($"Adding {downloadUrl} to download queue (original file name, if available: {originalFileName})...");
                 }
 
                 filesToDownload.Add(downloadUrl);

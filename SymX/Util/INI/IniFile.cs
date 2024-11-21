@@ -1,4 +1,4 @@
-﻿namespace LightningUtil
+﻿namespace SymX
 {
     /// <summary>
     /// IniFile

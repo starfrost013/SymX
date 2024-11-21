@@ -1,4 +1,4 @@
-﻿using NuCore.Utilities;
+﻿
 
 namespace SymX
 {
@@ -46,12 +46,12 @@ namespace SymX
 
             if (!Directory.Exists(inFolder))
             {
-                NCLogging.Log($"The folder {inFolder} does not exist!", ConsoleColor.Red);
+                Logger.Log($"The folder {inFolder} does not exist!", ConsoleColor.Red);
                 return false;
             }
             else
             {
-                if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"CSV Export mode: Checking folder {inFolder}, dumping to {outFile}");
+                if (Configuration.Verbosity >= Verbosity.Normal) Logger.Log($"CSV Export mode: Checking folder {inFolder}, dumping to {outFile}");
 
                 StreamWriter bw = new StreamWriter(new FileStream(outFile, FileMode.Create));
 
@@ -150,7 +150,7 @@ namespace SymX
 
                 bw.Close();
 
-                NCLogging.Log($"Successfully wrote CSV file to: {outFile}!", ConsoleColor.Green);
+                Logger.Log($"Successfully wrote CSV file to: {outFile}!", ConsoleColor.Green);
 
                 return true;
             }
@@ -193,7 +193,7 @@ namespace SymX
                 {
                     if (Configuration.Verbosity >= Verbosity.Normal)
                     {
-                        NCLogging.Log($"Warning: Rejected CSV line {curLine} as it does not have URL section", ConsoleColor.Yellow);
+                        Logger.Log($"Warning: Rejected CSV line {curLine} as it does not have URL section", ConsoleColor.Yellow);
                         numRejectedLines++;
                     }
                 }
@@ -201,14 +201,14 @@ namespace SymX
                 {
                     string csvLineUrl = csvLineSections[URL_COLUMN_NUMBER - 1];
 
-                    if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Found URL: {csvLineUrl}");
+                    if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Found URL: {csvLineUrl}");
 
                     urls.Add(csvLineUrl);
                 }
             }
 
             // take away 1 as we don't count the first line
-            if (numRejectedLines > 0 && Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"Warning: {numRejectedLines + 1} of {csvLines.Length - 1} lines (excluding the first line) did not have a valid URL column and were skipped!", ConsoleColor.Yellow);
+            if (numRejectedLines > 0 && Configuration.Verbosity >= Verbosity.Normal) Logger.Log($"Warning: {numRejectedLines + 1} of {csvLines.Length - 1} lines (excluding the first line) did not have a valid URL column and were skipped!", ConsoleColor.Yellow);
             return urls;
         }
     }

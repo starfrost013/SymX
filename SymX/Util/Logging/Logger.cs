@@ -1,5 +1,5 @@
 ﻿
-namespace LightningUtil
+namespace SymX
 {
     /// <summary>
     /// Logging
@@ -52,7 +52,7 @@ namespace LightningUtil
                 {
                     if (Settings.LogFileName == string.Empty)
                     {
-                        Logger.LogError("Passed empty file name to Logger::Init!", 6, LoggerSeverity.FatalError);
+                        LogError("Passed empty file name to Logger::Init!", 6, LoggerSeverity.FatalError);
                         return;
                     }
 
@@ -229,49 +229,28 @@ namespace LightningUtil
 
             Log($"{exceptionSeverity}:\n{errorString}", exceptionSeverity, printMetadata, logToFile, logToConsole);
 
-            // display message box
-            if (AssemblyUtils.NCLightningExists
-                && !dontShowMessageBox)
+            switch (exceptionSeverity)
             {
-                Debug.Assert(AssemblyUtils.NCLightningAssembly != null);
-                Type? lightningUtilName = AssemblyUtils.NCLightningAssembly.GetType(AssemblyUtils.LIGHTNING_UTILITIES_PRESET_NAME, false, true);
-
-                if (lightningUtilName == null)
-                {
-                    Log("Failed to load NCMessageBox type through reflection (ignoring)", ConsoleColor.Yellow, printMetadata, logToFile, logToConsole);
-                    return;
-                }
-
-                MethodBase? msgBoxOk = lightningUtilName.GetMethod("MessageBoxOK");
-
-                if (msgBoxOk == null)
-                {
-                    Log("Failed to display error box (ignoring)", ConsoleColor.Yellow, printMetadata, logToFile, logToConsole);
-                    return;
-                }
-
-                switch (exceptionSeverity)
-                {
-                    case LoggerSeverity.Message:
-                        msgBoxOk.Invoke(null, new object[]
-                        { "Information", errorString, SDL_MessageBoxFlags.SDL_MESSAGEBOX_INFORMATION });
-                        break;
-                    case LoggerSeverity.Warning:
-                        msgBoxOk.Invoke(null, new object[]
-                        { "Warning", errorString, SDL_MessageBoxFlags.SDL_MESSAGEBOX_WARNING });
-                        break;
-                    case LoggerSeverity.Error:
-                        msgBoxOk.Invoke(null, new object[]
-                        { "Error", errorString, SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR });
-                        break;
-                    case LoggerSeverity.FatalError:
-                        msgBoxOk.Invoke(null, new object[]
-                            { "Fatal Error", $"A fatal error has occurred:\n\n{errorString}\n\n" +
+                case LoggerSeverity.Message:
+                    MessageBox
+                    msgBoxOk.Invoke(null, new object[]
+                    { "Information", errorString, SDL_MessageBoxFlags.SDL_MESSAGEBOX_INFORMATION });
+                    break;
+                case LoggerSeverity.Warning:
+                    msgBoxOk.Invoke(null, new object[]
+                    { "Warning", errorString, SDL_MessageBoxFlags.SDL_MESSAGEBOX_WARNING });
+                    break;
+                case LoggerSeverity.Error:
+                    msgBoxOk.Invoke(null, new object[]
+                    { "Error", errorString, SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR });
+                    break;
+                case LoggerSeverity.FatalError:
+                    msgBoxOk.Invoke(null, new object[]
+                        { "Fatal Error", $"A fatal error has occurred:\n\n{errorString}\n\n" +
                                 $"The Lightning Game Engine-based application you are running must exit. We are sorry for the inconvenience.",
                                 SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR });
-                        break;
+                    break;
 
-                }
             }
 
             if (exceptionSeverity == LoggerSeverity.FatalError) Environment.Exit(id);
@@ -302,20 +281,20 @@ namespace LightningUtil
                 LogStream.Close();
             }
         }
+
+        /// <summary>
+        /// Clears the current line
+        /// Needed for SymX 4.1 11/21/24
+        /// </summary>
+        public static void ClearCurrentLine()
+        {
+            Console.Write("\x1b[2K");
+        }
+
+        public static void ClearEntireConsole()
+        {
+            Console.Write("\x1b[3J");
+        }
+        
     }
-}
-
-/// <summary>
-/// Define this here.
-/// 
-/// This is to reduce time spent in reflection which is very slow.
-/// </summary>
-[Flags]
-internal enum SDL_MessageBoxFlags : uint
-{
-    SDL_MESSAGEBOX_ERROR = 0x00000010,
-
-    SDL_MESSAGEBOX_WARNING = 0x00000020,
-
-    SDL_MESSAGEBOX_INFORMATION = 0x00000040
 }

@@ -1,4 +1,15 @@
 ﻿RELEASE NOTES:
+4.1 (November 2024) - UNSUPPORTED RELEASE
+THIS IS THE LAST EVER RELEASE
+
+I got annoyed using symx so I decided to fix it
+
+* Removed NuCore.Utilities and merged the parts of ite actually used into the main application
+* Updated from .NET 6.0 to .NET 9.0
+* Logging::Init now called before parsing configuration
+* Updated copyright from 2022 to 2022-2024
+* Removed SymX-UI
+
 4.0.0 Alpha 5.0x (May 22, 2023) - UNSUPPORTED RELEASE:
 * Overwrite CSV files.
 * Support CSV files with dates after December 31, 9999.
@@ -26,7 +37,7 @@ For real symbol servers (not MSDL), SymX will now parse the /000Admin folder if 
 This will download all of the symstore in most cases. However, there are some cases (such as nvidia's server) where it wipes history.txt every time they push a new version, so it will only grab the latest version.
 
 KNOWN ISSUE:
-Cosmetic: "NCLogging not initialised" may be printed at start
+Cosmetic: "Logger not initialised" may be printed at start
 
 Very sorry for the delay. Been busy with other stuff.
 

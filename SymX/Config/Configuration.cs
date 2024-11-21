@@ -1,4 +1,4 @@
-﻿using NuCore.Utilities;
+﻿
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -241,9 +241,9 @@ namespace SymX
             }
             catch (Exception ex)
             {
-                NCLogging.Log($"An error occurred while parsing command-line arguments: {ex.Message}", ConsoleColor.Red);
+                Logger.Log($"An error occurred while parsing command-line arguments: {ex.Message}", ConsoleColor.Red);
 
-                if (Verbosity >= Verbosity.Verbose) NCLogging.Log($"\n\nStacktrace: {ex.StackTrace}", ConsoleColor.Red);
+                if (Verbosity >= Verbosity.Verbose) Logger.Log($"\n\nStacktrace: {ex.StackTrace}", ConsoleColor.Red);
 
                 return false; 
             }
@@ -290,7 +290,7 @@ namespace SymX
 
             if (!Enum.TryParse(helpOption, true, out SearchMode searchMode))
             {
-                NCConsole.WriteLine("Invalid mode provided!\n");
+                Console.WriteLine("Invalid mode provided!\n");
                 return false;
             }
 
@@ -313,8 +313,8 @@ namespace SymX
 
             if (!Enum.TryParse(mode, true, out SearchMode searchMode))
             {
-                NCConsole.WriteLine("Invalid mode provided!\n");
-                NCConsole.WriteLine(Properties.Resources.Help);
+                Console.WriteLine("Invalid mode provided!\n");
+                Console.WriteLine(Properties.Resources.Help);
                 return false;
             }
 
@@ -572,9 +572,9 @@ namespace SymX
 
         private static bool ParsePdbFileArgs(string[] args)
         {
-            NCConsole.BackgroundColor = ConsoleColor.Red;
-            NCConsole.WriteLine("PDB File mode is not implemented yet!");
-            NCConsole.BackgroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.WriteLine("PDB File mode is not implemented yet!");
+            Console.BackgroundColor = ConsoleColor.White;
             return true;
         }
 
@@ -669,13 +669,13 @@ namespace SymX
                     if (CsvInFolder == null
                     || OutFile == null)
                     {
-                        NCLogging.Log("-csvinfolder and -outfile: both must be provided when using CSV Export mode!", ConsoleColor.Red, false, false);
+                        Logger.Log("-csvinfolder and -outfile: both must be provided when using CSV Export mode!", ConsoleColor.Red, false, false);
                         return false;
                     }
 
                     if (Directory.Exists(OutFile))
                     {
-                        NCLogging.Log("-outfile: cannot be an existing file or directory!", ConsoleColor.Red, false, false);
+                        Logger.Log("-outfile: cannot be an existing file or directory!", ConsoleColor.Red, false, false);
                         return false;
                     }
 
@@ -685,14 +685,14 @@ namespace SymX
                 case SearchMode.CsvImport:
                     if (!File.Exists(InFile))
                     {
-                        NCLogging.Log($"-infile: The file {InFile} does not exist!", ConsoleColor.Red, false, false);
+                        Logger.Log($"-infile: The file {InFile} does not exist!", ConsoleColor.Red, false, false);
                         return false;
                     }
 
                     if (!InFile.Contains(".csv"))
                     {
                         // Special request from Xeno. <4.0-alpha 4 didn't specify this 
-                        NCLogging.Log($"-infile: Not a csv file! Xeno is a fucking idiot.", ConsoleColor.Red, false, false);
+                        Logger.Log($"-infile: Not a csv file! Xeno is a fucking idiot.", ConsoleColor.Red, false, false);
                         return false;
                     }
 
@@ -713,13 +713,13 @@ namespace SymX
         {
             if (!File.Exists(IniPath))
             {
-                NCLogging.Log($"Invalid INI file, skipping INI loading ({IniPath} doesn't exist)", ConsoleColor.White, false, false);
+                Logger.Log($"Invalid INI file, skipping INI loading ({IniPath} doesn't exist)", ConsoleColor.White, false, false);
                 return true;
             }
 
-            NCINIFile iniFile = NCINIFile.Parse(IniPath);
+            IniFile iniFile = IniFile.Parse(IniPath);
 
-            NCINIFileSection settingsSection = iniFile.GetSection("Settings");
+            IniSection settingsSection = iniFile.GetSection("Settings");
 
             if (settingsSection != null)
             {
@@ -783,7 +783,7 @@ namespace SymX
             }
             else
             {
-                NCLogging.Log($"Warning: No Settings section in {IniPath}!", ConsoleColor.Yellow, false, false);
+                Logger.Log($"Warning: No Settings section in {IniPath}!", ConsoleColor.Yellow, false, false);
                 return true;
             }
            
@@ -797,22 +797,22 @@ namespace SymX
             switch (SearchMode)
             {
                 case SearchMode.None:
-                    NCConsole.WriteLine(Properties.Resources.Help);
+                    Console.WriteLine(Properties.Resources.Help);
                     break;
                 case SearchMode.Parse000Admin:
-                    NCConsole.WriteLine(Properties.Resources.Help000Admin);
+                    Console.WriteLine(Properties.Resources.Help000Admin);
                     break;
                 case SearchMode.Bruteforce:
-                    NCConsole.WriteLine(Properties.Resources.HelpBruteforce);
+                    Console.WriteLine(Properties.Resources.HelpBruteforce);
                     break;
                 case SearchMode.CsvExport:
-                    NCConsole.WriteLine(Properties.Resources.HelpCsvExport);
+                    Console.WriteLine(Properties.Resources.HelpCsvExport);
                     break;
                 case SearchMode.CsvImport:
-                    NCConsole.WriteLine(Properties.Resources.HelpCsvImport);
+                    Console.WriteLine(Properties.Resources.HelpCsvImport);
                     break;
                 case SearchMode.ParsePdbFile:
-                    NCConsole.WriteLine(Properties.Resources.HelpPdbFile);
+                    Console.WriteLine(Properties.Resources.HelpPdbFile);
                     break;
 
             }
@@ -825,13 +825,13 @@ namespace SymX
                 && !NoLogo)
             {
 #if DEBUG_UNLIMITED
-                NCLogging.Log($"{SymXVersion.SYMX_APPLICATION_NAME} [Unlimited Thread Count - WARNING: May be used for DDOS]", ConsoleColor.Green, false, false);
+                Logger.Log($"{SymXVersion.SYMX_APPLICATION_NAME} [Unlimited Thread Count - WARNING: May be used for DDOS]", ConsoleColor.Green, false, false);
 #else
-                NCLogging.Log($"{SymXVersion.SYMX_APPLICATION_NAME}", ConsoleColor.Green, false, false);
+                Logger.Log($"{SymXVersion.SYMX_APPLICATION_NAME}", ConsoleColor.Green, false, false);
 #endif
-                NCLogging.Log($"Version {SymXVersion.SYMX_VERSION_EXTENDED_STRING}", ConsoleColor.White, false, false);
-                NCLogging.Log("A MSDL-compatible SymStore bulk download tool", ConsoleColor.White, false, false);
-                NCLogging.Log("© 2022-2024 starfrost\n", ConsoleColor.White, false, false);
+                Logger.Log($"Version {SymXVersion.SYMX_VERSION_EXTENDED_STRING}", ConsoleColor.White, false, false);
+                Logger.Log("A MSDL-compatible SymStore bulk download tool", ConsoleColor.White, false, false);
+                Logger.Log("© 2022-2024 starfrost\n", ConsoleColor.White, false, false);
             }
         }
 

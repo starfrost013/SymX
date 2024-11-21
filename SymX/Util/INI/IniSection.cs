@@ -1,11 +1,11 @@
-﻿namespace LightningUtil
+﻿namespace SymX
 {
     /// <summary>
-    /// NCIniFileSection
+    /// IniSection
     /// 
     /// March 7, 2022
     /// 
-    /// Defines an MC INI file section.
+    /// Defines an INI file section.
     /// </summary>
     public class IniSection
     {
@@ -25,7 +25,7 @@
         public IniSection(string name)
         {
             Name = name;
-            Values = new();
+            Values = [];
         }
 
         /// <summary>

@@ -1,9 +1,9 @@
-﻿namespace LightningUtil
+﻿namespace SymX
 {
     /// <summary>
     /// LoggerSettings
     /// 
-    /// Defines NuCore logging settings
+    /// Defines SymX logging settings
     /// </summary>
     public class LoggerSettings
     {

@@ -1,4 +1,4 @@
-﻿using NuCore.Utilities;
+﻿
 using System.Diagnostics;
 using System.Net.Http.Headers;
 
@@ -50,7 +50,7 @@ namespace SymX
         #region Task manager
         public static void GenerateListOfTasks()
         {
-            if (Configuration.Verbosity == Verbosity.Verbose) NCLogging.Log("Initialising task list...");
+            if (Configuration.Verbosity == Verbosity.Verbose) Logger.Log("Initialising task list...");
 
             if (!Configuration.KeepOldLogs) TaskList.Add(Tasks.ClearLogs);
 
@@ -96,7 +96,7 @@ namespace SymX
 
                 Console.Title = $"{SymXVersion.SYMX_APPLICATION_NAME} - {taskString}";
 
-                if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log(taskString);
+                if (Configuration.Verbosity >= Verbosity.Normal) Logger.Log(taskString);
                 curTask++;
 
                 // perform the current task
@@ -115,12 +115,12 @@ namespace SymX
                         List<string> successfulUrls = ScanForFiles();
                         if (successfulUrls.Count > 0)
                         {
-                            if (!DownloadSuccessfulFiles(successfulUrls)) NCLogging.Log("An error occurred downloading files!\n", ConsoleColor.Red);
+                            if (!DownloadSuccessfulFiles(successfulUrls)) Logger.Log("An error occurred downloading files!\n", ConsoleColor.Red);
                         }
                         continue;
                     // Generate a CSV file from a folder.
                     case Tasks.GenerateCsv:
-                        if (!CSVFile.Run()) NCLogging.Log("MassView failed to generate CSV file!", ConsoleColor.Red);
+                        if (!CSVFile.Run()) Logger.Log("MassView failed to generate CSV file!", ConsoleColor.Red);
                         continue;
                     case Tasks.ParseCsv:
                         UrlList = CSVFile.ParseUrls(Configuration.InFile);
@@ -219,13 +219,13 @@ namespace SymX
                 }
                 catch
                 {
-                    NCLogging.Log("Warning: Failed to create temp file - another instance of SymX is likely running!", ConsoleColor.Yellow);
+                    Logger.Log("Warning: Failed to create temp file - another instance of SymX is likely running!", ConsoleColor.Yellow);
                     // don't run temp file commands to prevent crashing
                     Configuration.DontGenerateTempFile = true;
                 }
             }
 
-            if (Configuration.Verbosity >= Verbosity.Quiet) NCLogging.Log($"Trying {UrlList.Count} URLs...");
+            if (Configuration.Verbosity >= Verbosity.Quiet) Logger.Log($"Trying {UrlList.Count} URLs...");
 
             timer = Stopwatch.StartNew();
 
@@ -268,7 +268,7 @@ namespace SymX
                     {
                         string curUrl = UrlList[curUrlSet + curUrlInUrlSet];
                       
-                        if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Trying URL {curUrl}...");
+                        if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Trying URL {curUrl}...");
                         Task<bool> worker = Task<bool>.Run(() => CheckFileExists(curUrl));
                         tasks.Add(worker);
                     }
@@ -305,7 +305,7 @@ namespace SymX
                         // If we haven't specified we don't want a temporary file, write it to successful_urls.log
                         if (!Configuration.DontGenerateTempFile) tempFile.WriteLine(foundUrl);
 
-                        if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"Found a valid link at {foundUrl}!", ConsoleColor.Green);
+                        if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"Found a valid link at {foundUrl}!", ConsoleColor.Green);
                         successfulUrls.Add(foundUrl); // add it
                     }
                     else
@@ -314,12 +314,12 @@ namespace SymX
                         // if the task caused an exception then fail checking the URL
                         if (task.IsFaulted)
                         {
-                            NCLogging.Log($"An error occurred while scanning for the URL {foundUrl}!", ConsoleColor.Red);
+                            Logger.Log($"An error occurred while scanning for the URL {foundUrl}!", ConsoleColor.Red);
                             failedUrls++;
                         }
                         else
                         {
-                            if (Configuration.Verbosity >= Verbosity.Verbose) NCLogging.Log($"URL not found: {foundUrl}", ConsoleColor.Yellow);
+                            if (Configuration.Verbosity >= Verbosity.Verbose) Logger.Log($"URL not found: {foundUrl}", ConsoleColor.Yellow);
                         }
                     }
                 }
@@ -332,7 +332,7 @@ namespace SymX
             numSuccessfulUrls = successfulUrls.Count;
             urlsPerSecond = (double)(UrlList.Count / (timeElapsedMs / (double)1000));
 
-            if (Configuration.Verbosity >= Verbosity.Normal) NCLogging.Log($"Took {timeElapsed} seconds to check {UrlList.Count} URLs, found {numSuccessfulUrls} files ({urlsPerSecond.ToString("F1")} URLs per second)");
+            if (Configuration.Verbosity >= Verbosity.Normal) Logger.Log($"Took {timeElapsed} seconds to check {UrlList.Count} URLs, found {numSuccessfulUrls} files ({urlsPerSecond.ToString("F1")} URLs per second)");
 
             // close successfulurls.log (it is deleted later)
             if (!Configuration.DontGenerateTempFile) tempFile.Close();
@@ -351,22 +351,22 @@ namespace SymX
                 try
                 {
                     // clear the *ENTIRE* console, not just visible stuff. this fixes display issues
-                    // BUT may cause garbage <Win10 1507. The NCConsole class is a wrapper for Console that adds VTS functionality.
-                    NCConsole.Clear(true);
+                    // BUT will cause garbage to be printed <Win10 1507. The Console class is a wrapper for Console that adds VTS functionality.
+                    Logger.ClearEntireConsole();
                 }
                 catch { };
 
                 // draw it last so we draw over the top of the successful urls if necessary so the user can always see the progress
 
-                NCConsole.SetCursorPosition(0, 0);
+                Console.SetCursorPosition(0, 0);
 
                 // clear current line 
-                NCConsole.ClearCurrentLine();
+                Logger.ClearCurrentLine();
 
-                NCLogging.Log(reportString, ConsoleColor.White, false, false);
+                Logger.Log(reportString, ConsoleColor.White, false, false);
 
                 // clear current line again
-                NCConsole.ClearCurrentLine();
+                Logger.ClearCurrentLine();
 
                 int numberOfBarsToDraw = (int)(PROGRESS_BAR_LENGTH * (percentageCompletion / 100));
 
@@ -379,23 +379,23 @@ namespace SymX
                 // draw spaces as placeholders for the areas of the bar that are not yet completed
                 for (int curBar = numberOfBarsToDraw; curBar < (PROGRESS_BAR_LENGTH - 1); curBar++) Console.Write(" ");
 
-                NCLogging.Log("█\n\n", ConsoleColor.White, false, false);
+                Logger.Log("█\n\n", ConsoleColor.White, false, false);
 
                 // start at (0, 2) so that this is always visible
-                NCConsole.SetCursorPosition(0, 4);
+                Console.SetCursorPosition(0, 4);
 
                 // clear current line again. this will be in nucore later on
-                NCConsole.ClearCurrentLine();
+                Logger.ClearCurrentLine();
 
-                NCLogging.Log("Latest valid links: ", ConsoleColor.White, false, false);
+                Logger.Log("Latest valid links: ", ConsoleColor.White, false, false);
 
-                if (!Configuration.DontGenerateTempFile) NCLogging.Log("SuccessfulURLs.log contains all successfully resolved URLs", ConsoleColor.White, false, false);
+                if (!Configuration.DontGenerateTempFile) Logger.Log("SuccessfulURLs.log contains all successfully resolved URLs", ConsoleColor.White, false, false);
 
-                foreach (string successfulUrl in successfulUrls) NCLogging.Log(successfulUrl, ConsoleColor.White, false, false);
+                foreach (string successfulUrl in successfulUrls) Logger.Log(successfulUrl, ConsoleColor.White, false, false);
             }
             else
             {
-                NCLogging.Log(reportString);
+                Logger.Log(reportString);
             }
             
         }
@@ -429,7 +429,7 @@ namespace SymX
             }
             catch (Exception ex)
             {
-                NCLogging.Log($"A fatal error occurred while downloading files: {ex}", ConsoleColor.Red);
+                Logger.Log($"A fatal error occurred while downloading files: {ex}", ConsoleColor.Red);
                 return false;
             }
         }

@@ -1,6 +1,4 @@
-﻿using NuCore.Utilities;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 
 namespace SymX
 {
@@ -12,7 +10,7 @@ namespace SymX
         {
             try
             {
-                NCLogging.Log("Initialising HTTP client...");
+                Logger.Log("Initialising HTTP client...");
                 Client = new HttpClient
                 {
                     BaseAddress = new Uri(baseAddress)
@@ -23,7 +21,7 @@ namespace SymX
             }
             catch (Exception ex)
             {
-                _ = new NCException($"An error occurred while initialising the HTTP client.\n\n{ex}", 105, "An exception occurred during HttpManager::Init.", NCExceptionSeverity.FatalError, null, true);
+                Logger.LogError($"An error occurred while initialising the HTTP client.\n\n{ex}", 105, LoggerSeverity.FatalError, null, true);
                 return true; 
             }
 
