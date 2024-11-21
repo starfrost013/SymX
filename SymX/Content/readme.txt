@@ -15,9 +15,9 @@
               *%@%,                                                            
 
 A MSDL-compatible SymStore bulk download tool
-Version 4.0 Alpha 4.1
+Version 4.0 Alpha 5.0
 
-September 6, 2022
+May 22, 2023 - Unsupported Release
 
 SymX is a bulk download tool for binaries stored on symbol servers created using SymStore.exe, including the Microsoft Symbol Server, It has been used to find files from unleaked builds of Windows as well as dumping all the binaries from a particular Windows version.
 It is a merger of msdlurlgen and MassView that adds many new features to both, is far faster (100+ URLs per second at max threads, vs. <5), and is far more robust.

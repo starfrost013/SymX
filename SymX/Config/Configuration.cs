@@ -628,9 +628,19 @@ namespace SymX
                     if (ImageSize == null)
                     {
                         if (ImageSizeMin == 0
-                            || ImageSizeMax == 0)
+                            || ImageSizeMax == 0) Console.WriteLine("One of -imagesizemin and -imagesizemax not provided. It will scan from zero!");
+
+                        
+                        if (ImageSizeMin == 0
+                            && ImageSizeMax == 0)
                         {
                             Console.WriteLine("Either -imagesize or both -imagesizemin and -imagesizemax must be present!");
+                            return false;
+                        }
+
+                        if (ImageSizeMin > ImageSizeMax)
+                        {
+                            Console.WriteLine("-imagesizemin must be smaller than -imagesizemax!");
                             return false;
                         }
                     }
@@ -663,12 +673,14 @@ namespace SymX
                         return false;
                     }
 
-                    if (Directory.Exists(OutFile)
-                        || File.Exists(OutFile))
+                    if (Directory.Exists(OutFile))
                     {
                         NCLogging.Log("-outfile: cannot be an existing file or directory!", ConsoleColor.Red, false, false);
                         return false;
                     }
+
+                    if (File.Exists(OutFile)) File.Delete(OutFile);
+
                     return true;
                 case SearchMode.CsvImport:
                     if (!File.Exists(InFile))
@@ -819,7 +831,7 @@ namespace SymX
 #endif
                 NCLogging.Log($"Version {SymXVersion.SYMX_VERSION_EXTENDED_STRING}", ConsoleColor.White, false, false);
                 NCLogging.Log("A MSDL-compatible SymStore bulk download tool", ConsoleColor.White, false, false);
-                NCLogging.Log("© 2022 starfrost\n", ConsoleColor.White, false, false);
+                NCLogging.Log("© 2022-2024 starfrost\n", ConsoleColor.White, false, false);
             }
         }
 

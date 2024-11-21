@@ -1,9 +1,11 @@
 ﻿// SymX
 // A Microsoft Symbol Server bulk download tool
-// © 2022 starfrost
+// © 2022-2024 starfrost
 
 using NuCore.Utilities;
 using SymX;
+
+NCLogging.Init();
 
 if (Configuration.Parse(args))
 {
@@ -11,7 +13,7 @@ if (Configuration.Parse(args))
 
     // Initialise NuCore logging with logging based on the status of the -l option
     NCLogging.Settings.WriteToLog = Configuration.LogToFile;
-    NCLogging.Init();
+
 
     Configuration.PrintVersion();
     TaskManager.GenerateListOfTasks();

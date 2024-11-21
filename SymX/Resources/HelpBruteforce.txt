@@ -9,12 +9,12 @@ Required switches:
 -filename [-f]: Filename to search for on the Microsoft Symbol Server.
 
 EITHER
--imagesize [-i]: The SizeOfImage to search for, in hex string format. DISREGARDED if the -imagesizemin and -imagesizemax options are BOTH specified.
+-imagesize [-i]: The SizeOfImage to search for, in hex string format. 
 OR
 -imagesizemin [-imin]: Minimum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded.
-Required if -imagesize is not provided.
+Required if -imagesize is not provided. DISREGARDED if the -imagesize option is specified.
 -imagesizemax [-imax]: Maximum image size to search for in hex format. If both of these are set, the -imagesize option is disregarded. 
-Required if -imagesize is not provided.
+Required if -imagesize is not provided. DISREGARDED if the -imagesize option is specified.
 
 Optional switches:
 -numthreads [-threads, -t]: Change the number of threads used for scanning. A lower number of threads will reduce URL scanning performance. Range is 1-30, as this isn't DDOSX. The default value is 12.

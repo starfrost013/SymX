@@ -174,7 +174,7 @@ namespace SymX
             List<string> urlList = new List<string>();
 
             if (Configuration.ImageSizeMin == 0
-                    || Configuration.ImageSizeMax == 0)
+                    && Configuration.ImageSizeMax == 0)
             {
                 for (ulong curTime = Configuration.Start; curTime < Configuration.End; curTime++)
                 {

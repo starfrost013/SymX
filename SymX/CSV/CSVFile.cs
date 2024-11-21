@@ -114,6 +114,10 @@ namespace SymX
 
                                         // convert the date to hex formats
                                         ulong timeDateStamp = br.ReadUInt64();
+
+                                        if (timeDateStamp >= 253402218018 // 1/1/1970 to 12/31/9999 
+                                            || timeDateStamp < 0) timeDateStamp = 0;
+
                                         DateTime date = new DateTime(1970, 1, 1, 1, 1, 1).AddSeconds(timeDateStamp);
                                         string dateIso = date.ToString("yyyy-MM-dd HH:mm:ss");
                                         string dateHex = timeDateStamp.ToString("x");
