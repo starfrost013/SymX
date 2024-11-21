@@ -5,14 +5,6 @@
     /// 
     /// NuCore INI parser
     /// Pretty simple - simply uses the first character to determine token type
-    /// 
-    /// <para>Written February 2022</para>
-    /// <para>Updated July 2, 2022 in order to handle comments on the same line as values, handle newlines and rename variables to camelCase</para>
-    /// <para>Updated August 2, 2022 to fix a bug with INI comments on the same line as values in non-section lines, as well as to make searches case-insensitive.</para>
-    /// <para>Updated August 9, 2022 to add serialisation to file.</para>
-    /// <para>Updated January 15, 2023 to add nullable support,</para>
-    /// <para>Updated February 11, 2023 to fix case insensitivity consistency between different methods, and to add optional case insensitivity while searching for sections or values.</para>
-    /// <para>Updated February 22, 2023 to rename Write to Save and to rename some variables, as well as removing the "NC" prefix from the classes.</para>
     /// </summary>
     public class IniFile
     {
@@ -28,7 +20,7 @@
 
         public IniFile()
         {
-            Sections = new List<IniSection>();
+            Sections = [];
         }
 
         /// <summary>
