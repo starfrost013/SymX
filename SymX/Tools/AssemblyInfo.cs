@@ -7,7 +7,7 @@ using System.Reflection;
 [assembly: AssemblyDescription("An MSDL-compatible SymStore bulk download tool")]
 [assembly: AssemblyVersion("4.1.0.938")]
 [assembly: AssemblyFileVersion("4.1.0.938")]
-[assembly: AssemblyInformationalVersion("4.1.0-test (build 938, built 2024-11-21 23:21:45)")]
+[assembly: AssemblyInformationalVersion("4.1.0-test (build 938, built 2024-11-21 23:29:53)")]
 
 
 namespace SymX
@@ -22,7 +22,7 @@ namespace SymX
 		public static string SYMX_VERSION_SPECIFIER = "test";
 
 		public static string SYMX_VERSION_STRING = "4.1.0-test";
-		public static string SYMX_VERSION_EXTENDED_STRING = "4.1.0-test (build 938, built 2024-11-21 23:21:45)";
+		public static string SYMX_VERSION_EXTENDED_STRING = "4.1.0-test (build 938, built 2024-11-21 23:29:53)";
 	}
 }
 
