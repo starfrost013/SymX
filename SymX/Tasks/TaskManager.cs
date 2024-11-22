@@ -70,9 +70,6 @@ namespace SymX
                 case SearchMode.Parse000Admin:
                     TaskList.Add(Tasks.Parse000Admin);
                     break;
-                case SearchMode.ParsePdbFile:
-                    TaskList.Add(Tasks.ParsePdbFile);
-                    break;
             }
 
             TaskList.Add(Tasks.Exit);

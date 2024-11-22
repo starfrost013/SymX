@@ -229,30 +229,6 @@ namespace SymX
 
             Log($"{exceptionSeverity}:\n{errorString}", exceptionSeverity, printMetadata, logToFile, logToConsole);
 
-            switch (exceptionSeverity)
-            {
-                case LoggerSeverity.Message:
-                    MessageBox
-                    msgBoxOk.Invoke(null, new object[]
-                    { "Information", errorString, SDL_MessageBoxFlags.SDL_MESSAGEBOX_INFORMATION });
-                    break;
-                case LoggerSeverity.Warning:
-                    msgBoxOk.Invoke(null, new object[]
-                    { "Warning", errorString, SDL_MessageBoxFlags.SDL_MESSAGEBOX_WARNING });
-                    break;
-                case LoggerSeverity.Error:
-                    msgBoxOk.Invoke(null, new object[]
-                    { "Error", errorString, SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR });
-                    break;
-                case LoggerSeverity.FatalError:
-                    msgBoxOk.Invoke(null, new object[]
-                        { "Fatal Error", $"A fatal error has occurred:\n\n{errorString}\n\n" +
-                                $"The Lightning Game Engine-based application you are running must exit. We are sorry for the inconvenience.",
-                                SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR });
-                    break;
-
-            }
-
             if (exceptionSeverity == LoggerSeverity.FatalError) Environment.Exit(id);
         }
 

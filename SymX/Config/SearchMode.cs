@@ -40,10 +40,5 @@ namespace SymX
         /// Parse a /000admin folder and download the files in the transaction folders.
         /// </summary>
         Parse000Admin = 4,
-
-        /// <summary>
-        /// Download an image file from a PDB file.
-        /// </summary>
-        ParsePdbFile = 5,
     }
 }

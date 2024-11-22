@@ -45,14 +45,10 @@
         Parse000Admin = 10,
 
         /// <summary>
-        /// Parse a PDB file.
-        /// </summary>
-        ParsePdbFile = 11,
-
-        /// <summary>
         /// Parse a CSV file.
         /// </summary>
         ParseCsv = 12,
+
         /// <summary>
         /// Exit the application.
         /// </summary>

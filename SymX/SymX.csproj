@@ -11,7 +11,7 @@
 	<TransformOutOfDateOnly>false</TransformOutOfDateOnly>
 	<PackageIcon>logo.png</PackageIcon>
 	<ApplicationIcon>Content\icon.ico</ApplicationIcon>
-	<Configurations>Debug;Release;Debug_Unlimited</Configurations>
+	<Configurations>Debug;Release</Configurations>
 	<NoWarn>1701;1702</NoWarn>
 	<PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
@@ -21,10 +21,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Unlimited|AnyCPU'">
     <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
   </PropertyGroup>
 
@@ -94,12 +90,6 @@
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>AssemblyInfo.cs</LastGenOutput>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<Reference Include="NuCore.Utilities">
-			<HintPath>NuCore.Utilities.dll</HintPath>
-		</Reference>
 	</ItemGroup>
 	
   <ItemGroup>

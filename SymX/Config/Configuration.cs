@@ -333,8 +333,6 @@ namespace SymX
                     return ParseCsvImportArgs(args);
                 case SearchMode.Parse000Admin:
                     return Parse000AdminArgs(args);
-                case SearchMode.ParsePdbFile:
-                    return ParsePdbFileArgs(args);
             }
 
             return true; 
@@ -570,34 +568,11 @@ namespace SymX
             return true;
         }
 
-        private static bool ParsePdbFileArgs(string[] args)
-        {
-            Console.BackgroundColor = ConsoleColor.Red;
-            Console.WriteLine("PDB File mode is not implemented yet!");
-            Console.BackgroundColor = ConsoleColor.White;
-            return true;
-        }
-
         public static bool ParseVerify()
         {
             if (OutFolder != null
                && !Directory.Exists(OutFolder)) Directory.CreateDirectory(OutFolder);
 
-#if !DEBUG_UNLIMITED
-            // Check for invalid or DDOSing thread count options. 
-            if (NumThreads < 1
-                || NumThreads > 30)
-            {
-                Console.WriteLine("-numthreads: must be between 1-30 - no DDOSing the servers!");
-                return false; // don't DDOS the servers
-            }
-
-            if (NumDownloads < 1) // -numdownloads not provided or somehow we provided a negative number
-            {
-                NumDownloads = NumThreads;
-                if (NumDownloads > 15) NumDownloads = 15; // "soft" limit to 15 to prevent ddosing
-            }
-#endif
             if (IsAnotherSymXInstanceRunning() && !DontGenerateTempFile)
             {
                 Console.WriteLine("Cannot generate temporary file as another instance of SymX is running!");
@@ -698,7 +673,6 @@ namespace SymX
 
                     return true;
                 case SearchMode.Parse000Admin:
-                case SearchMode.ParsePdbFile:
                     return true; // not yet implemented
             }
 
@@ -811,9 +785,6 @@ namespace SymX
                 case SearchMode.CsvImport:
                     Console.WriteLine(Properties.Resources.HelpCsvImport);
                     break;
-                case SearchMode.ParsePdbFile:
-                    Console.WriteLine(Properties.Resources.HelpPdbFile);
-                    break;
 
             }
         }
@@ -824,11 +795,9 @@ namespace SymX
             if (Verbosity >= Verbosity.Normal
                 && !NoLogo)
             {
-#if DEBUG_UNLIMITED
-                Logger.Log($"{SymXVersion.SYMX_APPLICATION_NAME} [Unlimited Thread Count - WARNING: May be used for DDOS]", ConsoleColor.Green, false, false);
-#else
+
                 Logger.Log($"{SymXVersion.SYMX_APPLICATION_NAME}", ConsoleColor.Green, false, false);
-#endif
+
                 Logger.Log($"Version {SymXVersion.SYMX_VERSION_EXTENDED_STRING}", ConsoleColor.White, false, false);
                 Logger.Log("A MSDL-compatible SymStore bulk download tool", ConsoleColor.White, false, false);
                 Logger.Log("© 2022-2024 starfrost\n", ConsoleColor.White, false, false);

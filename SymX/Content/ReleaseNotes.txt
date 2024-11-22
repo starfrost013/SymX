@@ -9,6 +9,7 @@ I got annoyed using symx so I decided to fix it
 * Logging::Init now called before parsing configuration
 * Updated copyright from 2022 to 2022-2024
 * Removed SymX-UI
+* Removed never finished pdb file mode
 
 4.0.0 Alpha 5.0x (May 22, 2023) - UNSUPPORTED RELEASE:
 * Overwrite CSV files.
