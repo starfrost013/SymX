@@ -157,7 +157,7 @@ namespace SymX
         public static SearchMode SearchMode { get; set; }
 
         /// <summary>
-        /// Determines if only the context-specific hlep is to be displayed.
+        /// Determines if only the context-specific help pages are to be displayed.
         /// </summary>
         internal static bool HelpOnly { get; set; }
 
@@ -260,7 +260,11 @@ namespace SymX
         public static bool ParseArgs(string[] args)
         {
             // immediately reject if no mode provided
-            if (args.Length < 2) return false;
+            if (args.Length < 2)
+            {
+                ParseHelp("None"); // dumb ufcking hack 
+                return false;
+            }
 
             // make every single argument lowercase
             for (int curArgId = 0; curArgId < args.Length; curArgId++)

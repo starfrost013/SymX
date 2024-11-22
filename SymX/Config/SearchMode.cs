@@ -24,7 +24,7 @@ namespace SymX
         /// <summary>
         /// Default mode when no mode is specified.
         /// </summary>
-        Default = Bruteforce,
+        Default = None,
 
         /// <summary>
         /// Generate a CSV from an output folder

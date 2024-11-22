@@ -1,8 +1,7 @@
 {
   "profiles": {
     "SymX": {
-      "commandName": "Project",
-      "commandLineArgs": "-mode bruteforce -start 1314150400 -end 1314150700 -imagesizemin 0 -imagesizemax 1000000 -filename ntoskrnl.exe"
+      "commandName": "Project"
     }
   }
 }

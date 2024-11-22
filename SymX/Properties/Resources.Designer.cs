@@ -61,19 +61,17 @@ namespace SymX.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 
-        ///Usage:
-        ///SymX -start &lt;start time&gt; -end &lt;end time&gt; -filename &lt;filename&gt; -imagesize &lt;image size&gt; [options...]
-        ///SymX -generatecsv -csvinfolder &lt;folder&gt; -outfile &lt;filename&gt;
-        ///SymX -infile &lt;filename&gt;
+        ///   Looks up a localized string similar to Usage:
+        ///SymX -mode bruteforce -start &lt;start time&gt; -end &lt;end time&gt; -filename &lt;filename&gt; -imagesize &lt;image size&gt; [options...]
+        ///SymX -mode csvexport -generatecsv -csvinfolder &lt;folder&gt; -outfile &lt;filename&gt;
+        ///SymX -mode csvimport -infile &lt;filename&gt;
+        ///SymX -mode parseadmin -symbolserverurl &lt;symbol server url&gt;
         ///
         ///If no switches are provided, SymX will try to load settings from either Content\SymX.ini or the file specified by -inipath.
         ///
-        ///Required switches:
+        ///For extended help information, use the -help switch.
         ///
-        ///-start [-s]: Start time to scan for (in decimal unix time format)
-        ///-end [-e]: End time to scan for (in decimal unix time format)
-        ///-filename [-f]: Filename to search  [rest of string was truncated]&quot;;.
+        ///SymX -help bruteforce: H [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Help {
             get {
@@ -83,13 +81,14 @@ namespace SymX.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to 000Admin parse mode:
-        ///This mode parses the native /000Admin folder containing an index of all files uploaded to a symbol server. This is not available on MSDL because it is not a standard symbol server.
+        ///This mode parses the /000Admin folder containing an index of all files uploaded to a symbol store. This is not available on MSDL because it is not a standard symbol server.
         ///
         ///Required switches:
-        ///&lt;put the required switches here&gt;
+        ///This mode does not have any unique required switches. Use -symsrvurl to determine the symbol server to download.
         ///
         ///Optional switches:
-        ///&lt;put the optional switches here&gt;.
+        ///This mode does not have any unique optional switches.
+        ///.
         /// </summary>
         internal static string Help000Admin {
             get {
@@ -103,10 +102,10 @@ namespace SymX.Properties {
         ///Bruteforce mode takes a filename, date range, and an imagesize (or imagesize range) and bruteforces URLs, attempting to not make the user go insane by not finding any files. If, in the extremely unlikely situation it DOES find any files, it will automatically download them.
         ///
         ///Required switches:
-        ///&lt;put the required switches here&gt;
         ///
-        ///Optional switches:
-        ///&lt;put the optional switches here&gt;.
+        ///-start [-s]: Start time to scan for (in decimal unix time format)
+        ///-end [-e]: End time to scan for (in decimal unix time format)
+        ///-filename [-f]: Filename to search for on the Microsoft Symbol [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string HelpBruteforce {
             get {
@@ -119,10 +118,12 @@ namespace SymX.Properties {
         ///This mode generates a CSV file containing imagesizes, TimeDateStamps and URLs from a user-defined folder. 
         ///
         ///Required switches:
-        ///&lt;put the required switches here&gt;
+        ///-csvinfolder [-ci] and -outfile are required options.
+        ///A list of ImageSizes and TimeDateStamps will be generated from the folder specified by -csvinfolder and dumped to the CSV file specified by -outfile.
+        ///-infolder: Input folder to generate a CSV file from.
         ///
         ///Optional switches:
-        ///&lt;put the optional switches here&gt;.
+        ///-recursive [-recurse, -r]: Recursively scan a download folder for files to downloa [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string HelpCsvExport {
             get {
@@ -135,30 +136,15 @@ namespace SymX.Properties {
         ///This mode downloads files from URLs contained in a CSV file generated with CSV export mode.
         ///
         ///Required switches:
-        ///&lt;put the required switches here&gt;
+        ///-infile [-in]: Input to a CSV file generated using the CSV generation mode to try and download files from.
+        ///-outfolder: Output folder for files downloaded from your CSV file
         ///
         ///Optional switches:
-        ///&lt;put the optional switches here&gt;.
+        ///None.
         /// </summary>
         internal static string HelpCsvImport {
             get {
                 return ResourceManager.GetString("HelpCsvImport", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to PDB file parse mode:
-        ///This mode takes a PDB file and bruteforces imagesize from the TimeDateStamp located within the PDB file. 
-        ///
-        ///Required switches:
-        ///&lt;put the required switches here&gt;
-        ///
-        ///Optional switches:
-        ///&lt;put the optional switches here&gt;.
-        /// </summary>
-        internal static string HelpPdbFile {
-            get {
-                return ResourceManager.GetString("HelpPdbFile", resourceCulture);
             }
         }
     }
