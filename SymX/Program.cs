@@ -8,6 +8,7 @@ Logger.Init();
 
 if (Configuration.Parse(args))
 {
+    // if we only have help we are done here
     if (Configuration.HelpOnly) return;
 
     // Initialise NuCore logging with logging based on the status of the -l option
@@ -19,8 +20,4 @@ if (Configuration.Parse(args))
 
   
     while (TaskManager.Run()) ;
-}
-else
-{
-    Configuration.ShowHelp();
 }
