@@ -40,7 +40,7 @@ public static int SYMX_VERSION_MAJOR = 4;
 public static int SYMX_VERSION_MINOR = 1; 
 public static int SYMX_VERSION_REVISION = 0;
 public static int SYMX_VERSION_BUILD = (DateTime.UtcNow - new DateTime(2022, 04, 28)).Days;
-public static string SYMX_VERSION_SPECIFIER = "test";
+public static string SYMX_VERSION_SPECIFIER = "test1";
 
 public static string SYMX_VERSION_STRING = $"{SYMX_VERSION_MAJOR}.{SYMX_VERSION_MINOR}.{SYMX_VERSION_REVISION}-{SYMX_VERSION_SPECIFIER}";
 public static string SYMX_VERSION_EXTENDED_STRING = $"{SYMX_VERSION_STRING} (build {SYMX_VERSION_BUILD}, built {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")})";

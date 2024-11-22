@@ -265,23 +265,53 @@ namespace SymX
             // make every single argument lowercase
             for (int curArgId = 0; curArgId < args.Length; curArgId++)
             {
-                args[curArgId] = args[curArgId].ToLower();
+                string arg = args[curArgId];
+
+                switch (arg)
+                {
+                    case "-mode":
+                        // we already check for < 3 so this will never throw an exception
+                        string newSearchMode = args[1];
+
+                        if (!Enum.TryParse(newSearchMode, true, out SearchMode searchModeEnum))
+                        {
+                            Console.WriteLine("Invalid mode provided!\n");
+                            Console.WriteLine(Properties.Resources.Help);
+                            return false;
+                        }
+
+                        SearchMode = searchModeEnum;
+                        break;
+                    case "-help":
+                        string nextArg = args[1];
+                        ParseHelp(nextArg);
+                        HelpOnly = true;
+                        break;
+                    default:
+                        break;
+                }
             }
 
-            string firstArg = args[0];
+            // we already check for < 3 so this will never throw an exception
+            string mode = args[1];
 
-            switch (firstArg)
+            if (!Enum.TryParse(mode, true, out SearchMode searchMode))
             {
-                case "-mode":
-                    return ParseMode(args);
-                case "-help":
-                    string nextArg = args[1];
-                    ParseHelp(nextArg);
-                    HelpOnly = true;
-                    return true;
-                default:
-                    return false;
+                Console.WriteLine("Invalid mode provided!\n");
+                Console.WriteLine(Properties.Resources.Help);
+                return false;
             }
+
+            SearchMode = searchMode;
+
+            // now parse all args
+            if (!ParseUniversalArgs(args)) return false;
+            if (!ParseBruteforceArgs(args)) return false;
+            if (!ParseCsvExportArgs(args)) return false;
+            if (!ParseCsvImportArgs(args)) return false;
+            if (!Parse000AdminArgs(args)) return false;
+
+            return true;
         }
 
         private static bool ParseHelp(string helpOption)
@@ -301,43 +331,7 @@ namespace SymX
             return true;
         }
 
-        /// <summary>
-        /// Parses the -mode command-line option.
-        /// </summary>
-        /// <param name="args">The command-line arguments provided to the application.</param>
-        /// <returns>A boolean determining if the arguments were parsed successfully.</returns>
-        private static bool ParseMode(string[] args)
-        {
-            // we already check for < 3 so this will never throw an exception
-            string mode = args[1];
-
-            if (!Enum.TryParse(mode, true, out SearchMode searchMode))
-            {
-                Console.WriteLine("Invalid mode provided!\n");
-                Console.WriteLine(Properties.Resources.Help);
-                return false;
-            }
-
-            SearchMode = searchMode;
-
-            // parse universal arguments shared between all modes=
-            if (!ParseUniversalArgs(args)) return false;
-
-            switch (SearchMode) // parse all search modes
-            {
-                case SearchMode.Bruteforce:
-                    return ParseBruteforceArgs(args);
-                case SearchMode.CsvExport:
-                    return ParseCsvExportArgs(args);
-                case SearchMode.CsvImport:
-                    return ParseCsvImportArgs(args);
-                case SearchMode.Parse000Admin:
-                    return Parse000AdminArgs(args);
-            }
-
-            return true; 
-        }
-
+     
         /// <summary>
         /// Parse the command-line arguments shared across all or several modes.
         /// </summary>
