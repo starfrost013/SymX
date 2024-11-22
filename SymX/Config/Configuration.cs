@@ -796,7 +796,7 @@ namespace SymX
 
                 Logger.Log($"{SymXVersion.SYMX_APPLICATION_NAME}", ConsoleColor.Green, false, false);
 
-                Logger.Log($"Version {SymXVersion.SYMX_VERSION_EXTENDED_STRING}", ConsoleColor.White, false, false);
+                Logger.Log($"Version {SymXVersion.SYMX_VERSION_STRING}", ConsoleColor.White, false, false);
                 Logger.Log("A MSDL-compatible SymStore bulk download tool", ConsoleColor.White, false, false);
                 Logger.Log("© 2022-2024 starfrost\n", ConsoleColor.White, false, false);
             }

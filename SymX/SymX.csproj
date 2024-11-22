@@ -45,11 +45,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Update="Tools\AssemblyInfo.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>AssemblyInfo.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -86,10 +81,6 @@
 		<None Update="Content\logo.png">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
-		</None>
-		<None Update="Tools\AssemblyInfo.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>AssemblyInfo.cs</LastGenOutput>
 		</None>
 	</ItemGroup>
 	
