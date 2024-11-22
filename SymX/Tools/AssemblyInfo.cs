@@ -15,9 +15,9 @@ namespace SymX
         public static int SYMX_VERSION_MINOR = 1;
         public static int SYMX_VERSION_REVISION = 0;
         public static int SYMX_VERSION_BUILD = 939;
-        public static string SYMX_VERSION_SPECIFIER = "test1";
+        public static string SYMX_VERSION_SPECIFIER = "";
 
-        public static string SYMX_VERSION_STRING = "4.1.0-test1";
+        public static string SYMX_VERSION_STRING = "4.1.0";
     }
 }
 

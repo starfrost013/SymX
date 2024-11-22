@@ -11,7 +11,7 @@ For extended help information, use the -help switch.
 SymX -help bruteforce: Help for Bruteforce mode (or Classic mode)
 SymX -help csvexport: Help for CSV Export mode (previously -generatecsv)
 SymX -help csvimport: Help for CSV Import mode (previously -infile)
-SymX -help parse000admin: Help for 000Admin parsing mode
+SymX -help parseadmin: Help for 000Admin parsing mode
 
 Command line switches applicable to ALL modes:
 
