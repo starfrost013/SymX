@@ -10,6 +10,7 @@ I got annoyed using symx so I decided to fix it
 * Updated copyright from 2022 to 2022-2024
 * Removed SymX-UI
 * Removed never functional pdb file mode
+* Removed build number system
 * All builds can use an unlimited thread count
 * Fixed the stupid ordering required by the command line parser, args can be provided in any order.
 * Fixed help not behaving as one would expect
